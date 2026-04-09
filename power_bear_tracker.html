@@ -6,110 +6,224 @@
 <title>Power Bear Tracker</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f5f4f0;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;min-height:100vh}
-.app{max-width:430px;margin:0 auto;padding:16px 14px 40px}
+body{background:#EDECEA;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;min-height:100vh;font-size:16px;padding-bottom:72px}
+.tab{display:none}.tab.active{display:block}
+.app{max-width:430px;margin:0 auto;padding:16px 14px 16px}
+
+/* Header */
 .hdr{text-align:center;padding:16px 0 20px}
-.hdr h1{font-size:20px;font-weight:700;color:#1a1a18;letter-spacing:-.3px}
-.hdr p{font-size:12px;color:#888780;margin-top:4px}
-.ph-tabs{display:flex;gap:7px;margin-bottom:12px}
-.pht{flex:1;border:1px solid #d3d1c7;border-radius:10px;padding:9px 4px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
-.pht .pn{font-size:10px;color:#b4b2a9}
-.pht .pl{font-size:12px;font-weight:600;color:#5f5e5a;margin-top:2px}
-.pht.active{background:#faeeda;border-color:#fac775}
-.pht.active .pn{color:#BA7517}
-.pht.active .pl{color:#854F0B}
-.fw-row{background:#fff;border:1px solid #e8e6df;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.fw-lbl{font-size:12px;color:#888780;white-space:nowrap}
-.fw-track{flex:1;height:6px;background:#e8e6df;border-radius:3px;overflow:hidden}
-.fw-fill{height:6px;background:#185FA5;border-radius:3px;transition:width .5s}
-.fw-pct{font-size:12px;font-weight:600;color:#185FA5;white-space:nowrap;min-width:34px;text-align:right}
-.tip{background:#faeeda;border:1px solid #FAC775;border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:#854F0B;line-height:1.7}
-.day-tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:12px}
-.dt{border:1px solid #d3d1c7;border-radius:10px;padding:8px 2px;text-align:center;cursor:pointer;transition:all .15s;background:#fff}
-.dt .dn{font-size:14px;font-weight:700;color:#5f5e5a}
-.dt .dl{font-size:9px;color:#b4b2a9;margin-top:2px}
-.dt.active{background:#e6f1fb;border-color:#378ADD}
-.dt.active .dn{color:#185FA5}
-.dt.active .dl{color:#378ADD}
-.prog-wrap{background:#fff;border:1px solid #e8e6df;border-radius:10px;padding:11px 14px;margin-bottom:12px}
-.prog-top{display:flex;justify-content:space-between;margin-bottom:7px}
-.prog-lbl{font-size:12px;color:#888780}
-.prog-val{font-size:13px;font-weight:600;color:#1a1a18}
-.prog-track{height:6px;background:#e8e6df;border-radius:3px;overflow:hidden}
-.prog-fill{height:6px;background:#1D9E75;border-radius:3px;transition:width .35s}
-.tbox{border:1.5px solid #378ADD;border-radius:12px;background:#e6f1fb;padding:13px 15px;margin-bottom:12px;display:none}
-.th{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
-.tn{font-size:12px;color:#5f5e5a}
-.tsk{border:none;background:none;font-size:13px;color:#185FA5;cursor:pointer;padding:4px 0;font-weight:600}
+.hdr h1{font-size:22px;font-weight:800;color:#1a1a18;letter-spacing:-.5px}
+.hdr p{font-size:13px;color:#888780;margin-top:5px}
+
+/* Phase tabs */
+.ph-tabs{display:flex;gap:8px;margin-bottom:14px}
+.pht{flex:1;border:1.5px solid #C8C6BE;border-radius:12px;padding:10px 4px;text-align:center;cursor:pointer;background:#fff;transition:all .15s}
+.pht .pn{font-size:11px;color:#999690;font-weight:600}
+.pht .pl{font-size:13px;font-weight:700;color:#5f5e5a;margin-top:3px}
+.pht.active{background:#EF9F27;border-color:#BA7517}
+.pht.active .pn,.pht.active .pl{color:#fff}
+
+/* FW bar */
+.fw-row{background:#fff;border:1.5px solid #D8D6CE;border-radius:12px;padding:11px 15px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.fw-lbl{font-size:13px;color:#666460;white-space:nowrap;font-weight:600}
+.fw-track{flex:1;height:8px;background:#E0DED8;border-radius:4px;overflow:hidden}
+.fw-fill{height:8px;background:#185FA5;border-radius:4px;transition:width .5s}
+.fw-pct{font-size:13px;font-weight:700;color:#185FA5;white-space:nowrap;min-width:36px;text-align:right}
+
+/* Tip */
+.tip{background:#FFF3CD;border:1.5px solid #EF9F27;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:#7A4F00;line-height:1.75;font-weight:500}
+
+/* Day tabs */
+.day-tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}
+.dt{border:1.5px solid #C8C6BE;border-radius:12px;padding:9px 2px;text-align:center;cursor:pointer;background:#fff;transition:all .15s}
+.dt .dn{font-size:15px;font-weight:800;color:#5f5e5a}
+.dt .dl{font-size:10px;color:#999690;margin-top:2px;font-weight:600}
+.dt.active{background:#185FA5;border-color:#0C447C}
+.dt.active .dn{color:#fff}.dt.active .dl{color:#B5D4F4}
+
+/* Progress bar */
+.prog-wrap{background:#fff;border:1.5px solid #D8D6CE;border-radius:12px;padding:12px 15px;margin-bottom:14px}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center}
+.prog-lbl{font-size:13px;color:#666460;font-weight:600}
+.prog-val{font-size:15px;font-weight:800;color:#1a1a18}
+.prog-track{height:8px;background:#E0DED8;border-radius:4px;overflow:hidden}
+.prog-fill{height:8px;background:#1D9E75;border-radius:4px;transition:width .35s}
+
+/* Timer */
+.tbox{border:2px solid #378ADD;border-radius:14px;background:#D6EAFA;padding:14px 16px;margin-bottom:14px;display:none}
+.th{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tn{font-size:13px;color:#1a3a5c;font-weight:700}
+.tsk{border:none;background:none;font-size:14px;color:#185FA5;cursor:pointer;font-weight:700}
 .tb{display:flex;align-items:center;gap:14px}
-.tnum{font-size:48px;font-weight:700;color:#1a1a18;min-width:72px;text-align:right;line-height:1;transition:color .3s}
-.tnum.w{color:#BA7517}
-.tnum.h{color:#A32D2D}
+.tnum{font-size:56px;font-weight:800;color:#0C447C;min-width:80px;text-align:right;line-height:1;transition:color .3s}
+.tnum.w{color:#BA7517}.tnum.h{color:#A32D2D}
 .tright{flex:1}
-.tt{height:6px;background:#b5d4f4;border-radius:3px;overflow:hidden;margin-bottom:10px}
-.tf{height:6px;background:#185FA5;border-radius:3px;transition:width .8s linear}
-.tf.w{background:#BA7517}
-.tf.h{background:#A32D2D}
-.tbtns{display:flex;gap:7px}
-.tbtn{flex:1;padding:9px 4px;border:1px solid #d3d1c7;border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:#5f5e5a;cursor:pointer}
-.tbtn.p{background:#e6f1fb;border-color:#378ADD;color:#185FA5}
-.sl{font-size:10px;font-weight:700;color:#b4b2a9;letter-spacing:.1em;text-transform:uppercase;margin:0 0 7px 3px}
-.card{background:#fff;border:1px solid #e8e6df;border-radius:12px;margin-bottom:12px;overflow:hidden}
-.wr{display:flex;align-items:center;gap:13px;padding:14px 15px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.wr:active{background:#f5f4f0}
-.wc{width:28px;height:28px;border-radius:50%;border:2px solid #d3d1c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.tt{height:8px;background:#93C5E8;border-radius:4px;overflow:hidden;margin-bottom:10px}
+.tf{height:8px;background:#185FA5;border-radius:4px;transition:width .8s linear}
+.tf.w{background:#EF9F27}.tf.h{background:#E24B4A}
+.tbtns{display:flex;gap:8px}
+.tbtn{flex:1;padding:10px 4px;border:1.5px solid #93C5E8;border-radius:10px;background:#fff;font-size:13px;font-weight:700;color:#185FA5;cursor:pointer}
+.tbtn.p{background:#185FA5;border-color:#0C447C;color:#fff}
+
+/* Section label */
+.sl{font-size:11px;font-weight:800;color:#999690;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px 4px}
+
+/* Cards */
+.card{background:#fff;border:1.5px solid #D8D6CE;border-radius:14px;margin-bottom:14px;overflow:hidden}
+
+/* Walk */
+.wr{padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:flex-start;gap:14px}
+.wr:active{background:#F0EEE8}
+.wc{width:30px;height:30px;border-radius:50%;border:2px solid #C8C6BE;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:2px}
 .wc.done{background:#1D9E75;border-color:#1D9E75}
-.wt{font-size:15px;font-weight:500;color:#1a1a18}
-.ws{font-size:11px;color:#888780;margin-top:3px}
+.w-info{flex:1}
+.wt{font-size:16px;font-weight:700;color:#1a1a18;margin-bottom:6px}
+.w-params{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.w-param{background:#F5F4F0;border-radius:8px;padding:8px 10px}
+.w-param-label{font-size:10px;color:#999690;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.w-param-val{font-size:14px;font-weight:800;color:#1a1a18}
+.w-param-val span{font-size:11px;font-weight:600;color:#666460}
+.w-note{font-size:11px;color:#888780;line-height:1.6;background:#FFF8EC;border-radius:8px;padding:7px 10px;border-left:3px solid #EF9F27}
+
 /* Exercise rows */
-.er{padding:12px 15px;border-bottom:1px solid #f1efe8}
+.er{padding:14px 16px;border-bottom:1.5px solid #EDECEA}
 .er:last-child{border-bottom:none}
-.er-top{display:flex;align-items:flex-start;gap:8px}
+.er-top{display:flex;align-items:flex-start;gap:10px}
 .el{flex:1;min-width:0}
-.enw{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
-.enm{font-size:13px;font-weight:700;color:#1a1a18}
-.fb{font-size:10px;background:#e6f1fb;color:#185FA5;border-radius:4px;padding:2px 6px;font-weight:700}
-.ed{font-size:11px;color:#888780;line-height:1.5;margin-bottom:8px}
-/* Weight row */
-.wrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.wlbl{font-size:11px;color:#888780;white-space:nowrap}
-.bi{width:64px;height:26px;border:1px solid #d3d1c7;border-radius:7px;background:#f5f4f0;font-size:13px;font-weight:600;color:#1a1a18;padding:0 6px;text-align:center;font-family:inherit;-webkit-appearance:none}
-.bi:focus{outline:none;border-color:#378ADD;background:#fff}
-.wunit{font-size:11px;color:#888780}
-.warr{font-size:13px;color:#d3d1c7;margin:0 2px}
-.wrec{font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
-.wrec.p1{background:#faeeda;color:#854F0B}
-.wrec.p2{background:#e6f1fb;color:#185FA5}
-.wrec.p3{background:#eaf3de;color:#3B6D11}
-.wrec.none{color:#b4b2a9;background:none;font-weight:400}
+.enw{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.enm{font-size:15px;font-weight:800;color:#1a1a18}
+.fb{font-size:10px;background:#185FA5;color:#fff;border-radius:5px;padding:2px 7px;font-weight:800}
+.ed{font-size:12px;color:#888780;line-height:1.6;margin-bottom:9px;font-weight:500}
+.wrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.wlbl{font-size:12px;color:#666460;white-space:nowrap;font-weight:600}
+.bi{width:68px;height:30px;border:1.5px solid #C8C6BE;border-radius:8px;background:#F5F4F0;font-size:15px;font-weight:700;color:#1a1a18;padding:0 7px;text-align:center;font-family:inherit;-webkit-appearance:none}
+.bi:focus{outline:none;border-color:#185FA5;background:#fff}
+.wunit{font-size:12px;color:#888780;font-weight:600}
+.warr{font-size:15px;color:#C8C6BE;margin:0 2px}
+.wrec{font-size:13px;font-weight:800;padding:4px 10px;border-radius:7px;white-space:nowrap}
+.wrec.p1{background:#FFF3CD;color:#7A4F00;border:1px solid #EF9F27}
+.wrec.p2{background:#D6EAFA;color:#0C447C;border:1px solid #378ADD}
+.wrec.p3{background:#D6F0E4;color:#0F6E56;border:1px solid #1D9E75}
+.wrec.none{color:#AAAAAA;font-weight:500;font-size:12px;background:none;border:none;padding:0}
+
 /* Set buttons */
-.sets{display:flex;gap:5px;flex-shrink:0;padding-top:2px}
-.sb{width:34px;height:34px;border-radius:8px;border:1.5px solid #d3d1c7;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:#888780;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.sb.done{background:#1D9E75;border-color:#1D9E75;color:#fff}
-.sb:active{transform:scale(.9)}
-.done-banner{background:#eaf3de;border:1px solid #97C459;border-radius:10px;padding:12px;text-align:center;font-size:15px;font-weight:600;color:#3B6D11;margin-bottom:12px;display:none}
-.rb{width:100%;padding:12px;border:1px solid #d3d1c7;border-radius:10px;background:#fff;font-size:13px;font-weight:500;color:#888780;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent}
-.rb:active{background:#f5f4f0}
+.sets{display:flex;gap:6px;flex-shrink:0;padding-top:2px}
+.sb{width:38px;height:38px;border-radius:9px;border:2px solid #C8C6BE;background:#F5F4F0;cursor:pointer;font-size:14px;font-weight:800;color:#888780;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.sb.done{background:#1D9E75;border-color:#0F6E56;color:#fff}
+.sb:active{transform:scale(.88)}
+
+/* Done banner */
+.done-banner{background:#D6F0E4;border:1.5px solid #1D9E75;border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;display:none}
+.done-msg{font-size:16px;font-weight:800;color:#0F6E56;margin-bottom:10px}
+.save-btn{width:100%;padding:13px;background:#1D9E75;border:none;border-radius:10px;font-size:15px;font-weight:800;color:#fff;cursor:pointer}
+.save-btn:active{background:#0F6E56}
+
+.rb{width:100%;padding:13px;border:1.5px solid #C8C6BE;border-radius:12px;background:#fff;font-size:14px;font-weight:700;color:#888780;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent}
+.rb:active{background:#F0EEE8}
+
+/* ===== CALENDAR TAB ===== */
+.cal-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.stat-card{background:#fff;border:1.5px solid #D8D6CE;border-radius:12px;padding:12px 10px;text-align:center}
+.stat-num{font-size:26px;font-weight:800;color:#1a1a18;line-height:1}
+.stat-unit{font-size:11px;color:#888780;font-weight:600;margin-top:3px}
+.stat-label{font-size:10px;color:#b4b2a9;margin-top:2px;font-weight:600}
+
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-btn{width:36px;height:36px;border:1.5px solid #D8D6CE;border-radius:10px;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1a1a18;font-weight:700}
+.cal-nav-btn:active{background:#F0EEE8}
+.cal-month{font-size:17px;font-weight:800;color:#1a1a18}
+
+.cal-card{background:#fff;border:1.5px solid #D8D6CE;border-radius:14px;overflow:hidden;margin-bottom:14px}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:#F5F4F0;border-bottom:1px solid #E0DED8}
+.cal-wd{text-align:center;padding:8px 0;font-size:11px;font-weight:800;color:#888780}
+.cal-wd:first-child{color:#E24B4A}
+.cal-wd:last-child{color:#185FA5}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day{min-height:52px;padding:5px 4px;border-right:0.5px solid #F0EEE8;border-bottom:0.5px solid #F0EEE8;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day:active{background:#F5F4F0}
+.cal-day.empty{cursor:default;background:transparent}
+.cal-day.empty:active{background:transparent}
+.cal-day.today .cal-dn{background:#1a1a18;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.cal-day.future{opacity:.4;cursor:default}
+.cal-day.future:active{background:transparent}
+.cal-day.sun .cal-dn{color:#E24B4A}
+.cal-day.sat .cal-dn{color:#185FA5}
+.cal-dn{font-size:13px;font-weight:700;color:#1a1a18;margin-bottom:3px}
+.cal-badge{font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;white-space:nowrap}
+
+/* Legend */
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#5f5e5a}
+.leg-dot{width:10px;height:10px;border-radius:3px}
+
+/* ===== PROGRESS TAB ===== */
+.prog-select-wrap{background:#fff;border:1.5px solid #D8D6CE;border-radius:12px;padding:12px 15px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.prog-select-lbl{font-size:13px;font-weight:700;color:#1a1a18;white-space:nowrap}
+.prog-select{flex:1;height:36px;border:1.5px solid #C8C6BE;border-radius:8px;background:#F5F4F0;font-size:13px;font-weight:600;color:#1a1a18;padding:0 8px;font-family:inherit;-webkit-appearance:none}
+.prog-select:focus{outline:none;border-color:#185FA5}
+
+.prog-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.prog-stat{background:#fff;border:1.5px solid #D8D6CE;border-radius:12px;padding:12px 10px;text-align:center}
+.ps-num{font-size:20px;font-weight:800;color:#1a1a18;line-height:1}
+.ps-unit{font-size:10px;color:#888780;font-weight:600;margin-top:2px}
+.ps-label{font-size:10px;color:#b4b2a9;margin-top:2px;font-weight:600}
+.ps-num.up{color:#1D9E75}.ps-num.down{color:#E24B4A}
+
+.chart-card{background:#fff;border:1.5px solid #D8D6CE;border-radius:14px;padding:16px;margin-bottom:14px}
+.chart-title{font-size:13px;font-weight:700;color:#666460;margin-bottom:12px}
+.chart-svg-wrap{overflow-x:auto}
+.chart-empty{text-align:center;padding:40px 0;font-size:14px;color:#b4b2a9;font-weight:600}
+
+/* Bottom Nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid #D8D6CE;display:flex;z-index:100;max-width:430px;margin:0 auto}
+.bnav-btn{flex:1;border:none;background:none;padding:10px 0 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
+.bnav-btn .bnav-icon{font-size:22px}
+.bnav-btn .bnav-lbl{font-size:10px;font-weight:700;color:#b4b2a9}
+.bnav-btn.active .bnav-lbl{color:#185FA5}
+.bnav-btn.active .bnav-icon{filter:none}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-backdrop.show{display:flex}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:430px}
+.modal-title{font-size:16px;font-weight:800;color:#1a1a18;margin-bottom:6px}
+.modal-sub{font-size:13px;color:#888780;margin-bottom:16px}
+.modal-date-lbl{font-size:14px;font-weight:700;color:#185FA5;margin-bottom:14px}
+.day-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.day-opt{padding:12px 8px;border-radius:12px;border:2px solid #E0DED8;background:#F5F4F0;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+.day-opt:active{opacity:.7}
+.day-opt.sel{border-color:#185FA5}
+.day-opt-id{font-size:18px;font-weight:800;color:#1a1a18}
+.day-opt-lbl{font-size:10px;font-weight:700;color:#888780;margin-top:2px}
+.modal-btns{display:flex;gap:8px}
+.modal-cancel{flex:1;padding:13px;border:1.5px solid #C8C6BE;border-radius:12px;background:#fff;font-size:14px;font-weight:700;color:#888780;cursor:pointer}
+.modal-save{flex:2;padding:13px;border:none;border-radius:12px;background:#185FA5;font-size:14px;font-weight:800;color:#fff;cursor:pointer}
+.modal-save:active{background:#0C447C}
+.modal-del{width:100%;padding:12px;border:1.5px solid #E24B4A;border-radius:12px;background:#fff;font-size:13px;font-weight:700;color:#E24B4A;cursor:pointer;margin-top:8px}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;font-size:14px;font-weight:700;padding:12px 24px;border-radius:24px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
+
+<!-- ===== WORKOUT TAB ===== -->
+<div id="tab-workout" class="tab active">
 <div class="app">
   <div class="hdr"><h1>Power Bear Tracker</h1><p>PPL×2 週6日 ／ 怪我明け対応 ／ FW漸進移行プログラム</p></div>
-
   <div class="ph-tabs">
     <div class="pht active" onclick="sP(1,this)"><div class="pn">Phase 1</div><div class="pl">Week 1-3</div></div>
     <div class="pht" onclick="sP(2,this)"><div class="pn">Phase 2</div><div class="pl">Week 4-5</div></div>
     <div class="pht" onclick="sP(3,this)"><div class="pn">Phase 3</div><div class="pl">Week 6+</div></div>
   </div>
-
   <div class="fw-row">
     <span class="fw-lbl">FW比率（今日）</span>
     <div class="fw-track"><div class="fw-fill" id="fwf" style="width:0%"></div></div>
     <span class="fw-pct" id="fwp">0%</span>
   </div>
-
   <div class="tip" id="tip"></div>
-
   <div class="day-tabs">
     <div class="dt active" onclick="sD(0,this)"><div class="dn">A</div><div class="dl">Push</div></div>
     <div class="dt" onclick="sD(1,this)"><div class="dn">B</div><div class="dl">Legs</div></div>
@@ -118,12 +232,10 @@ body{background:#f5f4f0;font-family:-apple-system,BlinkMacSystemFont,'Hiragino S
     <div class="dt" onclick="sD(4,this)"><div class="dn">E</div><div class="dl">Legs+</div></div>
     <div class="dt" onclick="sD(5,this)"><div class="dn">F</div><div class="dl">Pull+</div></div>
   </div>
-
   <div class="prog-wrap">
-    <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A – Push（胸・肩）</span><span class="prog-val" id="pv">0%</span></div>
+    <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A</span><span class="prog-val" id="pv">0%</span></div>
     <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
   </div>
-
   <div class="tbox" id="tbox">
     <div class="th"><span class="tn" id="tn">インターバル</span><button class="tsk" onclick="skipT()">スキップ ×</button></div>
     <div class="tb">
@@ -137,96 +249,184 @@ body{background:#f5f4f0;font-family:-apple-system,BlinkMacSystemFont,'Hiragino S
       </div>
     </div>
   </div>
-
-  <div class="done-banner" id="db">🎉 今日のトレーニング完了！お疲れさまでした</div>
-
+  <div class="done-banner" id="db">
+    <div class="done-msg">🎉 今日のトレーニング完了！</div>
+    <button class="save-btn" onclick="saveWorkout()">📅 今日の記録を保存する</button>
+  </div>
   <div class="sl">ウォームアップ</div>
   <div class="card">
     <div class="wr" onclick="togW()">
-      <div class="wc" id="wc">
-        <svg width="13" height="11" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="wc" id="wc"><svg width="14" height="12" viewBox="0 0 14 12"><polyline points="1.5,6 5.5,10 12.5,1.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="w-info">
+        <div class="wt">ウォーキング 15〜20分</div>
+        <div class="w-params">
+          <div class="w-param"><div class="w-param-label">速度</div><div class="w-param-val">5.0〜5.5 <span>km/h</span></div></div>
+          <div class="w-param"><div class="w-param-label">勾配</div><div class="w-param-val">4〜6 <span>%（傾斜4〜6）</span></div></div>
+          <div class="w-param"><div class="w-param-label">目標心拍数</div><div class="w-param-val">最大の <span>60〜70%</span></div></div>
+          <div class="w-param"><div class="w-param-label">現在の設定</div><div class="w-param-val" style="color:#E24B4A">勾配2.0 <span>→ 4〜6に UP</span></div></div>
+        </div>
+        <div class="w-note">⚠️ 40分は長すぎ。20分超えるとコルチゾール↑で筋分解リスク。勾配4〜6%にすれば消費カロリー約40%増・グルート活性化↑でベア体型に直結。</div>
       </div>
-      <div><div class="wt">ウォーキング 15分</div><div class="ws">心拍数60-65% ／ 心肺機能維持・インスリン感受性UP</div></div>
     </div>
   </div>
-
   <div class="sl">ウェイトトレーニング（45分 ／ 上限16セット）</div>
   <div class="card" id="ec"></div>
   <button class="rb" onclick="resetD()">このメニューをリセット</button>
 </div>
+</div>
+
+<!-- ===== CALENDAR TAB ===== -->
+<div id="tab-calendar" class="tab">
+<div class="app">
+  <div class="hdr"><h1>カレンダー</h1><p>ジム記録・部位管理</p></div>
+  <div class="cal-stats">
+    <div class="stat-card"><div class="stat-num" id="st-month">0</div><div class="stat-unit">日</div><div class="stat-label">今月</div></div>
+    <div class="stat-card"><div class="stat-num" id="st-streak">0</div><div class="stat-unit">日</div><div class="stat-label">連続</div></div>
+    <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-unit">日</div><div class="stat-label">累計</div></div>
+  </div>
+  <div class="cal-legend" id="cal-legend"></div>
+  <div class="cal-nav">
+    <button class="cal-nav-btn" onclick="calMove(-1)">&#8249;</button>
+    <span class="cal-month" id="cal-month-lbl"></span>
+    <button class="cal-nav-btn" onclick="calMove(1)">&#8250;</button>
+  </div>
+  <div class="cal-card">
+    <div class="cal-weekdays">
+      <div class="cal-wd">日</div><div class="cal-wd">月</div><div class="cal-wd">火</div>
+      <div class="cal-wd">水</div><div class="cal-wd">木</div><div class="cal-wd">金</div><div class="cal-wd">土</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+</div>
+</div>
+
+<!-- ===== PROGRESS TAB ===== -->
+<div id="tab-progress" class="tab">
+<div class="app">
+  <div class="hdr"><h1>筋力記録</h1><p>種目別・重量推移グラフ</p></div>
+  <div class="prog-select-wrap">
+    <span class="prog-select-lbl">種目</span>
+    <select class="prog-select" id="ex-select" onchange="renderProgressChart()">
+      <option value="">-- 種目を選択 --</option>
+    </select>
+  </div>
+  <div class="prog-stats" id="prog-stats">
+    <div class="prog-stat"><div class="ps-num" id="ps-max">--</div><div class="ps-unit">kg</div><div class="ps-label">最高重量</div></div>
+    <div class="prog-stat"><div class="ps-num" id="ps-latest">--</div><div class="ps-unit">kg</div><div class="ps-label">直近重量</div></div>
+    <div class="prog-stat"><div class="ps-num" id="ps-diff">--</div><div class="ps-unit">kg</div><div class="ps-label">初回→直近</div></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">重量推移（直近10回）</div>
+    <div class="chart-svg-wrap" id="chart-area"><div class="chart-empty">種目を選択してください</div></div>
+  </div>
+</div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bnav">
+  <button class="bnav-btn active" id="nb-workout" onclick="showTab('workout')">
+    <span class="bnav-icon">🏋️</span><span class="bnav-lbl">トレーニング</span>
+  </button>
+  <button class="bnav-btn" id="nb-calendar" onclick="showTab('calendar')">
+    <span class="bnav-icon">📅</span><span class="bnav-lbl">カレンダー</span>
+  </button>
+  <button class="bnav-btn" id="nb-progress" onclick="showTab('progress')">
+    <span class="bnav-icon">📊</span><span class="bnav-lbl">記録</span>
+  </button>
+</nav>
+
+<!-- Day selector modal -->
+<div class="modal-backdrop" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">ジム記録</div>
+    <div class="modal-sub">この日のトレーニング内容を選択</div>
+    <div class="modal-date-lbl" id="modal-date-lbl"></div>
+    <div class="day-grid" id="modal-day-grid"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="modal-save" onclick="saveModalLog()">保存</button>
+    </div>
+    <button class="modal-del" id="modal-del-btn" onclick="deleteModalLog()">この日の記録を削除</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">記録しました！</div>
 
 <script>
+// ===== DATA =====
 const PH={
-  1:{tip:'⚠️ Phase 1（3週間）：★マーク種目は必ずウォームアップ1set（空重量×10）から。各種目の「前回MAX」を入力すると推奨重量が表示されます。腕に違和感があればFW種目は即スキップ。'},
-  2:{tip:'📈 Phase 2（2週間）：★種目のW-upセット継続。最後2repがギリギリになる重量を探る。5週終了後はデロード週（重量40%減・セット数半減）。'},
-  3:{tip:'🔥 Phase 3（Week 6+）：FW主体・漸進的過負荷。毎回+1〜2.5kgまたは+1rep を目標。新しい最大重量が出たら「前回MAX」を更新していく。6週ごとにデロード週。'}
+  1:{tip:'⚠️ Phase 1（3週間）：★マーク種目は必ずウォームアップ1set（空重量×10）から。「前回MAX」を入力すると推奨重量が表示されます。'},
+  2:{tip:'📈 Phase 2（2週間）：重量70〜80%。★種目のW-upセット継続。5週終了後はデロード週（重量40%減・セット数半減）。'},
+  3:{tip:'🔥 Phase 3（Week 6+）：FW主体・漸進的過負荷。毎回+1〜2.5kgまたは+1rep。新しい最大重量が出たら「前回MAX」を更新。'}
+};
+
+const DAY_COLORS={
+  A:{bg:'#D6EAFA',text:'#0C447C',type:'Push'},
+  B:{bg:'#D6F0E4',text:'#0F6E56',type:'Legs'},
+  C:{bg:'#FFF3CD',text:'#7A4F00',type:'Pull'},
+  D:{bg:'#B5D4F4',text:'#042C53',type:'Push+'},
+  E:{bg:'#9FE1CB',text:'#04342C',type:'Legs+'},
+  F:{bg:'#FAC775',text:'#412402',type:'Pull+'}
 };
 
 const DD=[
   {id:'A',lbl:'Push（胸・肩）',ph:{
     1:[{n:'チェストプレス',d:'4set × 10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set × 12rep ／ 胸の広がり意識',s:3,fw:0,r:60},{n:'ショルダープレス',d:'4set × 10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'サイドレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
-    2:[{n:'チェストプレス',d:'3set × 8-10rep',s:3,fw:0,r:90},{n:'DBフライ',d:'3set × 12rep ／ ダンベル・ストレッチ重視',s:3,fw:1,r:60},{n:'DBショルダープレス',d:'4set × 10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:90},{n:'サイドレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
+    2:[{n:'チェストプレス',d:'3set × 8-10rep',s:3,fw:0,r:90},{n:'DBフライ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60},{n:'DBショルダープレス',d:'4set × 10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:90},{n:'サイドレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
     3:[{n:'DBベンチプレス',d:'4set × 8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:120},{n:'DBフライ',d:'3set × 10rep ／ ダンベル',s:3,fw:1,r:60},{n:'DBショルダープレス',d:'4set × 8rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:90},{n:'サイドレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}]
   }},
-  {id:'B',lbl:'Legs（前腿・クワッド）',ph:{
+  {id:'B',lbl:'Legs（前腿）',ph:{
     1:[{n:'レッグプレス',d:'4set × 12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'レッグエクステンション',d:'3set × 15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'アダクター',d:'3set × 15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
-    2:[{n:'レッグプレス',d:'3set × 10rep ／ ★W-up 1set',s:3,fw:0,r:120},{n:'ゴブレットスクワット',d:'3set × 12rep ／ DB両手保持・背筋まっすぐ',s:3,fw:1,r:90},{n:'レッグエクステンション',d:'3set × 12rep',s:3,fw:0,r:60},{n:'アダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
-    3:[{n:'DBスクワット',d:'4set × 10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:120},{n:'ゴブレットスクワット',d:'3set × 12rep ／ より重いDBで',s:3,fw:1,r:90},{n:'レッグプレス',d:'3set × 8rep ／ 今週最重量',s:3,fw:0,r:120},{n:'レッグエクステンション',d:'3set × 12rep',s:3,fw:0,r:60}]
+    2:[{n:'レッグプレス',d:'3set × 10rep ／ ★W-up 1set',s:3,fw:0,r:120},{n:'ゴブレットスクワット',d:'3set × 12rep ／ DB両手保持',s:3,fw:1,r:90},{n:'レッグエクステンション',d:'3set × 12rep',s:3,fw:0,r:60},{n:'アダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
+    3:[{n:'DBスクワット',d:'4set × 10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:120},{n:'ゴブレットスクワット',d:'3set × 12rep ／ より重いDB',s:3,fw:1,r:90},{n:'レッグプレス',d:'3set × 8rep ／ 今週最重量',s:3,fw:0,r:120},{n:'レッグエクステンション',d:'3set × 12rep',s:3,fw:0,r:60}]
   }},
-  {id:'C',lbl:'Pull（背中・二頭）',ph:{
+  {id:'C',lbl:'Pull（背中）',ph:{
     1:[{n:'ラットプルダウン',d:'4set × 10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ローロー',d:'4set × 10-12rep ／ 収縮1秒止め',s:4,fw:0,r:90},{n:'アームカール',d:'3set × 12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
     2:[{n:'ラットプルダウン',d:'3set × 8-10rep ／ ★W-up 1set',s:3,fw:0,r:90},{n:'DBロウ',d:'4set × 10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:75},{n:'ハンマーカール',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
-    3:[{n:'DBロウ',d:'4set × 8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep',s:3,fw:0,r:90},{n:'ハンマーカール',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'2set × 20rep ／ テンポゆっくり',s:2,fw:0,r:45}]
+    3:[{n:'DBロウ',d:'4set × 8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep',s:3,fw:0,r:90},{n:'ハンマーカール',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'2set × 20rep',s:2,fw:0,r:45}]
   }},
-  {id:'D',lbl:'Push+（胸・肩 重め）',ph:{
-    1:[{n:'チェストプレス',d:'4set × 8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set × 15rep ／ ストレッチ重視',s:3,fw:0,r:60},{n:'ショルダープレス',d:'4set × 8-10rep ／ 重め ★W-up 1set',s:4,fw:0,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
-    2:[{n:'DBベンチプレス',d:'4set × 8-10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ペクトラル',d:'3set × 12rep ／ 上部意識',s:3,fw:0,r:60},{n:'DBショルダープレス',d:'4set × 8-10rep ／ 重め ★W-up 1set',s:4,fw:1,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
-    3:[{n:'DBベンチプレス',d:'4set × 6-8rep ／ 今週最重量 ★W-up 1set必須',s:4,fw:1,r:120},{n:'DBフライ',d:'3set × 10rep ／ ダンベル ストレッチ',s:3,fw:1,r:60},{n:'DBショルダープレス',d:'4set × 8rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}]
+  {id:'D',lbl:'Push+（重め）',ph:{
+    1:[{n:'チェストプレス',d:'4set × 8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set × 15rep ／ ストレッチ重視',s:3,fw:0,r:60},{n:'ショルダープレス',d:'4set × 8-10rep ／ 重め',s:4,fw:0,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
+    2:[{n:'DBベンチプレス',d:'4set × 8-10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ペクトラル',d:'3set × 12rep ／ 上部意識',s:3,fw:0,r:60},{n:'DBショルダープレス',d:'4set × 8-10rep ／ 重め',s:4,fw:1,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}],
+    3:[{n:'DBベンチプレス',d:'4set × 6-8rep ／ 今週最重量 ★W-up 1set必須',s:4,fw:1,r:120},{n:'DBフライ',d:'3set × 10rep ／ ダンベル',s:3,fw:1,r:60},{n:'DBショルダープレス',d:'4set × 8rep ／ ダンベル',s:4,fw:1,r:90},{n:'フロントレイズ',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60}]
   }},
-  {id:'E',lbl:'Legs+（後腿・臀部）',ph:{
+  {id:'E',lbl:'Legs+（後腿）',ph:{
     1:[{n:'レッグカール',d:'4set × 12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'グルート',d:'4set × 15rep ／ 臀筋・ベア体型の土台',s:4,fw:0,r:75},{n:'レッグプレス',d:'3set × 12rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
-    2:[{n:'レッグカール',d:'3set × 10rep ／ ★W-up 1set',s:3,fw:0,r:90},{n:'RDL',d:'3set × 12rep ／ ダンベル ★W-up 1set・背筋注意',s:3,fw:1,r:90},{n:'グルート',d:'3set × 15rep ／ 収縮ポジションで止める',s:3,fw:0,r:60},{n:'アブダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
-    3:[{n:'RDL',d:'4set × 10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:120},{n:'DBランジ',d:'3set × 12rep（片足）／ ダンベル・バランス注意',s:3,fw:1,r:90},{n:'レッグカール',d:'3set × 10rep',s:3,fw:0,r:75},{n:'グルート',d:'3set × 15rep',s:3,fw:0,r:60}]
+    2:[{n:'レッグカール',d:'3set × 10rep ／ ★W-up 1set',s:3,fw:0,r:90},{n:'RDL',d:'3set × 12rep ／ ダンベル ★W-up 1set',s:3,fw:1,r:90},{n:'グルート',d:'3set × 15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set × 15rep',s:3,fw:0,r:60}],
+    3:[{n:'RDL',d:'4set × 10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:120},{n:'DBランジ',d:'3set × 12rep（片足）／ ダンベル',s:3,fw:1,r:90},{n:'レッグカール',d:'3set × 10rep',s:3,fw:0,r:75},{n:'グルート',d:'3set × 15rep',s:3,fw:0,r:60}]
   }},
-  {id:'F',lbl:'Pull+（背中 重め）',ph:{
-    1:[{n:'ラットプルダウン',d:'4set × 8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:90},{n:'ローロー',d:'4set × 8-10rep ／ 重め・収縮1秒止め',s:4,fw:0,r:90},{n:'DBロウ',d:'3set × 10rep ／ ダンベル',s:3,fw:1,r:75},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
-    2:[{n:'DBロウ',d:'4set × 8-10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep ／ ★W-up 1set',s:3,fw:0,r:90},{n:'DBカール',d:'3set × 12rep ／ ダンベル・スロー3秒',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
-    3:[{n:'DBロウ',d:'4set × 8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep',s:3,fw:0,r:90},{n:'ハンマーカール',d:'3set × 10rep ／ ダンベル・スロー',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'2set × 20rep',s:2,fw:0,r:45}]
+  {id:'F',lbl:'Pull+（重め）',ph:{
+    1:[{n:'ラットプルダウン',d:'4set × 8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:90},{n:'ローロー',d:'4set × 8-10rep ／ 収縮1秒止め',s:4,fw:0,r:90},{n:'DBロウ',d:'3set × 10rep ／ ダンベル',s:3,fw:1,r:75},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
+    2:[{n:'DBロウ',d:'4set × 8-10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep',s:3,fw:0,r:90},{n:'DBカール',d:'3set × 12rep ／ ダンベル',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'3set × 15rep',s:3,fw:0,r:45}],
+    3:[{n:'DBロウ',d:'4set × 8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:90},{n:'ラットプルダウン',d:'3set × 8rep',s:3,fw:0,r:90},{n:'ハンマーカール',d:'3set × 10rep ／ ダンベル',s:3,fw:1,r:60},{n:'アブドミナルクランチ',d:'2set × 20rep',s:2,fw:0,r:45}]
   }}
 ];
 
+// ===== WORKOUT STATE =====
 let cp=1,cd=0,wd=false,sd={};
 let ti=null,ts=0,tt=0,tr=false;
 
-/* ---- weight helpers ---- */
 function r25(kg){return Math.round(kg/2.5)*2.5;}
-function lsKey(name){return 'pbm_'+name;}
-function loadBase(name){try{return parseFloat(localStorage.getItem(lsKey(name)))||0;}catch(e){return 0;}}
-function saveBase(name,val){try{localStorage.setItem(lsKey(name),val);}catch(e){}}
-
-function recText(base,phase){
-  if(!base||base<=0) return null;
-  if(phase===1) return r25(base*0.5)+'〜'+r25(base*0.6)+'kg';
-  if(phase===2) return r25(base*0.7)+'〜'+r25(base*0.8)+'kg';
+function lsKey(n){return 'pbm_'+n;}
+function loadBase(n){try{return parseFloat(localStorage.getItem(lsKey(n)))||0;}catch(e){return 0;}}
+function saveBase(n,v){try{localStorage.setItem(lsKey(n),v);}catch(e){}}
+function recText(base,ph){
+  if(!base||base<=0)return null;
+  if(ph===1)return r25(base*.5)+'〜'+r25(base*.6)+'kg';
+  if(ph===2)return r25(base*.7)+'〜'+r25(base*.8)+'kg';
   return base+'kg〜 (+1〜2.5kg/回)';
 }
-function recClass(phase){
-  if(phase===1) return 'wrec p1';
-  if(phase===2) return 'wrec p2';
-  return 'wrec p3';
-}
-
-function onBaseInput(name,val,spanId){
+function recClass(ph){return ph===1?'wrec p1':ph===2?'wrec p2':'wrec p3';}
+function onBaseInput(nm,val,sid){
   const v=parseFloat(val)||0;
-  saveBase(name,v>0?v:0);
-  const sp=document.getElementById(spanId);
-  if(!sp) return;
-  const txt=recText(v,cp);
-  if(txt){sp.textContent='推奨 '+txt;sp.className=recClass(cp);}
+  saveBase(nm,v>0?v:0);
+  const sp=document.getElementById(sid);
+  if(!sp)return;
+  const t=recText(v,cp);
+  if(t){sp.textContent='推奨 '+t;sp.className=recClass(cp);}
   else{sp.textContent='前回MAXを入力';sp.className='wrec none';}
 }
-
-/* ---- progress ---- */
 function ex(){return DD[cd].ph[cp];}
 function totS(){return ex().reduce((a,e)=>a+e.s,0);}
 function donS(){let c=0;ex().forEach((_,i)=>{for(let s=0;s<ex()[i].s;s++)if(sd[i+'_'+s])c++;});return c;}
@@ -238,103 +438,289 @@ function updProg(){
   document.getElementById('db').style.display=p===100?'block':'none';
 }
 function updFW(){const p=fwPct();document.getElementById('fwf').style.width=p+'%';document.getElementById('fwp').textContent=p+'%';}
-
-/* ---- render ---- */
 function render(){
-  const card=document.getElementById('ec');
-  card.innerHTML='';
+  const card=document.getElementById('ec');card.innerHTML='';
+  const cP=cp,cD=cd;
   ex().forEach((e,i)=>{
-    const wrapper=document.createElement('div');
-    wrapper.className='er';
+    const w=document.createElement('div');w.className='er';
     const bg=e.fw?'<span class="fb">FW</span>':'';
     const base=loadBase(e.n);
-    const txt=recText(base,cp);
-    const recTxt=txt?'推奨 '+txt:'前回MAXを入力';
-    const rcls=txt?recClass(cp):'wrec none';
-    const spanId='rec'+i+'_'+cd+'_'+cp;
+    const t=recText(base,cp);
+    const rt=t?'推奨 '+t:'前回MAXを入力';
+    const rc=t?recClass(cp):'wrec none';
+    const sid='rec'+i+'_'+cD+'_'+cP;
     const nm=e.n.replace(/'/g,"\\'");
     const bs=Array.from({length:e.s},(_,s)=>`<button class="sb${sd[i+'_'+s]?' done':''}" onclick="tapS(${i},${s},${e.r},'${nm}',this)">${s+1}</button>`).join('');
-    wrapper.innerHTML=`
-      <div class="er-top">
-        <div class="el">
-          <div class="enw"><span class="enm">${e.n}</span>${bg}</div>
-          <div class="ed">${e.d}</div>
-          <div class="wrow">
-            <span class="wlbl">前回MAX</span>
-            <input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5"
-              oninput="onBaseInput('${nm}',this.value,'${spanId}')">
-            <span class="wunit">kg</span>
-            <span class="warr">→</span>
-            <span id="${spanId}" class="${rcls}">${recTxt}</span>
-          </div>
-        </div>
-        <div class="sets">${bs}</div>
-      </div>`;
-    card.appendChild(wrapper);
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${bg}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">→</span><span id="${sid}" class="${rc}">${rt}</span></div></div><div class="sets">${bs}</div></div>`;
+    card.appendChild(w);
   });
-  document.getElementById('dlbl').textContent='Day '+DD[cd].id+' \u2013 '+DD[cd].lbl;
+  document.getElementById('dlbl').textContent='Day '+DD[cd].id+' – '+DD[cd].lbl;
   updFW();updProg();
 }
-
-/* ---- set tap ---- */
-function tapS(ei,si,rest,name,btn){
+function tapS(ei,si,rest,nm,btn){
   const k=ei+'_'+si;sd[k]=!sd[k];btn.classList.toggle('done',sd[k]);updProg();
-  if(sd[k]) startT(rest,name);
+  if(sd[k])startT(rest,nm);
 }
-
-/* ---- timer ---- */
-function startT(secs,name){
+function startT(secs,nm){
   clearInterval(ti);ts=secs;tt=secs;tr=true;
   document.getElementById('tbox').style.display='block';
-  document.getElementById('tn').textContent=name+' / 推奨 '+secs+'秒';
-  document.getElementById('ttog').textContent='一時停止';
-  updT();
+  document.getElementById('tn').textContent=nm+' / 推奨 '+secs+'秒';
+  document.getElementById('ttog').textContent='一時停止';updT();
   ti=setInterval(()=>{
     if(!tr)return;ts--;
-    if(ts<=0){
-      ts=0;clearInterval(ti);
+    if(ts<=0){ts=0;clearInterval(ti);
       const n=document.getElementById('tnum');n.textContent='GO!';n.className='tnum h';
       document.getElementById('tf').style.width='0%';document.getElementById('tf').className='tf h';
-      document.getElementById('ttog').textContent='完了';return;
-    }
+      document.getElementById('ttog').textContent='完了';return;}
     updT();
   },1000);
 }
 function updT(){
   const n=document.getElementById('tnum'),f=document.getElementById('tf');
   n.textContent=ts;const p=Math.round(ts/tt*100);f.style.width=p+'%';
-  if(ts>tt*0.5){n.className='tnum';f.className='tf';}
-  else if(ts>tt*0.25){n.className='tnum w';f.className='tf w';}
+  if(ts>tt*.5){n.className='tnum';f.className='tf';}
+  else if(ts>tt*.25){n.className='tnum w';f.className='tf w';}
   else{n.className='tnum h';f.className='tf h';}
 }
 function togT(){if(ts===0){skipT();return;}tr=!tr;document.getElementById('ttog').textContent=tr?'一時停止':'再開';}
 function skipT(){clearInterval(ti);tr=false;document.getElementById('tbox').style.display='none';}
 function addT(s){ts+=s;tt+=s;updT();}
-
-/* ---- nav ---- */
 function sP(p,el){
   cp=p;sd={};wd=false;skipT();
   document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');
   document.getElementById('tip').textContent=PH[p].tip;
-  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
-  render();
+  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();
 }
 function sD(idx,el){
   cd=idx;sd={};wd=false;skipT();
   document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');
-  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
-  render();
+  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();
 }
 function togW(){wd=!wd;document.getElementById('wc').classList.toggle('done',wd);updProg();}
 function resetD(){
   sd={};wd=false;skipT();
-  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
-  render();
+  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();
 }
 
-/* ---- init ---- */
+// ===== STORAGE HELPERS =====
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function todayStr(){return fmtDate(new Date());}
+function getLog(ds){try{return JSON.parse(localStorage.getItem('gym_log_'+ds));}catch(e){return null;}}
+function setLog(ds,data){try{localStorage.setItem('gym_log_'+ds,JSON.stringify(data));}catch(e){}}
+function delLog(ds){try{localStorage.removeItem('gym_log_'+ds);}catch(e){}}
+
+function getWeightHistory(nm){try{return JSON.parse(localStorage.getItem('gym_wh_'+nm))||[];}catch(e){return[];}}
+function addWeightHistory(nm,ds,wt){
+  if(!wt||wt<=0)return;
+  try{
+    let h=getWeightHistory(nm);
+    const idx=h.findIndex(x=>x.date===ds);
+    if(idx>=0)h[idx].weight=wt;else h.push({date:ds,weight:wt});
+    h.sort((a,b)=>a.date.localeCompare(b.date));
+    if(h.length>30)h=h.slice(-30);
+    localStorage.setItem('gym_wh_'+nm,JSON.stringify(h));
+  }catch(e){}
+}
+
+function saveWorkout(){
+  const ds=todayStr();
+  const log={day:DD[cd].id,phase:cp,label:DD[cd].lbl};
+  setLog(ds,log);
+  ex().forEach(e=>{const b=loadBase(e.n);if(b>0)addWeightHistory(e.n,ds,b);});
+  showToast('記録しました！📅');
+  renderCalStats();renderCalendar();
+  populateExSelect();
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===== CALENDAR =====
+let calYear,calMonth;
+function initCal(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();}
+function calMove(d){
+  calMonth+=d;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();renderCalStats();
+}
+function renderCalStats(){
+  const today=new Date();
+  // Month count
+  let mc=0;const dim=new Date(calYear,calMonth+1,0).getDate();
+  for(let d=1;d<=dim;d++){
+    const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if(getLog(ds))mc++;
+  }
+  document.getElementById('st-month').textContent=mc;
+  // Total
+  let tc=0;try{for(let k in localStorage)if(k.startsWith('gym_log_'))tc++;}catch(e){}
+  document.getElementById('st-total').textContent=tc;
+  // Streak
+  let streak=0;
+  for(let i=0;i<365;i++){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    if(getLog(fmtDate(d)))streak++;
+    else if(i>0)break;
+  }
+  document.getElementById('st-streak').textContent=streak;
+}
+function renderCalLegend(){
+  const leg=document.getElementById('cal-legend');
+  leg.innerHTML=Object.entries(DAY_COLORS).map(([id,c])=>
+    `<div class="leg-item"><div class="leg-dot" style="background:${c.bg};border:1px solid ${c.text}"></div>${id}:${c.type}</div>`
+  ).join('');
+}
+function renderCalendar(){
+  const first=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  const todayDs=fmtDate(today);
+  document.getElementById('cal-month-lbl').textContent=calYear+'年'+(calMonth+1)+'月';
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  // Empty cells
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dow=(first+d-1)%7;
+    const isToday=ds===todayDs;
+    const isFuture=new Date(calYear,calMonth,d)>today&&!isToday;
+    const log=getLog(ds);
+    const cell=document.createElement('div');
+    let cls='cal-day';
+    if(isToday)cls+=' today';
+    if(isFuture)cls+=' future';
+    if(dow===0)cls+=' sun';
+    if(dow===6)cls+=' sat';
+    cell.className=cls;
+    let badge='';
+    if(log&&DAY_COLORS[log.day]){
+      const c=DAY_COLORS[log.day];
+      badge=`<span class="cal-badge" style="background:${c.bg};color:${c.text}">${log.day}</span>`;
+    }
+    cell.innerHTML=`<span class="cal-dn">${d}</span>${badge}`;
+    if(!isFuture)cell.onclick=()=>openModal(ds,log);
+    grid.appendChild(cell);
+  }
+}
+
+// ===== MODAL =====
+let modalDs='',modalSelDay='';
+function openModal(ds,log){
+  modalDs=ds;modalSelDay=log?log.day:'';
+  const lbl=document.getElementById('modal-date-lbl');
+  const parts=ds.split('-');
+  lbl.textContent=parts[0]+'年'+parseInt(parts[1])+'月'+parseInt(parts[2])+'日';
+  const g=document.getElementById('modal-day-grid');
+  g.innerHTML=DD.map(d=>{
+    const c=DAY_COLORS[d.id];
+    const sel=d.id===modalSelDay?'sel':'';
+    return `<div class="day-opt ${sel}" style="${sel?'background:'+c.bg+';border-color:'+c.text:''}" onclick="selModalDay('${d.id}',this)">
+      <div class="day-opt-id" style="color:${c.text}">${d.id}</div>
+      <div class="day-opt-lbl">${c.type}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('modal-del-btn').style.display=log?'block':'none';
+  document.getElementById('modal').classList.add('show');
+}
+function selModalDay(id,el){
+  modalSelDay=id;
+  document.querySelectorAll('.day-opt').forEach(x=>{
+    x.classList.remove('sel');
+    const did=x.querySelector('.day-opt-id').textContent;
+    const c=DAY_COLORS[did];
+    x.style.background='';x.style.borderColor='';
+  });
+  const c=DAY_COLORS[id];
+  el.classList.add('sel');el.style.background=c.bg;el.style.borderColor=c.text;
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal'))
+    document.getElementById('modal').classList.remove('show');
+}
+function saveModalLog(){
+  if(!modalSelDay){showToast('部位を選択してください');return;}
+  const d=DD.find(x=>x.id===modalSelDay);
+  setLog(modalDs,{day:modalSelDay,phase:cp,label:d.lbl});
+  document.getElementById('modal').classList.remove('show');
+  renderCalendar();renderCalStats();showToast('記録しました！');
+}
+function deleteModalLog(){
+  delLog(modalDs);
+  document.getElementById('modal').classList.remove('show');
+  renderCalendar();renderCalStats();showToast('削除しました');
+}
+
+// ===== PROGRESS CHART =====
+function getAllExNames(){
+  const s=new Set();
+  DD.forEach(d=>[1,2,3].forEach(p=>d.ph[p].forEach(e=>s.add(e.n))));
+  return [...s];
+}
+function populateExSelect(){
+  const sel=document.getElementById('ex-select');
+  const cur=sel.value;
+  const names=getAllExNames().filter(n=>getWeightHistory(n).length>0);
+  sel.innerHTML='<option value="">-- 種目を選択 --</option>';
+  names.forEach(n=>sel.innerHTML+=`<option value="${n}"${n===cur?' selected':''}>${n}</option>`);
+  if(cur&&names.includes(cur))renderProgressChart();
+}
+function renderProgressChart(){
+  const nm=document.getElementById('ex-select').value;
+  const area=document.getElementById('chart-area');
+  if(!nm){area.innerHTML='<div class="chart-empty">種目を選択してください</div>';
+    ['ps-max','ps-latest','ps-diff'].forEach(id=>{document.getElementById(id).textContent='--';document.getElementById(id).className='ps-num';});
+    return;
+  }
+  let h=getWeightHistory(nm);
+  if(!h||h.length===0){area.innerHTML='<div class="chart-empty">データがまだありません</div>';return;}
+  h=h.slice(-10);
+  const maxW=Math.max(...h.map(x=>x.weight));
+  const minW=Math.min(...h.map(x=>x.weight));
+  const first=h[0].weight,last=h[h.length-1].weight;
+  const diff=+(last-first).toFixed(1);
+  document.getElementById('ps-max').textContent=maxW;
+  document.getElementById('ps-latest').textContent=last;
+  const diffEl=document.getElementById('ps-diff');
+  diffEl.textContent=(diff>=0?'+':'')+diff;
+  diffEl.className='ps-num'+(diff>0?' up':diff<0?' down':'');
+  const W=340,H=160,pad=24;
+  const range=maxW-minW||maxW;
+  const bw=Math.min(36,Math.floor((W-pad*2)/(h.length*1.4)));
+  const gap=Math.floor((W-pad*2-bw*h.length)/(h.length+1));
+  let bars='',labels='',vals='';
+  h.forEach((item,i)=>{
+    const x=pad+gap+i*(bw+gap);
+    const bh=Math.max(8,Math.floor(((item.weight-minW)/(range||1))*(H-50)+16));
+    const y=H-bh-22;
+    const isMax=item.weight===maxW;
+    const col=isMax?'#1D9E75':'#185FA5';
+    bars+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="5" fill="${col}"/>`;
+    vals+=`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a18">${item.weight}</text>`;
+    const dt=item.date.slice(5).replace('-','/');
+    labels+=`<text x="${x+bw/2}" y="${H-4}" text-anchor="middle" font-size="9" fill="#888780">${dt}</text>`;
+  });
+  area.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">${bars}${vals}${labels}</svg>`;
+}
+
+// ===== TAB NAVIGATION =====
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('nb-'+id).classList.add('active');
+  if(id==='calendar'){renderCalendar();renderCalStats();}
+  if(id==='progress'){populateExSelect();}
+}
+
+// ===== INIT =====
 document.getElementById('tip').textContent=PH[1].tip;
 render();
+initCal();renderCalLegend();
 </script>
 </body>
 </html>
