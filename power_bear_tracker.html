@@ -176,8 +176,13 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .fb-key{font-size:9px;background:#1A2400;color:#C8FF00;border-radius:5px;padding:2px 7px;font-weight:800;border:1px solid #3A5000}
 .ed{font-size:12px;color:var(--t3);line-height:1.6;margin-bottom:9px;font-weight:600}
 .wrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.wrow-compact{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ex-memo-row{margin-top:6px}
+.ex-memo-in{width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;color:var(--t2);font-size:11px;padding:5px 9px;font-weight:600;outline:none}
+.ex-memo-in::placeholder{color:var(--t4);font-weight:500}
+.ex-prev-memo{font-size:10px;color:#8A60C8;font-weight:700;margin-top:3px;line-height:1.5;padding:3px 6px;background:#0D0320;border-radius:6px}
 .wlbl{font-size:11px;color:var(--t3);white-space:nowrap;font-weight:700}
-.bi{width:70px;height:32px;border:1.5px solid var(--bd2);border-radius:10px;background:var(--bg3);font-size:15px;font-weight:800;color:var(--t1);padding:0 8px;text-align:center;font-family:var(--font);-webkit-appearance:none}
+.bi{width:60px;height:32px;border:1.5px solid var(--bd2);border-radius:10px;background:var(--bg3);font-size:15px;font-weight:800;color:var(--t1);padding:0 8px;text-align:center;font-family:var(--font);-webkit-appearance:none}
 .bi:focus{outline:none;border-color:var(--acc)}
 .wunit{font-size:11px;color:var(--t3);font-weight:600}
 .warr{font-size:14px;color:var(--bd2);margin:0 2px}
@@ -416,16 +421,6 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A</span><span class="prog-val" id="pv">0%</span></div>
     <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
   </div>
-  <div class="tbox" id="tbox">
-    <div class="th"><span class="tn" id="tn">REST</span><button class="tsk" onclick="skipT()">スキップ ×</button></div>
-    <div class="tb">
-      <span class="tnum" id="tnum">90</span>
-      <div class="tright">
-        <div class="tt"><div class="tf" id="tf" style="width:100%"></div></div>
-        <div class="tbtns"><button class="tbtn p" id="ttog" onclick="togT()">一時停止</button><button class="tbtn" onclick="addT(30)">+30秒</button></div>
-      </div>
-    </div>
-  </div>
   <div class="done-banner" id="db">
     <div class="done-msg">🎉 セッション完了！</div>
     <div class="tag-row" id="tag-row"></div>
@@ -437,18 +432,29 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="wr" onclick="togW()">
       <div class="wc" id="wc"><svg width="14" height="12" viewBox="0 0 14 12"><polyline points="1.5,6 5.5,10 12.5,1.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="w-info">
-        <div class="wt">インクラインウォーキング 15〜20分</div>
-        <div class="w-params">
+        <div class="wt" onclick="togWDetail()" style="cursor:pointer">インクラインウォーキング 15〜20分 <span id="w-arrow" style="font-size:11px;color:var(--t3)">▼</span></div>
+        <div id="w-detail" style="display:none"><div class="w-params">
           <div class="w-param"><div class="w-param-label">Speed</div><div class="w-param-val">5.0〜5.5 <span>km/h</span></div></div>
           <div class="w-param"><div class="w-param-label">Incline</div><div class="w-param-val">4〜6 <span>%</span></div></div>
           <div class="w-param"><div class="w-param-label">心拍数</div><div class="w-param-val">60〜70 <span>% max</span></div></div>
           <div class="w-param"><div class="w-param-label">現在設定</div><div class="w-param-val" style="color:var(--red)">2.0% <span>→ 4〜6に UP</span></div></div>
         </div>
         <div class="w-note">⚠️ 20分超でコルチゾール↑・筋分解リスク（Wilson et al.2012）。勾配4〜6%でグルート活性化↑・消費カロリー約40%増。インクライン後は動的ストレッチ2〜3分を追加推奨。</div>
+        </div></div>
       </div>
     </div>
   </div>
   <div class="sl">ウェイトトレーニング</div>
+  <div class="tbox" id="tbox">
+    <div class="th"><span class="tn" id="tn">REST</span><button class="tsk" onclick="skipT()">スキップ ×</button></div>
+    <div class="tb">
+      <span class="tnum" id="tnum">90</span>
+      <div class="tright">
+        <div class="tt"><div class="tf" id="tf" style="width:100%"></div></div>
+        <div class="tbtns"><button class="tbtn p" id="ttog" onclick="togT()">一時停止</button><button class="tbtn" onclick="addT(30)">+30秒</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card" id="ec"></div>
   <div id="neck-section" style="display:none">
     <div class="sl" style="color:#BF5AF2;margin-top:4px">★ ネックルーティン（有酸素前5分で実施）</div>
@@ -740,6 +746,7 @@ function saveBase(n,v){try{localStorage.setItem(lsKey(n),v);}catch(e){}}
 function isDeloadMode(){return ls('gym_deload_mode')===true;}
 function recText(base,ph){if(!base||base<=0)return null;if(isDeloadMode())return r25(base*.6)+'kg（デロード中）';if(ph===1)return r25(base*.5)+'〜'+r25(base*.6)+'kg';if(ph===2)return r25(base*.7)+'〜'+r25(base*.8)+'kg';return base+'kg〜 (+1〜2.5kg)';}
 function recClass(ph){if(isDeloadMode())return 'wrec pdl';return ph===1?'wrec p1':ph===2?'wrec p2':'wrec p3';}
+function saveExMemo(nm,val){try{if(val&&val.trim()){ls('gym_exmemo_'+nm,val.trim());}else{localStorage.removeItem('gym_exmemo_'+nm);}}catch(e){}}
 function onBaseInput(nm,val,sid){const v=parseFloat(val)||0;saveBase(nm,v>0?v:0);const sp=document.getElementById(sid);if(!sp)return;const t=recText(v,cp);if(t){sp.textContent=t;sp.className=recClass(cp);}else{sp.textContent='MAX入力→推奨';sp.className='wrec none';}}
 
 /* ===== NUTRITION ===== */
@@ -829,28 +836,7 @@ function renderMealPlan(freq){
   document.getElementById('meal-list').innerHTML=noteHtml+mealsHtml;
 }
 
-function renderMealPlan(bw,kcal,pro,carb,fat){
-  const rn=n=>Math.round(n);
-  const dist=[.25,.30,.10,.30,.05];
-  const defs=[
-    {time:'朝食',note:'起床後1時間以内・血糖値を上げてタンパク質補給',
-      foods:(p,c,f)=>[{n:'白米',a:(carb>0&&c>0?rn(c/0.37):0)+'g'},{n:'卵',a:Math.max(2,p>0?rn(p/7):0)+'個'},{n:'納豆',a:'1パック'},{n:'バナナ',a:'1本'}]},
-    {time:'昼食',note:'トレーニング前2時間または昼食・炭水化物多めで',
-      foods:(p,c,f)=>[{n:'白米 or パスタ',a:(carb>0&&c>0?rn(c/0.37):0)+'g'},{n:'鶏胸肉 or サーモン',a:rn(Math.max(0,p)*5)+'g'},{n:'ブロッコリー',a:'1/2株'},{n:'オリーブ油',a:'大さじ1'}]},
-    {time:'補食',note:'トレーニング直後30分以内が最重要タイミング',
-      foods:(p,c,f)=>[{n:'プロテイン',a:rn(p||0)+'g相当'},{n:'おにぎり',a:'1〜2個'},{n:'牛乳',a:'200ml'}]},
-    {time:'夕食',note:'トレーニング後2〜3時間後・良質な脂質も摂る',
-      foods:(p,c,f)=>[{n:'白米 or 芋類',a:(carb>0&&c>0?rn(c/0.37):0)+'g'},{n:'牛赤身 or 豚ロース',a:rn(Math.max(0,p)*5)+'g'},{n:'根菜・豆類',a:'1〜2品'},{n:'味噌汁',a:'1杯'}]},
-    {time:'就寝前',note:'カゼインで睡眠中の筋合成をサポート',
-      foods:(p,c,f)=>[{n:'カゼインプロテイン',a:rn(p||0)+'g'},{n:'ギリシャヨーグルト',a:'100g'},{n:'ナッツ類',a:'一掴み'}]}
-  ];
-  const html=defs.map((d,i)=>{
-    const dp=rn(pro*dist[i]),dc=rn(carb*dist[i]),df=rn(fat*dist[i]);
-    const tags=d.foods(dp,dc,df).map(f=>`<div class="food-tag">${f.n} <span class="fa">${f.a}</span></div>`).join('');
-    return `<div class="meal-row"><div class="meal-time-lbl">${d.time}</div><div class="meal-body"><div class="meal-note">${d.note}</div><div class="meal-foods">${tags}</div><div class="meal-macros"><div class="macro-p">P ${dp}g</div><div class="macro-c">C ${dc}g</div><div class="macro-f">F ${df}g</div></div></div></div>`;
-  }).join('');
-  document.getElementById('meal-list').innerHTML=html;
-}
+
 
 /* ===== PROGRAM ===== */
 function curProg(){return PROGS[cfreq];}
@@ -917,12 +903,13 @@ function render(){
       const ncol=score<2?'var(--grn)':score<3.5?'var(--acc)':'var(--ylw)';
       nextHtml='<div style="font-size:10px;color:'+ncol+';font-weight:700;margin-top:2px">'+lbl+': '+nxt.toFixed(1)+'kg</div>';
     }
+    const exMemoKey='gym_exmemo_'+nm;
+    const prevExMemo=ls(exMemoKey)||'';
     const bs=Array.from({length:adjS},(_,s)=>{
       const done=sd[i+'_'+s]?' done':'';
       return `<button class="sb${done}" onclick="tapS(${i},${s},${adjInt},'${nm}',this)">${s+1}</button>`;
     }).join('');
-    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}">${rt}</span></div>${trendHtml}${nextHtml}</div><div class="sets">${bs}</div></div>`;
-    card.appendChild(w);
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${bs}</div></div>`;    card.appendChild(w);
   });
   document.getElementById('dlbl').textContent='Day '+day.id+' — '+day.lbl;
   updFW();updProg();
@@ -938,7 +925,26 @@ function addT(s){ts+=s;tt+=s;updT();}
 
 function sP(p,el){cp=p;sd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
 function sD(idx,el){cd=idx;sd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
-function togW(){wd=!wd;document.getElementById('wc').classList.toggle('done',wd);updProg();}
+function togWDetail(){
+  const d=document.getElementById('w-detail');
+  const a=document.getElementById('w-arrow');
+  if(!d)return;
+  const show=d.style.display==='none';
+  d.style.display=show?'block':'none';
+  if(a)a.textContent=show?'▲':'▼';
+}
+function togW(){
+  wd=!wd;
+  document.getElementById('wc').classList.toggle('done',wd);
+  // チェック完了時に詳細を自動折りたたみ
+  if(wd){
+    const d=document.getElementById('w-detail');
+    const a=document.getElementById('w-arrow');
+    if(d){d.style.display='none';}
+    if(a){a.textContent='▼';}
+  }
+  updProg();
+}
 function resetD(){sd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
 /* ===== CONDITION ===== */
