@@ -147,7 +147,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .pm-lbl{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
 .pm-txt{font-size:13px;color:var(--t3);line-height:1.6}
 
-.sl{font-size:10px;font-weight:800;color:var(--t4);letter-spacing:.14em;text-transform:uppercase;margin:0 0 9px 2px}
+.sl{font-size:10px;font-weight:800;color:#8ABCD8;letter-spacing:.14em;text-transform:uppercase;margin:16px 0 9px 2px;padding-left:8px;border-left:3px solid #5A9CC0}
 .card{background:var(--bg2);border:1.5px solid var(--bd);border-radius:18px;margin-bottom:14px;overflow:hidden}
 
 /* Walk */
@@ -165,7 +165,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .w-note{font-size:11px;color:var(--org);line-height:1.65;background:#1A0E00;border-radius:10px;padding:8px 11px;border-left:2px solid var(--org)}
 
 /* Exercise */
-.er{padding:14px 16px;border-bottom:1px solid var(--bd)}
+.er{padding:14px 16px;border-bottom:2px solid rgba(255,255,255,0.08);position:relative}.er+.er{padding-top:16px}
 .er:last-child{border-bottom:none}
 .er-top{display:flex;flex-direction:column;gap:0}
 .el{flex:1;min-width:0}
@@ -425,7 +425,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="done-msg">🎉 セッション完了！</div>
     <div class="tag-row" id="tag-row"></div>
     <textarea class="memo-input" id="memo-input" placeholder="今日のメモ（例：チェストプレス70kgで余裕あった→次回72.5kgへ）"></textarea>
-    <button class="save-btn" onclick="saveWorkout()">記録を保存する</button>
+    <button class="save-btn" id="save-btn" onclick="saveWorkout()">記録を保存する</button>
   </div>
   <div class="sl">ウォームアップ</div>
   <div class="card">
@@ -846,7 +846,19 @@ function totS(){return ex().reduce((a,e)=>a+e.s,0);}
 function donS(){let c=0;ex().forEach((_,i)=>{for(let s=0;s<ex()[i].s;s++)if(sd[i+'_'+s])c++;});return c;}
 function fwPct(){const e=ex();return Math.round(e.filter(x=>x.fw).length/e.length*100);}
 
-function updProg(){const tot=totS()+1,don=donS()+(wd?1:0),p=Math.round(don/tot*100);document.getElementById('pv').textContent=p+'%';document.getElementById('pf').style.width=p+'%';document.getElementById('db').style.display=p===100?'block':'none';}
+function updProg(){
+  const tot=totS(),don=donS();
+  // 全セット完了したら自動でwcをチェック
+  if(tot>0&&don>=tot&&!wd){wd=true;document.getElementById('wc').classList.add('done');}
+  const pct=tot>0?Math.round(don/tot*100):0;
+  document.getElementById('pv').textContent=pct+'%';
+  document.getElementById('pf').style.width=pct+'%';
+  // 1セットでもこなしたら保存バナー表示（途中保存対応）
+  const db=document.getElementById('db');
+  if(pct>=100){db.style.display='block';document.querySelector('#db .done-msg').textContent='🎉 セッション完了！';const sb=document.getElementById('save-btn');if(sb)sb.textContent='記録を保存する';}
+  else if(pct>0){db.style.display='block';document.querySelector('#db .done-msg').textContent='💾 途中保存もできます（'+pct+'% 完了）';const sb=document.getElementById('save-btn');if(sb)sb.textContent='途中保存する';}
+  else{db.style.display='none';}
+}
 function updFW(){const p=fwPct();document.getElementById('fwf').style.width=p+'%';document.getElementById('fwp').textContent=p+'%';}
 
 function setFreq(f,el){
