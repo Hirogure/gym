@@ -842,8 +842,9 @@ function renderMealPlan(freq){
 function curProg(){return PROGS[cfreq];}
 function curDays(){return curProg().days;}
 function ex(){return curDays()[cd].ph[cp];}
-function totS(){return ex().reduce((a,e)=>a+e.s,0);}
-function donS(){let c=0;ex().forEach((_,i)=>{for(let s=0;s<ex()[i].s;s++)if(sd[i+'_'+s])c++;});return c;}
+function adjSets(e){const isCompound=(e.r>=120);return isCompound?Math.max(1,e.s+condAdjSets):e.s;}
+function totS(){return ex().reduce((a,e)=>a+adjSets(e),0);}
+function donS(){let c=0;ex().forEach((e,i)=>{const aS=adjSets(e);for(let j=0;j<aS;j++)if(sd[i+'_'+j])c++;});return c;}
 function fwPct(){const e=ex();return Math.round(e.filter(x=>x.fw).length/e.length*100);}
 
 function updProg(){
