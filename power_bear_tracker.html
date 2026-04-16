@@ -126,6 +126,18 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .pfc-legend{display:flex;gap:12px;margin-bottom:4px}
 .pfc-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#8A60C8}
 .pfc-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.wgb{flex:1;padding:8px 4px;border:1.5px solid #2A1A50;border-radius:10px;background:#0D0320;font-size:11px;font-weight:800;color:#6A40A8;cursor:pointer;font-family:var(--font);transition:all .15s}
+.wgb.active{background:#2A1A50;border-color:#BF5AF2;color:#BF5AF2}
+.tib{flex:1;padding:8px 3px;border:1.5px solid #0E2A38;border-radius:10px;background:#080F18;font-size:11px;font-weight:800;color:#2A5870;cursor:pointer;font-family:var(--font);transition:all .15s}
+.tib.active{background:#0A2030;border-color:#5BC8FF;color:#5BC8FF}
+.wu-btn{background:#4A4000 !important;border:1.5px solid #808000 !important;color:#FFE040 !important;font-size:10px !important;font-weight:800 !important;min-width:44px}
+.wu-btn.done{background:#1A3A00 !important;border-color:#4CAF50 !important;color:#fff !important;background-color:#2A6010 !important}
+.rest-btn{width:100%;padding:13px;background:#0A1800;border:1.5px solid #2A5020;border-radius:12px;font-size:12px;font-weight:800;color:#4A9040;cursor:pointer;font-family:var(--font);margin-bottom:12px;transition:all .2s}
+.rest-btn:hover{background:#102000;border-color:#4A9040}
+.rest-guide{background:#0A1800;border:1.5px solid #2A5020;border-radius:16px;padding:18px 16px;margin-bottom:14px}
+.rest-guide-ttl{font-size:13px;font-weight:800;color:#4ADB60;margin-bottom:12px}
+.rest-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:11px;color:var(--t2);line-height:1.6}
+.rest-icon{font-size:16px;flex-shrink:0;margin-top:1px}
 .meal-section-ttl{font-size:10px;font-weight:800;color:var(--pur);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding-top:12px;border-top:1px solid #1A0A30}
 .meal-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #130830}
 .meal-row:last-child{border-bottom:none}
@@ -405,6 +417,34 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="pm-txt" id="prev-memo-txt"></div>
   </div>
 
+  <!-- 休養日ガイダンス（非表示で待機） -->
+  <div class="rest-guide" id="rest-guide" style="display:none">
+    <div class="rest-guide-ttl">🌿 今日は休養日 — 回復プロトコル</div>
+    <div style="font-size:10px;color:#2A6030;margin-bottom:12px;line-height:1.6">📚 筋肥大の60〜80%はトレ後48〜72時間の回復時に起きます（Damas et al. 2016）。休む日こそ成長中。</div>
+    <div class="rest-item"><div class="rest-icon">🚶</div><div><b>アクティブリカバリー（推奨）</b><br>軽いウォーキング20〜30分。血流促進で疲労物質の除去を促進。筋肉は使わない。</div></div>
+    <div class="rest-item"><div class="rest-icon">💧</div><div><b>水分補給</b><br>体重×35ml以上。回復に必要な栄養素の輸送を助ける。</div></div>
+    <div class="rest-item"><div class="rest-icon">🥩</div><div><b>タンパク質は変えない</b><br>休養日もタンパク質2.0g/kgを維持。筋タンパク合成は休み中も進んでいる。</div></div>
+    <div class="rest-item"><div class="rest-icon">😴</div><div><b>睡眠7〜9時間</b><br>成長ホルモンの80%は深睡眠中に分泌。睡眠こそ最強の回復剤。</div></div>
+    <div class="rest-item"><div class="rest-icon">🧘</div><div><b>ストレッチ5〜10分</b><br>可動域維持とケガ予防。強度なし、気持ちいい範囲で。</div></div>
+    <button onclick="hideRestGuide()" style="width:100%;margin-top:8px;padding:10px;background:#102000;border:1px solid #3A7030;border-radius:10px;font-size:11px;font-weight:800;color:#4ADB60;cursor:pointer;font-family:var(--font)">← トレーニングメニューに戻る</button>
+  </div>
+
+  <!-- メインのトレーニングUI -->
+  <div id="rest-guide-main">
+  <button class="rest-btn" onclick="logRestDay()">🌿 今日は休養日にする（回復ガイドを見る）</button>
+  <div style="background:#0A1520;border:1.5px solid #0E2A38;border-radius:14px;padding:12px 15px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:800;color:#5BC8FF;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px">⏱ 今日の時間</div>
+    <div style="font-size:10px;color:#2A4858;line-height:1.5;margin-bottom:8px">📚 45〜60分が最適（テストステロン↑・コルチゾール最小）。時間が少ない日はBEAR KEYのみに絞るのが科学的に最効率。</div>
+    <div style="display:flex;gap:5px">
+      <button class="tib" id="ti30" onclick="setTimeMode(30,this)">30分</button>
+      <button class="tib" id="ti45" onclick="setTimeMode(45,this)">45分</button>
+      <button class="tib active" id="ti60" onclick="setTimeMode(60,this)">60分</button>
+      <button class="tib" id="ti75" onclick="setTimeMode(75,this)">75分</button>
+      <button class="tib" id="ti90" onclick="setTimeMode(90,this)">90分</button>
+    </div>
+    <div id="time-mode-note" style="font-size:10px;color:#4A90A8;margin-top:7px;line-height:1.5">標準メニュー</div>
+  </div>
+
   <div class="ph-tabs">
     <div class="pht active" onclick="sP(1,this)"><div class="pn">Phase</div><div class="pl">1 / W1-3</div></div>
     <div class="pht" onclick="sP(2,this)"><div class="pn">Phase</div><div class="pl">2 / W4-5</div></div>
@@ -461,6 +501,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="card" id="neck-exercises"></div>
     <div style="font-size:11px;color:#8A60C8;padding:0 14px 12px;line-height:1.65">[Nippard推奨]首の専用トレのみで首横断面積が有意増加。「服を着て最も目立つ部位」</div>
   </div>
+  </div><!-- /rest-guide-main -->
   <button class="rb" onclick="resetD()">リセット</button>
 </div>
 </div>
@@ -469,6 +510,22 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 <div id="tab-calendar" class="tab">
 <div class="app">
   <div class="hdr"><div><h1>カレンダー</h1><p>ジム記録・部位管理</p></div></div>
+  <!-- 週目標設定 -->
+  <div style="background:#0A0520;border:1.5px solid #2A1A50;border-radius:14px;padding:13px 15px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:800;color:#BF5AF2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">📅 今週の目標日数</div>
+    <div style="font-size:10px;color:#6A40A8;line-height:1.6;margin-bottom:10px">📚 習慣化研究（Lally et al. 2010）：習慣定着まで平均66日。まず週3〜4から始め、達成できたら増やすのが最速。</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button class="wgb" id="wg3" onclick="setWeekGoal(3,this)">週3日</button>
+      <button class="wgb" id="wg4" onclick="setWeekGoal(4,this)">週4日</button>
+      <button class="wgb" id="wg5" onclick="setWeekGoal(5,this)">週5日</button>
+      <button class="wgb" id="wg6" onclick="setWeekGoal(6,this)">週6日</button>
+    </div>
+    <div id="week-goal-prog" style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;height:8px;background:#1A0A30;border-radius:4px;overflow:hidden"><div id="wg-bar" style="height:8px;border-radius:4px;background:var(--pur);transition:width .4s;width:0%"></div></div>
+      <div id="wg-label" style="font-size:11px;font-weight:800;color:#BF5AF2;white-space:nowrap">今週 0 / 3日</div>
+    </div>
+    <div id="wg-advice" style="font-size:10px;color:#8A60C8;margin-top:6px;line-height:1.5"></div>
+  </div>
   <div class="cal-stats">
     <div class="stat-card"><div class="stat-num" id="st-month">0</div><div class="stat-unit">日</div><div class="stat-label">今月</div></div>
     <div class="stat-card"><div class="stat-num" id="st-streak">0</div><div class="stat-unit">日</div><div class="stat-label">連続</div></div>
@@ -595,7 +652,8 @@ const DAY_COLORS={
   C:{bg:'#1A1000',text:'#FF9500',type:'Pull'},D:{bg:'#000D1A',text:'#64D2FF',type:'Push+'},
   E:{bg:'#000D06',text:'#69F0AE',type:'Legs+'},F:{bg:'#0D0800',text:'#FFCC00',type:'Pull+'},
   U:{bg:'#001A33',text:'#5BC8FF',type:'Upper'},L:{bg:'#001A0A',text:'#00E676',type:'Lower'},
-  G:{bg:'#1A0A1A',text:'#BF5AF2',type:'全身'}
+  G:{bg:'#1A0A1A',text:'#BF5AF2',type:'全身'},
+  REST:{bg:'#0A1A08',text:'#4ADB60',type:'休養日'}
 };
 
 const QUICK_TAGS=['🔥 絶好調','👍 普通','😓 しんどい','🏆 PB更新','💪 重量UP','😤 気合い十分'];
@@ -723,6 +781,19 @@ let ti=null,ts=0,tt=0,tr=false;
 let selTags=[],condState={fatigue:0,sleep:0,soreness:0};
 let calYear,calMonth,reportWeekOffset=0;
 let modalDs='',modalSelDay='';
+let timeMode=60;  // 今日のトレーニング時間（分）
+let weekGoal=ls('gym_week_goal')||3;  // 週目標日数
+let wsd={};  // ウォームアップセット完了状態
+
+// 筋肉グループ定義（連日同部位チェック用）
+// 📚 同部位は48時間以上空ける（Schoenfeld & Grgic 2019）
+const MUSCLE_GROUP={
+  A:'push',D:'push',           // 胸・肩・僧帽
+  B:'legs',E:'legs',L:'legs',  // 脚・臀部
+  C:'pull',F:'pull',U:'pull',  // 背中・二頭
+  G:'full'                      // 全身
+};
+const MUSCLE_LABEL={push:'Push（胸・肩）',legs:'Legs（脚・臀部）',pull:'Pull（背中）',full:'全身'};
 
 /* ===== STORAGE ===== */
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -783,46 +854,125 @@ function setMealFreq(n,el){
 function renderMealPlan(freq){
   var rn=function(n){if(n===undefined||n===null||isNaN(n)||!isFinite(n))return 0;return Math.max(0,Math.round(n));};
   var pro=rn(_np),carb=rn(_nc),fat=rn(_nf);
-  var rice=function(c){return c>0?rn(c/0.37):0;};
-  var meat=function(p){return rn(p*5);};
-  var egg=function(p){return p>0?Math.max(2,rn(p/7)):2;};
-  var NOTES={2:'⚠️ 2食は吸収効率が下がります。各食で卵・肉・乳製品を多めに摂ってください。',3:'✅ 最もシンプルで続けやすい3食構成。各食で量をしっかり食べることが重要。',4:'✅ 3食にトレ後補食を1回追加するだけ。コスパ最強の構成です。',5:'💪 理想的な5食。タンパク質の吸収効率が最大化されます。'};
+  // 📚 修正方針: Stokes et al.(2018) タンパク質1.6〜2.2g/kg/日
+  // 1食あたりの卵は最大3個。残りはサラダチキン・ヨーグルト・プロテイン等で補う
+  // 朝食の「卵8個」問題を解消：卵は2〜3個固定、タンパク質源を分散
+  var eggCount=function(p){return Math.min(3,Math.max(2,Math.round(p*0.25/7)));};
+  var chickenG=function(p){return rn(p*0.4*4.5);};  // 鶏胸肉(100g=22g pro)
+  var riceG=function(c){return c>0?rn(c/0.37):0;};
+  var NOTES={
+    2:'⚠️ 2食はタンパク質合成効率が下がります（Areta et al. 2013）。各食でしっかり摂取を。',
+    3:'✅ シンプルで続けやすい3食。各食30〜40gのタンパク質を意識。',
+    4:'💪 3食＋補食が最もコスパ高い。トレ後30分以内の補食が最重要。',
+    5:'🏆 理想的な5食。タンパク質合成が最大化（Norton & Layman 2006）。'
+  };
   var MEALS={
     2:[
-      {time:'朝食',note:'起床後1時間以内・タンパク質と炭水化物を多めに',dist:0.45,
-        foods:function(p,c,f){return [{n:'白米',a:rice(c)+'g'},{n:'卵',a:egg(p)+'個'},{n:'納豆',a:'1パック'},{n:'バナナ',a:'1本'},{n:'牛乳',a:'200ml'}];}},
-      {time:'夕食',note:'トレーニング後・制限なく食べる',dist:0.55,
-        foods:function(p,c,f){return [{n:'白米 or 芋類',a:rice(c)+'g'},{n:'肉 or 魚',a:meat(p)+'g'},{n:'野菜・豆類',a:'たっぷり'},{n:'味噌汁',a:'1杯'},{n:'プロテイン(補助)',a:rn(p*0.15)+'g'}];}}
+      {time:'朝食',note:'起床後1時間以内 · タンパク質＋炭水化物を優先',dist:0.45,
+        foods:function(p,c,f){return [
+          {n:'白米',a:riceG(c*0.45)+'g'},
+          {n:'卵',a:eggCount(p*0.45)+'個（目玉焼き or 茹で）'},
+          {n:'サラダチキン',a:chickenG(p*0.45)+'g'},
+          {n:'納豆',a:'1パック（タンパク質8g）'},
+          {n:'バナナ',a:'1本（トレ前エネルギー源）'}
+        ];}},
+      {time:'夕食',note:'トレーニング後 · タンパク質と脂質をしっかり',dist:0.55,
+        foods:function(p,c,f){return [
+          {n:'白米 or 芋類',a:riceG(c*0.55)+'g'},
+          {n:'鶏もも or 牛赤身',a:rn(p*0.55*4.5)+'g'},
+          {n:'野菜 · 根菜',a:'たっぷり'},
+          {n:'味噌汁',a:'1杯'},
+          {n:'ギリシャヨーグルト',a:'100g（就寝前タンパク）'}
+        ];}}
     ],
     3:[
-      {time:'朝食',note:'起床後1時間以内・血糖値を上げてタンパク質補給',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米',a:rice(c)+'g'},{n:'卵',a:egg(p)+'個'},{n:'納豆',a:'1パック'},{n:'バナナ',a:'1本'}];}},
-      {time:'昼食',note:'炭水化物多め・トレーニングに備えるかお昼に食べる',dist:0.40,
-        foods:function(p,c,f){return [{n:'白米 or パスタ',a:rice(c)+'g'},{n:'鶏胸肉 or サーモン',a:meat(p)+'g'},{n:'ブロッコリー',a:'1/2株'},{n:'オリーブ油',a:'大さじ1'}];}},
-      {time:'夕食',note:'トレーニング後2〜3時間・良質なタンパク質と脂質',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米 or 芋類',a:rice(c)+'g'},{n:'牛赤身 or 豚ロース',a:meat(p)+'g'},{n:'根菜・豆類',a:'1〜2品'},{n:'味噌汁',a:'1杯'}];}}
+      {time:'朝食',note:'起床後1時間以内 · 1食30〜40gタンパク質目標',dist:0.30,
+        foods:function(p,c,f){return [
+          {n:'白米',a:riceG(c*0.30)+'g'},
+          {n:'卵',a:eggCount(p*0.30)+'個'},
+          {n:'サラダチキン or 納豆',a:chickenG(p*0.30)+'g / 1パック'},
+          {n:'バナナ',a:'1本'},
+          {n:'牛乳',a:'200ml（タンパク質7g）'}
+        ];}},
+      {time:'昼食',note:'炭水化物多め · 午後のトレーニングに備える',dist:0.40,
+        foods:function(p,c,f){return [
+          {n:'白米 or パスタ',a:riceG(c*0.40)+'g'},
+          {n:'鶏胸肉 or サーモン',a:rn(p*0.40*4.5)+'g'},
+          {n:'ブロッコリー',a:'1/2株（ビタミンC・亜鉛）'},
+          {n:'オリーブ油',a:'大さじ1（良質な脂質）'}
+        ];}},
+      {time:'夕食',note:'トレ後2〜3時間 · 良質なタンパク質と脂質',dist:0.30,
+        foods:function(p,c,f){return [
+          {n:'白米 or 芋類',a:riceG(c*0.30)+'g'},
+          {n:'牛赤身 or 豚ロース',a:rn(p*0.30*4.5)+'g'},
+          {n:'根菜 · 豆類',a:'1〜2品'},
+          {n:'味噌汁',a:'1杯'},
+          {n:'ギリシャヨーグルト',a:'100g（就寝前カゼイン効果）'}
+        ];}}
     ],
     4:[
-      {time:'朝食',note:'起床後1時間以内・タンパク質と炭水化物を補給',dist:0.25,
-        foods:function(p,c,f){return [{n:'白米',a:rice(c)+'g'},{n:'卵',a:egg(p)+'個'},{n:'納豆',a:'1パック'},{n:'バナナ',a:'1本'}];}},
-      {time:'昼食',note:'炭水化物多め・午後のトレーニングに備える',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米 or パスタ',a:rice(c)+'g'},{n:'鶏胸肉',a:meat(p)+'g'},{n:'ブロッコリー',a:'1/2株'}];}},
-      {time:'補食',note:'トレーニング直後30分以内・このタイミングが一番重要',dist:0.15,
-        foods:function(p,c,f){return [{n:'プロテイン',a:rn(p)+'g相当'},{n:'おにぎり',a:'1〜2個'},{n:'牛乳',a:'200ml'}];}},
-      {time:'夕食',note:'トレーニング後2〜3時間・良質な脂質も摂る',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米 or 芋類',a:rice(c)+'g'},{n:'牛赤身 or 豚ロース',a:meat(p)+'g'},{n:'根菜・豆類',a:'1〜2品'},{n:'味噌汁',a:'1杯'}];}}
+      {time:'朝食',note:'起床後1時間以内 · 1食25〜35gタンパク質',dist:0.25,
+        foods:function(p,c,f){return [
+          {n:'白米',a:riceG(c*0.25)+'g'},
+          {n:'卵',a:eggCount(p*0.25)+'個'},
+          {n:'納豆',a:'1パック'},
+          {n:'バナナ',a:'1本'},
+          {n:'牛乳',a:'200ml'}
+        ];}},
+      {time:'昼食',note:'炭水化物多め · エネルギー補充',dist:0.30,
+        foods:function(p,c,f){return [
+          {n:'白米 or パスタ',a:riceG(c*0.30)+'g'},
+          {n:'鶏胸肉',a:rn(p*0.30*4.5)+'g'},
+          {n:'ブロッコリー',a:'1/2株'}
+        ];}},
+      {time:'補食（トレ後30分以内）',note:'🔑 最重要タイミング。このタイミングだけは絶対に守る',dist:0.15,
+        foods:function(p,c,f){return [
+          {n:'プロテイン',a:rn(p*0.15)+'g（ホエイが最速）'},
+          {n:'おにぎり',a:'1〜2個（糖質でインスリン↑）'},
+          {n:'牛乳',a:'200ml（ロイシン補給）'}
+        ];}},
+      {time:'夕食',note:'トレ後2〜3時間 · 良質な脂質も摂る',dist:0.30,
+        foods:function(p,c,f){return [
+          {n:'白米 or 芋類',a:riceG(c*0.30)+'g'},
+          {n:'牛赤身 or 豚ロース',a:rn(p*0.30*4.5)+'g'},
+          {n:'根菜 · 豆類',a:'1〜2品'},
+          {n:'味噌汁',a:'1杯'}
+        ];}}
     ],
     5:[
-      {time:'朝食',note:'起床後1時間以内・血糖値を上げてタンパク質補給',dist:0.25,
-        foods:function(p,c,f){return [{n:'白米',a:rice(c)+'g'},{n:'卵',a:egg(p)+'個'},{n:'納豆',a:'1パック'},{n:'バナナ',a:'1本'}];}},
-      {time:'昼食',note:'炭水化物多め・エネルギー補充',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米 or パスタ',a:rice(c)+'g'},{n:'鶏胸肉 or サーモン',a:meat(p)+'g'},{n:'ブロッコリー',a:'1/2株'},{n:'オリーブ油',a:'大さじ1'}];}},
-      {time:'補食',note:'トレーニング直後30分以内が最重要タイミング',dist:0.10,
-        foods:function(p,c,f){return [{n:'プロテイン',a:rn(p)+'g相当'},{n:'おにぎり',a:'1〜2個'},{n:'牛乳',a:'200ml'}];}},
-      {time:'夕食',note:'トレーニング後2〜3時間後・良質な脂質も摂る',dist:0.30,
-        foods:function(p,c,f){return [{n:'白米 or 芋類',a:rice(c)+'g'},{n:'牛赤身 or 豚ロース',a:meat(p)+'g'},{n:'根菜・豆類',a:'1〜2品'},{n:'味噌汁',a:'1杯'}];}},
-      {time:'就寝前',note:'カゼインで睡眠中の筋合成をサポート',dist:0.05,
-        foods:function(p,c,f){return [{n:'カゼインプロテイン',a:rn(p)+'g'},{n:'ギリシャヨーグルト',a:'100g'},{n:'ナッツ類',a:'一掴み'}];}}
+      {time:'朝食',note:'起床後1時間以内',dist:0.20,
+        foods:function(p,c,f){return [
+          {n:'白米',a:riceG(c*0.20)+'g'},
+          {n:'卵',a:eggCount(p*0.20)+'個'},
+          {n:'納豆',a:'1パック'},
+          {n:'バナナ',a:'1本'}
+        ];}},
+      {time:'昼食',note:'炭水化物多め',dist:0.25,
+        foods:function(p,c,f){return [
+          {n:'白米 or パスタ',a:riceG(c*0.25)+'g'},
+          {n:'鶏胸肉 or サーモン',a:rn(p*0.25*4.5)+'g'},
+          {n:'ブロッコリー',a:'1/2株'},
+          {n:'オリーブ油',a:'大さじ1'}
+        ];}},
+      {time:'補食（トレ後30分以内）',note:'🔑 最重要',dist:0.15,
+        foods:function(p,c,f){return [
+          {n:'プロテイン',a:rn(p*0.15)+'g（ホエイ）'},
+          {n:'おにぎり',a:'1〜2個'},
+          {n:'牛乳',a:'200ml'}
+        ];}},
+      {time:'夕食',note:'トレ後2〜3時間',dist:0.30,
+        foods:function(p,c,f){return [
+          {n:'白米 or 芋類',a:riceG(c*0.30)+'g'},
+          {n:'牛赤身 or 豚ロース',a:rn(p*0.30*4.5)+'g'},
+          {n:'根菜 · 豆類',a:'1〜2品'},
+          {n:'味噌汁',a:'1杯'}
+        ];}},
+      {time:'就寝前30分',note:'カゼインで睡眠中の筋合成（Res et al. 2012）',dist:0.10,
+        foods:function(p,c,f){return [
+          {n:'ギリシャヨーグルト',a:'150g（カゼイン源）'},
+          {n:'カゼインプロテイン（任意）',a:rn(p*0.10)+'g'},
+          {n:'ナッツ類',a:'一掴み（良質な脂質）'}
+        ];}}
     ]
   };
   var plan=MEALS[freq]||MEALS[3];
@@ -842,9 +992,84 @@ function renderMealPlan(freq){
 function curProg(){return PROGS[cfreq];}
 function curDays(){return curProg().days;}
 function ex(){return curDays()[cd].ph[cp];}
-function adjSets(e){const isCompound=(e.r>=120);return isCompound?Math.max(1,e.s+condAdjSets):e.s;}
-function totS(){return ex().reduce((a,e)=>a+adjSets(e),0);}
-function donS(){let c=0;ex().forEach((e,i)=>{const aS=adjSets(e);for(let j=0;j<aS;j++)if(sd[i+'_'+j])c++;});return c;}
+/* ===== TIME MODE ===== */
+// 科学的根拠: 45-60分が最適ゾーン（テストステロン/コルチゾール比最大）
+// 30分: KEY種目のみ・各1set減 / 45分: 標準-1set / 60分: 標準 / 75分: 標準+1set / 90分: フル
+const TIME_NOTES={
+  30:'🔥 KEY種目のみに絞り込み。短くても効果は落ちません（Schoenfeld 2015）。',
+  45:'⚡ 標準より各種目1set減。効率重視で十分な刺激を確保。',
+  60:'✅ 最適時間帯。テストステロン↑・コルチゾール最小バランス。',
+  75:'💪 余裕ある日のフルメニュー。漸進的過負荷を意識。',
+  90:'🏋️ 最大ボリュームモード。週に1〜2回が上限推奨。'
+};
+function setTimeMode(mins,el){
+  timeMode=mins;
+  document.querySelectorAll('.tib').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('time-mode-note').textContent=TIME_NOTES[mins]||'';
+  sd={};wd=false;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
+  render();
+}
+
+/* ===== WEEK GOAL ===== */
+function setWeekGoal(n,el){
+  weekGoal=n;ls('gym_week_goal',n);
+  document.querySelectorAll('.wgb').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  updateWeekGoalProgress();
+}
+function getThisWeekCount(){
+  const today=new Date();
+  const dow=today.getDay();
+  const mon=new Date(today);mon.setDate(today.getDate()-dow+(dow===0?-6:1));
+  let count=0;
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);if(getLog(fmtDate(d)))count++;}
+  return count;
+}
+function updateWeekGoalProgress(){
+  const done=getThisWeekCount();
+  const goal=weekGoal;
+  const pct=Math.min(100,Math.round(done/goal*100));
+  const bar=document.getElementById('wg-bar');
+  const lbl=document.getElementById('wg-label');
+  const adv=document.getElementById('wg-advice');
+  if(bar)bar.style.width=pct+'%';
+  if(lbl)lbl.textContent='今週 '+done+' / '+goal+'日';
+  if(adv){
+    const remain=goal-done;
+    if(remain<=0)adv.textContent='🎉 今週の目標達成！よくやった！次週は+1日を目指してもOK。';
+    else if(done===0)adv.textContent='📌 今週はまだ0日。今日からスタートしよう。';
+    else adv.textContent='あと'+remain+'日で目標達成。2〜3日に1回ペースを守ろう。';
+  }
+}
+
+function adjSets(e){
+  const isCompound=(e.r>=120);
+  let base=isCompound?Math.max(1,e.s+condAdjSets):e.s;
+  // 時間モードによるset調整
+  if(timeMode===30){
+    // KEY種目のみ実施、各1set（最小限）
+    if(!e.key&&!e.fw===false)return 0;  // non-KEYは除外しない（表示はするがset=1）
+    return e.key?Math.max(1,base-2):Math.max(1,base-2);
+  }
+  if(timeMode===45)return Math.max(1,base-1);
+  if(timeMode===75)return base+1;
+  if(timeMode===90)return base+2;
+  return base; // 60分: 標準
+}
+function totS(){
+  // ウォームアップ有り種目はそのsetも合算
+  return ex().reduce((a,e)=>a+adjSets(e)+(e.d.includes('W-up')?1:0),0);
+}
+function donS(){
+  let c=0;
+  ex().forEach((e,i)=>{
+    const aS=adjSets(e);
+    for(let j=0;j<aS;j++)if(sd[i+'_'+j])c++;
+    if(e.d.includes('W-up')&&wsd[i])c++;  // ウォームアップset
+  });
+  return c;
+}
 function fwPct(){const e=ex();return Math.round(e.filter(x=>x.fw).length/e.length*100);}
 
 function updProg(){
@@ -922,22 +1147,116 @@ function render(){
       const done=sd[i+'_'+s]?' done':'';
       return `<button class="sb${done}" onclick="tapS(${i},${s},${adjInt},'${nm}',this)">${s+1}</button>`;
     }).join('');
-    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${bs}</div></div>`;    card.appendChild(w);
+    // ウォームアップボタン（W-up必須の種目のみ）
+    const hasWU=e.d.includes('W-up');
+    const wuDone=wsd[i]?' done':'';
+    const wuBtn=hasWU?`<button class="sb wu-btn${wuDone}" onclick="tapWU(${i},this)" title="ウォームアップセット（軽重量×10〜15rep）">W-up</button>`:'';
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
   });
   document.getElementById('dlbl').textContent='Day '+day.id+' — '+day.lbl;
   updFW();updProg();
   renderNeckSection(day);
+  renderConsecutiveWarning();
 }
 
 function tapS(ei,si,rest,nm,btn){const k=ei+'_'+si;sd[k]=!sd[k];btn.classList.toggle('done',sd[k]);updProg();if(sd[k])startT(rest,nm);}
+
+// ウォームアップセット完了
+function tapWU(ei,btn){
+  wsd[ei]=!wsd[ei];
+  btn.classList.toggle('done',wsd[ei]);
+  updProg();
+  if(wsd[ei])showToast('W-up完了 ✓ メインセットへ');
+}
+
+// ===== 連日同部位チェック =====
+// 前日のtypeを取得
+function getYesterdayType(){
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const log=getLog(fmtDate(yesterday));
+  return log?log.dayType||log.day:null;
+}
+// 今日選択中のtypeの筋肉グループ
+function getCurrentMuscleGroup(){
+  const day=curDays()[cd];
+  return MUSCLE_GROUP[day.type]||null;
+}
+// 連日チェック → 同グループなら警告+推奨dayを返す
+function checkConsecutiveDay(){
+  const yType=getYesterdayType();
+  if(!yType)return null;
+  const yGroup=MUSCLE_GROUP[yType];
+  const todayGroup=getCurrentMuscleGroup();
+  if(!yGroup||!todayGroup)return null;
+  // full（全身）は常に要注意
+  if(yGroup==='full'||todayGroup==='full')return{warn:true,yGroup,todayGroup,suggest:'full'};
+  if(yGroup===todayGroup)return{warn:true,yGroup,todayGroup,suggest:findAlternativeDay(yGroup)};
+  return null;
+}
+// 同グループ以外の推奨Dayを探す
+function findAlternativeDay(avoidGroup){
+  const days=curDays();
+  for(let i=0;i<days.length;i++){
+    const g=MUSCLE_GROUP[days[i].type];
+    if(g&&g!==avoidGroup&&g!=='full'){
+      return{idx:i,day:days[i]};
+    }
+  }
+  return null;
+}
+// 連日警告バナーの更新
+function renderConsecutiveWarning(){
+  let el=document.getElementById('consec-warning');
+  if(!el){
+    el=document.createElement('div');
+    el.id='consec-warning';
+    el.style.cssText='display:none;background:#1A0500;border:1.5px solid #FF6030;border-radius:12px;padding:11px 14px;margin-bottom:12px;font-size:10px;line-height:1.7';
+    const wrap=document.getElementById('day-tabs-wrap');
+    wrap.parentNode.insertBefore(el,wrap.nextSibling);
+  }
+  const result=checkConsecutiveDay();
+  if(result&&result.warn){
+    const yLbl=MUSCLE_LABEL[result.yGroup]||result.yGroup;
+    const todayLbl=MUSCLE_LABEL[result.todayGroup]||result.todayGroup;
+    let suggestHtml='';
+    if(result.suggest&&result.suggest.idx!==undefined){
+      const alt=result.suggest.day;
+      suggestHtml=`<div style="margin-top:6px"><button onclick="autoSwitchDay(${result.suggest.idx})" style="background:#003A15;border:1px solid #00C853;border-radius:8px;padding:5px 12px;color:#00C853;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font)">▶ ${alt.id}（${alt.lbl}）に切り替える</button></div>`;
+    }
+    el.style.display='block';
+    el.innerHTML=`⚠️ <b style="color:#FF6030">連日同部位の警告</b><br>昨日：${yLbl} → 今日も：${todayLbl}<br><span style="color:#FF9060">同部位は48時間以上空けないと回復不足になります（Schoenfeld & Grgic 2019）</span>${suggestHtml}`;
+  }else{
+    el.style.display='none';
+  }
+}
+function autoSwitchDay(idx){
+  const tabs=document.querySelectorAll('.dt');
+  if(tabs[idx])sD(idx,tabs[idx]);
+  document.getElementById('consec-warning').style.display='none';
+  showToast('Dayを切り替えました ✓');
+}
+
+// ===== 休養日ガイダンス =====
+function logRestDay(){
+  const ds=todayStr();
+  setLog(ds,{day:'REST',dayType:'REST',phase:cp,label:'休養日',freq:cfreq,isRest:true});
+  document.getElementById('rest-guide').style.display='block';
+  document.getElementById('rest-guide-main').style.display='none';
+  renderCalStats();renderCalendar();
+  showToast('休養日を記録しました ✓');
+}
+function hideRestGuide(){
+  document.getElementById('rest-guide').style.display='none';
+  document.getElementById('rest-guide-main').style.display='block';
+}
 function startT(secs,nm){clearInterval(ti);ts=secs;tt=secs;tr=true;document.getElementById('tbox').style.display='block';document.getElementById('tn').textContent=nm+' — '+secs+'秒';document.getElementById('ttog').textContent='一時停止';updT();ti=setInterval(()=>{if(!tr)return;ts--;if(ts<=0){ts=0;clearInterval(ti);const n=document.getElementById('tnum');n.textContent='GO!';n.className='tnum h';document.getElementById('tf').style.width='0%';document.getElementById('tf').className='tf h';document.getElementById('ttog').textContent='完了';return;}updT();},1000);}
 function updT(){const n=document.getElementById('tnum'),f=document.getElementById('tf');n.textContent=ts;const p=Math.round(ts/tt*100);f.style.width=p+'%';if(ts>tt*.5){n.className='tnum';f.className='tf';}else if(ts>tt*.25){n.className='tnum w';f.className='tf w';}else{n.className='tnum h';f.className='tf h';}}
 function togT(){if(ts===0){skipT();return;}tr=!tr;document.getElementById('ttog').textContent=tr?'一時停止':'再開';}
 function skipT(){clearInterval(ti);tr=false;document.getElementById('tbox').style.display='none';}
 function addT(s){ts+=s;tt+=s;updT();}
 
-function sP(p,el){cp=p;sd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
-function sD(idx,el){cd=idx;sd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
+function sP(p,el){cp=p;sd={};wsd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
+function sD(idx,el){cd=idx;sd={};wsd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();renderConsecutiveWarning();}
 function togWDetail(){
   const d=document.getElementById('w-detail');
   const a=document.getElementById('w-arrow');
@@ -958,7 +1277,7 @@ function togW(){
   }
   updProg();
 }
-function resetD(){sd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
+function resetD(){sd={};wsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
 /* ===== CONDITION ===== */
 function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
@@ -1201,7 +1520,7 @@ function showTab(id){
   });
   document.getElementById('tab-'+id).classList.add('active');
   document.getElementById('nb-'+id).classList.add('active');
-  if(id==='calendar'){renderCalendar();renderCalStats();}
+  if(id==='calendar'){renderCalendar();renderCalStats();updateWeekGoalProgress();}
   if(id==='report')renderWeeklyReport();
   if(id==='records'){populateExSelect();renderBWSection();renderPBHall();}
 }
@@ -1212,6 +1531,14 @@ document.getElementById('prog-name-sub').textContent=PROGS[6].sub;
 renderDayTabs();
 initCal();renderCalLegend();loadTodayCond();initCondUI();updCondAdv();
 checkDeload();checkDeloadEnd();loadPrevMemo();initTagRow();render();
+// 週目標UI初期化
+(function(){
+  const wg=ls('gym_week_goal')||3;
+  weekGoal=wg;
+  const btn=document.getElementById('wg'+wg);
+  if(btn){btn.classList.add('active');}
+  updateWeekGoalProgress();
+})();
 </script>
 </body>
 </html>
