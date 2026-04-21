@@ -68,8 +68,10 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .prog-track{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}
 .prog-fill{height:8px;background:linear-gradient(90deg,var(--grn),var(--acc));border-radius:4px;transition:width .4s}
 
-/* Timer */
-.tbox{border:1.5px solid var(--acc2);border-radius:18px;background:#050F1A;padding:15px 16px;margin-bottom:14px;display:none}
+/* Timer — fixed bottom */
+.tbox{border:1.5px solid var(--acc2);border-radius:18px 18px 0 0;background:#050F1A;padding:14px 16px 18px;display:none;
+  position:fixed;bottom:60px;left:0;right:0;max-width:430px;margin:0 auto;z-index:200;
+  box-shadow:0 -4px 24px rgba(30,127,255,.18)}
 .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
 .tn{font-size:13px;color:var(--acc);font-weight:700}
 .tsk{border:none;background:none;font-size:13px;color:var(--acc);cursor:pointer;font-weight:700;font-family:var(--font)}
@@ -98,6 +100,24 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .ca-ok{background:#001233;color:var(--acc);border:1px solid #0A3060}
 .ca-warn{background:#1A1000;color:var(--ylw);border:1px solid #3D2A00}
 .ca-bad{background:#1A0000;color:var(--red);border:1px solid #3A0000}
+
+/* Accordion Steps */
+.acc-step{border:1.5px solid var(--bd);border-radius:18px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.acc-step.done{border-color:#00C853}
+.acc-step.active{border-color:var(--acc2)}
+.acc-hdr{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer;background:var(--bg2);user-select:none}
+.acc-step.locked .acc-hdr{cursor:default;opacity:.5}
+.acc-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--t3);flex-shrink:0;transition:all .2s}
+.acc-step.done .acc-num{background:#00C853;border-color:#00C853;color:#000}
+.acc-step.active .acc-num{background:var(--acc2);border-color:var(--acc2);color:#fff}
+.acc-title{flex:1;font-size:13px;font-weight:800;color:var(--t2)}
+.acc-status{font-size:10px;font-weight:700;color:var(--t4)}
+.acc-step.done .acc-status{color:#00C853}
+.acc-step.active .acc-status{color:var(--acc)}
+.acc-arrow{font-size:10px;color:var(--t4);transition:transform .2s}
+.acc-body{display:none;padding:0 15px 15px}
+.acc-step.active .acc-body{display:block}
+.acc-next-btn{width:100%;margin-top:12px;padding:11px;background:var(--acc2);border:none;border-radius:12px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font)}
 
 /* Deload */
 .dl-banner{background:#1A0000;border:1.5px solid var(--red);border-radius:16px;padding:14px;margin-bottom:14px;display:none}
@@ -396,7 +416,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
         <div class="nutr-stat"><div class="nutr-stat-val" id="n-carb">—</div><div class="nutr-stat-lbl">炭水化物 g/日</div></div>
         <div class="nutr-stat"><div class="nutr-stat-val" id="n-fat">—</div><div class="nutr-stat-lbl">脂質 g/日</div></div>
       </div>
-      <div class="nutr-basis">📚 Jeff Nippard Bear Mode推奨・Schoenfeld et al.(2017)<br>タンパク質 2.0g/kg ／ 維持カロリー+350kcal ／ P:C:F＝25:50:25</div>
+      <div class="nutr-basis">タンパク質 2.0g/kg ／ 維持カロリー+350kcal ／ P:C:F＝25:50:25</div>
       <div class="pfc-bar-outer">
         <div class="pfc-seg-p" id="pfc-p" style="width:25%"></div>
         <div class="pfc-seg-c" id="pfc-c" style="width:50%"></div>
@@ -413,78 +433,152 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
   </div>
 
   <div class="prev-memo" id="prev-memo" style="display:none">
-    <div class="pm-lbl">前回メモ</div>
+    <div class="pm-lbl">📋 前回メモ</div>
     <div class="pm-txt" id="prev-memo-txt"></div>
+    <div style="font-size:9px;color:#3a2858;margin-top:5px;line-height:1.5">💡 メモのコツ：使用重量・セット感覚（余裕あり/ギリギリ）・次回の目標重量を書くと翌回に活きる</div>
   </div>
 
-  <!-- 休養日ガイダンス（非表示で待機） -->
+  <!-- 休養日ガイダンス -->
   <div class="rest-guide" id="rest-guide" style="display:none">
     <div class="rest-guide-ttl">🌿 今日は休養日 — 回復プロトコル</div>
-    <div style="font-size:10px;color:#2A6030;margin-bottom:12px;line-height:1.6">📚 筋肥大の60〜80%はトレ後48〜72時間の回復時に起きます（Damas et al. 2016）。休む日こそ成長中。</div>
-    <div class="rest-item"><div class="rest-icon">🚶</div><div><b>アクティブリカバリー（推奨）</b><br>軽いウォーキング20〜30分。血流促進で疲労物質の除去を促進。筋肉は使わない。</div></div>
-    <div class="rest-item"><div class="rest-icon">💧</div><div><b>水分補給</b><br>体重×35ml以上。回復に必要な栄養素の輸送を助ける。</div></div>
-    <div class="rest-item"><div class="rest-icon">🥩</div><div><b>タンパク質は変えない</b><br>休養日もタンパク質2.0g/kgを維持。筋タンパク合成は休み中も進んでいる。</div></div>
-    <div class="rest-item"><div class="rest-icon">😴</div><div><b>睡眠7〜9時間</b><br>成長ホルモンの80%は深睡眠中に分泌。睡眠こそ最強の回復剤。</div></div>
-    <div class="rest-item"><div class="rest-icon">🧘</div><div><b>ストレッチ5〜10分</b><br>可動域維持とケガ予防。強度なし、気持ちいい範囲で。</div></div>
+    <div style="font-size:10px;color:#2A6030;margin-bottom:12px;line-height:1.6">休む日こそ成長中。筋肥大の大半はトレ後の回復時に起きる。</div>
+    <div class="rest-item"><div class="rest-icon">🚶</div><div><b>軽いウォーキング20〜30分</b><br>血流促進で疲労物質を除去。筋肉は使わない。</div></div>
+    <div class="rest-item"><div class="rest-icon">💧</div><div><b>水分補給（体重×35ml以上）</b><br>栄養素の輸送・回復を助ける。</div></div>
+    <div class="rest-item"><div class="rest-icon">🥩</div><div><b>タンパク質は維持（2.0g/kg）</b><br>休み中も筋タンパク合成は進行中。</div></div>
+    <div class="rest-item"><div class="rest-icon">😴</div><div><b>睡眠7〜9時間</b><br>成長ホルモンの80%は深睡眠中に分泌。</div></div>
+    <div class="rest-item"><div class="rest-icon">🧘</div><div><b>ストレッチ5〜10分</b><br>可動域維持・ケガ予防。無理なく気持ちよい範囲で。</div></div>
     <button onclick="hideRestGuide()" style="width:100%;margin-top:8px;padding:10px;background:#102000;border:1px solid #3A7030;border-radius:10px;font-size:11px;font-weight:800;color:#4ADB60;cursor:pointer;font-family:var(--font)">← トレーニングメニューに戻る</button>
   </div>
 
-  <!-- メインのトレーニングUI -->
+  <!-- アコーディオン -->
   <div id="rest-guide-main">
-  <button class="rest-btn" onclick="logRestDay()">🌿 今日は休養日にする（回復ガイドを見る）</button>
-  <div style="background:#0A1520;border:1.5px solid #0E2A38;border-radius:14px;padding:12px 15px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:800;color:#5BC8FF;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px">⏱ 今日の時間</div>
-    <div style="font-size:10px;color:#2A4858;line-height:1.5;margin-bottom:8px">📚 45〜60分が最適（テストステロン↑・コルチゾール最小）。時間が少ない日はBEAR KEYのみに絞るのが科学的に最効率。</div>
-    <div style="display:flex;gap:5px">
-      <button class="tib" id="ti30" onclick="setTimeMode(30,this)">30分</button>
-      <button class="tib" id="ti45" onclick="setTimeMode(45,this)">45分</button>
-      <button class="tib active" id="ti60" onclick="setTimeMode(60,this)">60分</button>
-      <button class="tib" id="ti75" onclick="setTimeMode(75,this)">75分</button>
-      <button class="tib" id="ti90" onclick="setTimeMode(90,this)">90分</button>
+  <button class="rest-btn" onclick="logRestDay()">🌿 今日は休養日にする</button>
+
+  <!-- STEP 1: コンディション -->
+  <div class="acc-step active" id="acc1">
+    <div class="acc-hdr" onclick="accToggle(1)">
+      <div class="acc-num">1</div>
+      <div class="acc-title">コンディションチェック</div>
+      <div class="acc-status" id="acc1-status">入力中</div>
+      <div class="acc-arrow" id="acc1-arrow">▼</div>
     </div>
-    <div id="time-mode-note" style="font-size:10px;color:#4A90A8;margin-top:7px;line-height:1.5">標準メニュー</div>
+    <div class="acc-body">
+      <div style="font-size:10px;color:var(--t4);margin-bottom:10px">体調でセット数・インターバルを自動調整します</div>
+      <div class="cond-row"><span class="cond-lbl">疲労度</span><div class="cond-btns" id="cb-fatigue"></div></div>
+      <div class="cond-row"><span class="cond-lbl">睡眠</span><div class="cond-btns" id="cb-sleep"></div></div>
+      <div class="cond-row"><span class="cond-lbl">筋肉痛</span><div class="cond-btns" id="cb-soreness"></div></div>
+      <div class="cond-adv" id="cond-adv"></div>
+      <button class="acc-next-btn" id="acc1-next" onclick="accComplete(1)" style="opacity:.4;pointer-events:none">3項目を入力して次へ →</button>
+    </div>
   </div>
 
-  <div class="ph-tabs">
-    <div class="pht active" onclick="sP(1,this)"><div class="pn">Phase</div><div class="pl">1 / W1-3</div></div>
-    <div class="pht" onclick="sP(2,this)"><div class="pn">Phase</div><div class="pl">2 / W4-5</div></div>
-    <div class="pht" onclick="sP(3,this)"><div class="pn">Phase</div><div class="pl">3 / W6+</div></div>
+  <!-- STEP 2: 今日の時間 -->
+  <div class="acc-step locked" id="acc2">
+    <div class="acc-hdr" onclick="accToggle(2)">
+      <div class="acc-num">2</div>
+      <div class="acc-title">⏱ 今日の時間</div>
+      <div class="acc-status" id="acc2-status">ロック中</div>
+      <div class="acc-arrow" id="acc2-arrow">▶</div>
+    </div>
+    <div class="acc-body">
+      <div style="font-size:10px;color:var(--t4);margin-bottom:8px">45〜60分が最適。短い日はKEY種目に絞るのが効率的</div>
+      <div style="display:flex;gap:5px">
+        <button class="tib" id="ti30" onclick="setTimeMode(30,this)">30分</button>
+        <button class="tib" id="ti45" onclick="setTimeMode(45,this)">45分</button>
+        <button class="tib active" id="ti60" onclick="setTimeMode(60,this)">60分</button>
+        <button class="tib" id="ti75" onclick="setTimeMode(75,this)">75分</button>
+        <button class="tib" id="ti90" onclick="setTimeMode(90,this)">90分</button>
+      </div>
+      <div id="time-mode-note" style="font-size:10px;color:#4A90A8;margin-top:7px">標準メニュー（60分）</div>
+      <button class="acc-next-btn" onclick="accComplete(2)">時間を確定して次へ →</button>
+    </div>
   </div>
-  <div class="fw-row">
-    <span class="fw-lbl">FW比率（今日）</span>
-    <div class="fw-track"><div class="fw-fill" id="fwf" style="width:0%"></div></div>
-    <span class="fw-pct" id="fwp">0%</span>
-  </div>
-  <div class="tip" id="tip"></div>
-  <div class="day-tabs" id="day-tabs-wrap"></div>
-  <div class="prog-wrap">
-    <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A</span><span class="prog-val" id="pv">0%</span></div>
-    <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
-  </div>
-  <div class="done-banner" id="db">
-    <div class="done-msg">🎉 セッション完了！</div>
-    <div class="tag-row" id="tag-row"></div>
-    <textarea class="memo-input" id="memo-input" placeholder="今日のメモ（例：チェストプレス70kgで余裕あった→次回72.5kgへ）"></textarea>
-    <button class="save-btn" id="save-btn" onclick="saveWorkout()">記録を保存する</button>
-  </div>
-  <div class="sl">ウォームアップ</div>
-  <div class="card">
-    <div class="wr" onclick="togW()">
-      <div class="wc" id="wc"><svg width="14" height="12" viewBox="0 0 14 12"><polyline points="1.5,6 5.5,10 12.5,1.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="w-info">
-        <div class="wt" onclick="togWDetail()" style="cursor:pointer">インクラインウォーキング 15〜20分 <span id="w-arrow" style="font-size:11px;color:var(--t3)">▼</span></div>
-        <div id="w-detail" style="display:none"><div class="w-params">
-          <div class="w-param"><div class="w-param-label">Speed</div><div class="w-param-val">5.0〜5.5 <span>km/h</span></div></div>
-          <div class="w-param"><div class="w-param-label">Incline</div><div class="w-param-val">4〜6 <span>%</span></div></div>
-          <div class="w-param"><div class="w-param-label">心拍数</div><div class="w-param-val">60〜70 <span>% max</span></div></div>
-          <div class="w-param"><div class="w-param-label">現在設定</div><div class="w-param-val" style="color:var(--red)">2.0% <span>→ 4〜6に UP</span></div></div>
+
+  <!-- STEP 3: ウォームアップ -->
+  <div class="acc-step locked" id="acc3">
+    <div class="acc-hdr" onclick="accToggle(3)">
+      <div class="acc-num">3</div>
+      <div class="acc-title">🚶 ウォームアップ</div>
+      <div class="acc-status" id="acc3-status">ロック中</div>
+      <div class="acc-arrow" id="acc3-arrow">▶</div>
+    </div>
+    <div class="acc-body">
+      <div class="card">
+        <div class="wr" onclick="togW()">
+          <div class="wc" id="wc"><svg width="14" height="12" viewBox="0 0 14 12"><polyline points="1.5,6 5.5,10 12.5,1.5" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="w-info">
+            <div class="wt" onclick="togWDetail()" style="cursor:pointer">インクラインウォーキング 15〜20分 <span id="w-arrow" style="font-size:11px;color:var(--t3)">▼</span></div>
+            <div id="w-detail" style="display:none">
+              <div class="w-params">
+                <div class="w-param"><div class="w-param-label">Speed</div><div class="w-param-val">5.0〜5.5 <span>km/h</span></div></div>
+                <div class="w-param"><div class="w-param-label">Incline</div><div class="w-param-val">4〜6 <span>%</span></div></div>
+                <div class="w-param"><div class="w-param-label">心拍数</div><div class="w-param-val">60〜70 <span>% max</span></div></div>
+              </div>
+              <div class="w-note">20分以内で。勾配4〜6%でグルート活性↑。終了後にストレッチ2〜3分推奨。</div>
+            </div>
+          </div>
         </div>
-        <div class="w-note">⚠️ 20分超でコルチゾール↑・筋分解リスク（Wilson et al.2012）。勾配4〜6%でグルート活性化↑・消費カロリー約40%増。インクライン後は動的ストレッチ2〜3分を追加推奨。</div>
-        </div></div>
+      </div>
+      <button class="acc-next-btn" id="acc3-next" onclick="accComplete(3)" style="opacity:.5;pointer-events:none">チェックして次へ →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: ウェイトトレーニング -->
+  <div class="acc-step locked" id="acc4">
+    <div class="acc-hdr" onclick="accToggle(4)">
+      <div class="acc-num">4</div>
+      <div class="acc-title">🏋️ ウェイトトレーニング</div>
+      <div class="acc-status" id="acc4-status">ロック中</div>
+      <div class="acc-arrow" id="acc4-arrow">▶</div>
+    </div>
+    <div class="acc-body">
+      <div id="consec-warning-anchor"></div>
+      <div class="ph-tabs">
+        <div class="pht active" onclick="sP(1,this)"><div class="pn">Phase</div><div class="pl">1 / W1-3</div></div>
+        <div class="pht" onclick="sP(2,this)"><div class="pn">Phase</div><div class="pl">2 / W4-5</div></div>
+        <div class="pht" onclick="sP(3,this)"><div class="pn">Phase</div><div class="pl">3 / W6+</div></div>
+      </div>
+      <div class="fw-row">
+        <span class="fw-lbl">FW比率</span>
+        <div class="fw-track"><div class="fw-fill" id="fwf" style="width:0%"></div></div>
+        <span class="fw-pct" id="fwp">0%</span>
+      </div>
+      <div class="tip" id="tip"></div>
+      <div class="day-tabs" id="day-tabs-wrap"></div>
+      <div class="prog-wrap">
+        <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A</span><span class="prog-val" id="pv">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+      </div>
+      <div class="done-banner" id="db">
+        <div class="done-msg">🎉 セッション完了！</div>
+        <div class="tag-row" id="tag-row"></div>
+        <!-- メモ クイック挿入 -->
+        <div style="font-size:9px;color:#4A7090;margin-bottom:5px;font-weight:800">💬 メモ（翌回に活きる3点：使用重量・セット感覚・次回目標）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+          <button onclick="insertMemo('次回+2.5kg')" style="font-size:9px;padding:3px 8px;background:#001A10;border:1px solid #006040;border-radius:8px;color:#00C853;cursor:pointer;font-family:var(--font)">次回+2.5kg</button>
+          <button onclick="insertMemo('余裕あり')" style="font-size:9px;padding:3px 8px;background:#001A10;border:1px solid #006040;border-radius:8px;color:#00C853;cursor:pointer;font-family:var(--font)">余裕あり</button>
+          <button onclick="insertMemo('ギリギリだった')" style="font-size:9px;padding:3px 8px;background:#1A0A00;border:1px solid #804000;border-radius:8px;color:#FF9500;cursor:pointer;font-family:var(--font)">ギリギリ</button>
+          <button onclick="insertMemo('フォーム要確認')" style="font-size:9px;padding:3px 8px;background:#1A1000;border:1px solid #806000;border-radius:8px;color:#FFCC00;cursor:pointer;font-family:var(--font)">フォーム要確認</button>
+          <button onclick="insertMemo('重量キープ')" style="font-size:9px;padding:3px 8px;background:#001020;border:1px solid #003060;border-radius:8px;color:#5BC8FF;cursor:pointer;font-family:var(--font)">重量キープ</button>
+          <button onclick="insertMemo('次回同重量で確認')" style="font-size:9px;padding:3px 8px;background:#001020;border:1px solid #003060;border-radius:8px;color:#5BC8FF;cursor:pointer;font-family:var(--font)">次回同重量</button>
+          <button onclick="insertMemo('筋肉痛しっかり来そう')" style="font-size:9px;padding:3px 8px;background:#0A001A;border:1px solid #400080;border-radius:8px;color:#BF5AF2;cursor:pointer;font-family:var(--font)">筋肉痛来そう</button>
+        </div>
+        <textarea class="memo-input" id="memo-input" placeholder="例）チェストプレス70kg → 余裕あり、次回72.5kgへ。ショルダーはフォームが崩れ気味、鏡で確認する。"></textarea>
+        <button class="save-btn" id="save-btn" onclick="saveWorkout()">記録を保存する</button>
+      </div>
+      <div class="sl">ウェイトトレーニング</div>
+      <div class="card" id="ec"></div>
+      <div id="neck-section" style="display:none">
+        <div class="sl" style="color:#BF5AF2;margin-top:4px">★ ネックルーティン</div>
+        <div class="card" id="neck-exercises"></div>
+        <div style="font-size:11px;color:#8A60C8;padding:0 14px 12px;line-height:1.65">首の専用トレで首横断面積が有意増加。「服を着て最も目立つ部位」</div>
       </div>
     </div>
   </div>
-  <div class="sl">ウェイトトレーニング</div>
+
+  </div><!-- /rest-guide-main -->
+
+  <!-- タイマー fixed -->
   <div class="tbox" id="tbox">
     <div class="th"><span class="tn" id="tn">REST</span><button class="tsk" onclick="skipT()">スキップ ×</button></div>
     <div class="tb">
@@ -495,14 +589,8 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
       </div>
     </div>
   </div>
-  <div class="card" id="ec"></div>
-  <div id="neck-section" style="display:none">
-    <div class="sl" style="color:#BF5AF2;margin-top:4px">★ ネックルーティン（有酸素前5分で実施）</div>
-    <div class="card" id="neck-exercises"></div>
-    <div style="font-size:11px;color:#8A60C8;padding:0 14px 12px;line-height:1.65">[Nippard推奨]首の専用トレのみで首横断面積が有意増加。「服を着て最も目立つ部位」</div>
-  </div>
-  </div><!-- /rest-guide-main -->
-  <button class="rb" onclick="resetD()">リセット</button>
+
+  <button class="rb" onclick="resetAll()">リセット</button>
 </div>
 </div>
 
@@ -513,7 +601,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
   <!-- 週目標設定 -->
   <div style="background:#0A0520;border:1.5px solid #2A1A50;border-radius:14px;padding:13px 15px;margin-bottom:12px">
     <div style="font-size:10px;font-weight:800;color:#BF5AF2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">📅 今週の目標日数</div>
-    <div style="font-size:10px;color:#6A40A8;line-height:1.6;margin-bottom:10px">📚 習慣化研究（Lally et al. 2010）：習慣定着まで平均66日。まず週3〜4から始め、達成できたら増やすのが最速。</div>
+    <div style="font-size:10px;color:#6A40A8;line-height:1.6;margin-bottom:10px">習慣化まで平均66日。週3〜4日から始めて徐々に増やすのが定着の最速ルート。</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
       <button class="wgb" id="wg3" onclick="setWeekGoal(3,this)">週3日</button>
       <button class="wgb" id="wg4" onclick="setWeekGoal(4,this)">週4日</button>
@@ -622,12 +710,20 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div class="modal-title">ジム記録</div>
-    <div class="modal-sub">この日のトレーニング内容を選択</div>
+    <div class="modal-title" id="modal-title">ジム記録</div>
     <div class="modal-date-lbl" id="modal-date-lbl"></div>
-    <div class="day-grid" id="modal-day-grid"></div>
-    <div class="modal-btns"><button class="modal-cancel" onclick="closeModal()">キャンセル</button><button class="modal-save" onclick="saveModalLog()">保存する</button></div>
-    <button class="modal-del" id="modal-del-btn" onclick="deleteModalLog()">この日の記録を削除</button>
+    <!-- 過去記録表示エリア -->
+    <div id="modal-log-detail" style="display:none;background:#080F18;border-radius:12px;padding:12px 14px;margin-bottom:12px">
+      <div id="modal-log-content" style="font-size:11px;color:var(--t2);line-height:1.8"></div>
+      <button onclick="switchToEdit()" style="margin-top:8px;width:100%;padding:8px;background:transparent;border:1px solid var(--bd2);border-radius:10px;font-size:11px;font-weight:700;color:var(--t3);cursor:pointer;font-family:var(--font)">✏️ 編集する</button>
+    </div>
+    <!-- 記録入力エリア -->
+    <div id="modal-edit-area">
+      <div class="modal-sub">この日のトレーニング内容を選択</div>
+      <div class="day-grid" id="modal-day-grid"></div>
+      <div class="modal-btns"><button class="modal-cancel" onclick="closeModal()">キャンセル</button><button class="modal-save" onclick="saveModalLog()">保存する</button></div>
+      <button class="modal-del" id="modal-del-btn" onclick="deleteModalLog()">この日の記録を削除</button>
+    </div>
   </div>
 </div>
 
@@ -996,11 +1092,11 @@ function ex(){return curDays()[cd].ph[cp];}
 // 科学的根拠: 45-60分が最適ゾーン（テストステロン/コルチゾール比最大）
 // 30分: KEY種目のみ・各1set減 / 45分: 標準-1set / 60分: 標準 / 75分: 標準+1set / 90分: フル
 const TIME_NOTES={
-  30:'🔥 KEY種目のみに絞り込み。短くても効果は落ちません（Schoenfeld 2015）。',
-  45:'⚡ 標準より各種目1set減。効率重視で十分な刺激を確保。',
-  60:'✅ 最適時間帯。テストステロン↑・コルチゾール最小バランス。',
-  75:'💪 余裕ある日のフルメニュー。漸進的過負荷を意識。',
-  90:'🏋️ 最大ボリュームモード。週に1〜2回が上限推奨。'
+  30:'KEY種目のみ。短くても絞れば効果は落ちない。',
+  45:'標準より各種目1set減。効率重視で十分な刺激を確保。',
+  60:'最適時間帯。ホルモンバランスと筋肥大効果のベスト。',
+  75:'余裕ある日のフルメニュー。漸進的過負荷を意識。',
+  90:'最大ボリューム。週1〜2回が上限目安。'
 };
 function setTimeMode(mins,el){
   timeMode=mins;
@@ -1224,7 +1320,7 @@ function renderConsecutiveWarning(){
       suggestHtml=`<div style="margin-top:6px"><button onclick="autoSwitchDay(${result.suggest.idx})" style="background:#003A15;border:1px solid #00C853;border-radius:8px;padding:5px 12px;color:#00C853;font-size:10px;font-weight:800;cursor:pointer;font-family:var(--font)">▶ ${alt.id}（${alt.lbl}）に切り替える</button></div>`;
     }
     el.style.display='block';
-    el.innerHTML=`⚠️ <b style="color:#FF6030">連日同部位の警告</b><br>昨日：${yLbl} → 今日も：${todayLbl}<br><span style="color:#FF9060">同部位は48時間以上空けないと回復不足になります（Schoenfeld & Grgic 2019）</span>${suggestHtml}`;
+    el.innerHTML=`⚠️ <b style="color:#FF6030">連日同部位の警告</b><br>昨日：${yLbl} → 今日も：${todayLbl}<br><span style="color:#FF9060">同部位は48時間以上空けないと回復不足になります</span>${suggestHtml}`;
   }else{
     el.style.display='none';
   }
@@ -1265,17 +1361,97 @@ function togWDetail(){
   d.style.display=show?'block':'none';
   if(a)a.textContent=show?'▲':'▼';
 }
+// ウォームアップ完了連動：Step3のNextボタンを有効化
 function togW(){
   wd=!wd;
   document.getElementById('wc').classList.toggle('done',wd);
-  // チェック完了時に詳細を自動折りたたみ
   if(wd){
     const d=document.getElementById('w-detail');
     const a=document.getElementById('w-arrow');
-    if(d){d.style.display='none';}
-    if(a){a.textContent='▼';}
+    if(d)d.style.display='none';
+    if(a)a.textContent='▼';
+    // Step3のNextボタンを有効化
+    const btn=document.getElementById('acc3-next');
+    if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  } else {
+    const btn=document.getElementById('acc3-next');
+    if(btn){btn.style.opacity='.5';btn.style.pointerEvents='none';}
   }
   updProg();
+}
+
+// ===== ACCORDION =====
+let accStep=1; // 現在のアクティブステップ
+
+function accToggle(n){
+  // ロック中は開かない
+  const el=document.getElementById('acc'+n);
+  if(el&&el.classList.contains('locked'))return;
+  // 既に開いている場合は閉じる（完了済みのみ）
+  if(el&&el.classList.contains('done')){
+    const body=el.querySelector('.acc-body');
+    const arrow=document.getElementById('acc'+n+'-arrow');
+    if(body){
+      const isOpen=body.style.display!=='none'&&el.classList.contains('active');
+      // done済みステップのトグル
+      el.classList.toggle('active');
+      if(arrow)arrow.textContent=el.classList.contains('active')?'▼':'▶';
+    }
+  }
+}
+
+function accComplete(n){
+  const el=document.getElementById('acc'+n);
+  if(!el)return;
+  el.classList.remove('active');
+  el.classList.add('done');
+  const status=document.getElementById('acc'+n+'-status');
+  const arrow=document.getElementById('acc'+n+'-arrow');
+  if(status)status.textContent='完了 ✓';
+  if(arrow)arrow.textContent='▶';
+
+  // 次のステップをアンロック
+  const next=document.getElementById('acc'+(n+1));
+  if(next){
+    next.classList.remove('locked');
+    next.classList.add('active');
+    const ns=document.getElementById('acc'+(n+1)+'-status');
+    const na=document.getElementById('acc'+(n+1)+'-arrow');
+    if(ns)ns.textContent=n+1===4?'進行中':'入力中';
+    if(na)na.textContent='▼';
+    // Step4開放時にrenderConsecutiveWarning
+    if(n+1===4)renderConsecutiveWarning();
+  }
+  accStep=n+1;
+}
+
+// コンディション全入力チェック → Step1 Nextボタン有効化
+function checkCondComplete(){
+  const f=condState.fatigue,sl=condState.sleep,so=condState.soreness;
+  const btn=document.getElementById('acc1-next');
+  if(f&&sl&&so){
+    if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  } else {
+    if(btn){btn.style.opacity='.4';btn.style.pointerEvents='none';}
+  }
+}
+
+function resetAll(){
+  // アコーディオンリセット
+  [1,2,3,4].forEach(n=>{
+    const el=document.getElementById('acc'+n);
+    if(!el)return;
+    el.classList.remove('done','active','locked');
+    if(n===1){el.classList.add('active');document.getElementById('acc1-status').textContent='入力中';}
+    else{el.classList.add('locked');document.getElementById('acc'+n+'-status').textContent='ロック中';}
+    const arrow=document.getElementById('acc'+n+'-arrow');
+    if(arrow)arrow.textContent=n===1?'▼':'▶';
+  });
+  // Step1 nextボタンをリセット
+  const btn=document.getElementById('acc1-next');
+  if(btn){btn.style.opacity='.4';btn.style.pointerEvents='none';}
+  accStep=1;
+  resetD();
 }
 function resetD(){sd={};wsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
@@ -1293,26 +1469,26 @@ function updCondAdv(){
   let txt,cls;
   if(score<2){
     condAdjSets=+1; condAdjIntervalExtra=0;
-    txt='🔥 絶好調！<b>コンパウンド+1set追加</b> ／ RIR 1〜2目標 ／ +2.5kgチャレンジday<br><small style="opacity:.75">根拠: Helms et al. 2018 — 低RPE日はボリューム増加で超適応</small>';
+    txt='🔥 絶好調！コンパウンド+1set追加 ／ RIR 1〜2目標 ／ +2.5kgチャレンジday';
     cls='ca-good';badge.textContent='絶好調';badge.style.background='#001A0A';badge.style.color='var(--grn)';
   } else if(score<3){
     condAdjSets=0; condAdjIntervalExtra=0;
-    txt='👍 良好。通常通り実施 ／ RIR 2〜3目標 ／ コンパウンドのインターバルは3分しっかり<br><small style="opacity:.75">根拠: Schoenfeld 2016 — 3分インターバルが筋肥大最大化</small>';
+    txt='👍 良好。通常通り実施 ／ RIR 2〜3目標 ／ インターバルは3分しっかり<br><small style="opacity:.6">3分インターバルで筋肥大最大化</small>';
     cls='ca-ok';badge.textContent='良好';badge.style.background='#001233';badge.style.color='var(--acc)';
   } else if(score<3.8){
     condAdjSets=-1; condAdjIntervalExtra=30;
-    txt='😐 疲れ気味。<b>コンパウンド-1set・インターバル+30秒</b> ／ RIR 3〜4目標 ／ 重量キープ優先<br><small style="opacity:.75">根拠: Bartolomei et al. 2024 — 回復スコア低下時のボリューム減が過剰疲労を防ぐ</small>';
+    txt='😐 疲れ気味。<b>コンパウンド-1set・インターバル+30秒</b> ／ RIR 3〜4目標 ／ 重量キープ優先<br><small style="opacity:.6">回復低下時はボリューム減で過剰疲労を防ぐ</small>';
     cls='ca-warn';badge.textContent='疲れ気味';badge.style.background='#1A1000';badge.style.color='var(--ylw)';
   } else {
     condAdjSets=-1; condAdjIntervalExtra=60;
-    txt='🚨 かなり疲れ。<b>コンパウンド-1set・重量-5%・インターバル+60秒</b> ／ RIR 4+目標 ／ デロードも検討<br><small style="opacity:.75">根拠: Refalo et al. 2024 — 筋肥大は RIR 0〜3、高疲労時は RIR 増加で injury risk↓</small>';
+    txt='🚨 かなり疲れ。<b>コンパウンド-1set・重量-5%・インターバル+60秒</b> ／ RIR 4+目標 ／ デロードも検討<br><small style="opacity:.6">高疲労時はRIR増加でケガリスク低減</small>';
     cls='ca-bad';badge.textContent='要注意';badge.style.background='#1A0000';badge.style.color='var(--red)';
   }
   adv.innerHTML='<div>'+txt+'</div>';adv.className='cond-adv '+cls;
   render();
 }
 
-function setCond(key,val){condState[key]=val;const d=ls('gym_cond_'+todayStr())||{};d[key]=val;ls('gym_cond_'+todayStr(),d);initCondUI();updCondAdv();}
+function setCond(key,val){condState[key]=val;const d=ls('gym_cond_'+todayStr())||{};d[key]=val;ls('gym_cond_'+todayStr(),d);initCondUI();updCondAdv();checkCondComplete();}
 function loadTodayCond(){const d=ls('gym_cond_'+todayStr());if(d){condState.fatigue=d.fatigue||0;condState.sleep=d.sleep||0;condState.soreness=d.soreness||0;}else condState={fatigue:0,sleep:0,soreness:0};}
 
 /* ===== DELOAD ===== */
@@ -1360,6 +1536,12 @@ function dismissDeload(){ls('gym_deload_dismissed',todayStr());document.getEleme
 function checkDeloadEnd(){const end=ls('gym_deload_end');if(end&&new Date()>new Date(end)){ls('gym_deload_mode',false);try{localStorage.removeItem('gym_deload_end');}catch(e){}showToast('\u30c7\u30ed\u30fc\u30c9\u9031\u7d42\u4e86\u3002\u901a\u5e38\u30e2\u30fc\u30c9\u306b\u623b\u308a\u307e\u3057\u305f\u3002');render();}}
 
 /* ===== MEMO & TAGS ===== */
+function insertMemo(text){
+  const ta=document.getElementById('memo-input');
+  if(!ta)return;
+  ta.value=ta.value?(ta.value+' / '+text):text;
+  ta.focus();
+}
 function loadPrevMemo(){const today=new Date();for(let i=1;i<=30;i++){const d=new Date(today);d.setDate(d.getDate()-i);const log=getLog(fmtDate(d));if(log&&(log.note||log.tags)){const el=document.getElementById('prev-memo'),txt=document.getElementById('prev-memo-txt'),parts=[],mm=fmtDate(d).slice(5).replace('-','/');if(log.tags&&log.tags.length)parts.push(log.tags.join(' '));if(log.note)parts.push(log.note);txt.textContent=mm+' | '+parts.join(' / ');el.style.display='block';return;}}document.getElementById('prev-memo').style.display='none';}
 function initTagRow(){document.getElementById('tag-row').innerHTML=QUICK_TAGS.map((t,i)=>'<button class="tag-btn'+(selTags.includes(i)?' sel':'')+'" onclick="toggleTag('+i+',this)">'+t+'</button>').join('');}
 function toggleTag(i,btn){const idx=selTags.indexOf(i);if(idx>=0)selTags.splice(idx,1);else selTags.push(i);btn.classList.toggle('sel',selTags.includes(i));}
@@ -1412,15 +1594,81 @@ function renderCalendar(){
 function openModal(ds,log){
   modalDs=ds;modalSelDay=log?log.day:'';
   const parts=ds.split('-');
-  document.getElementById('modal-date-lbl').textContent=parts[0]+'\u5e74'+parseInt(parts[1])+'\u6708'+parseInt(parts[2])+'\u65e5';
+  const dateStr=parts[0]+'年'+parseInt(parts[1])+'月'+parseInt(parts[2])+'日';
+  document.getElementById('modal-date-lbl').textContent=dateStr;
+
+  const isToday=ds===todayStr();
+  const detail=document.getElementById('modal-log-detail');
+  const editArea=document.getElementById('modal-edit-area');
+
+  if(log&&!isToday){
+    // 過去記録の表示モード
+    document.getElementById('modal-title').textContent='📋 '+dateStr+' の記録';
+    const c=DAY_COLORS[log.dayType||log.day]||DAY_COLORS['A'];
+    let html='';
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="background:${c.bg};color:${c.text};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;border:1px solid ${c.text}40">${log.day||'?'} ${c.type}</span>
+      ${log.label?`<span style="font-size:11px;color:var(--t3)">${log.label}</span>`:''}
+    </div>`;
+    if(log.fatigue||log.sleep||log.soreness){
+      html+=`<div style="font-size:10px;color:var(--t4);margin-bottom:8px">疲労:${log.fatigue||'-'} / 睡眠:${log.sleep||'-'} / 筋肉痛:${log.soreness||'-'}</div>`;
+    }
+    // 重量履歴（当日のWH記録）
+    const prog=PROGS[log.freq||6];
+    const dayDef=prog?prog.days.find(d=>d.id===log.day):null;
+    if(dayDef){
+      const ph=log.phase||1;
+      const exList=dayDef.ph[ph]||[];
+      const weights=exList.map(e=>{
+        const wh=getWH(e.n);
+        const entry=wh.find(x=>x.date===ds);
+        return entry?`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #0E1E38">
+          <span style="color:var(--t2)">${e.n}</span>
+          <span style="color:var(--acc);font-weight:800">${entry.weight}kg</span>
+        </div>`:null;
+      }).filter(Boolean).join('');
+      if(weights){
+        html+=`<div style="margin-bottom:8px;font-size:10px;font-weight:800;color:var(--t4);margin-bottom:6px">使用重量</div>${weights}`;
+      }
+    }
+    if(log.tags&&log.tags.length){
+      html+=`<div style="margin-top:8px">${log.tags.map(t=>`<span style="font-size:10px;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:2px 8px;margin-right:4px">${t}</span>`).join('')}</div>`;
+    }
+    if(log.note){
+      html+=`<div style="margin-top:8px;font-size:11px;color:var(--t2);background:var(--bg3);border-radius:8px;padding:8px 10px;line-height:1.6">💬 ${log.note}</div>`;
+    }
+    if(log.isRest){
+      html='<div style="color:#4ADB60;font-size:13px;font-weight:800">🌿 休養日</div>';
+    }
+    document.getElementById('modal-log-content').innerHTML=html;
+    detail.style.display='block';
+    editArea.style.display='none';
+  } else {
+    // 新規入力 or 今日の編集モード
+    document.getElementById('modal-title').textContent='ジム記録';
+    detail.style.display='none';
+    editArea.style.display='block';
+    const shown=new Set();
+    const g=document.getElementById('modal-day-grid');
+    g.innerHTML=Object.values(PROGS).flatMap(p=>p.days).filter(d=>{if(shown.has(d.id))return false;shown.add(d.id);return true;}).map(d=>{
+      const c=DAY_COLORS[d.type]||DAY_COLORS['A'];const sel=d.id===modalSelDay?'sel':'';
+      return '<div class="day-opt '+sel+'" style="'+(sel?'background:'+c.bg+';border-color:'+c.text:'')+'" onclick="selModalDay(\''+d.id+'\',this)"><div class="day-opt-id" style="color:'+c.text+'">'+d.id+'</div><div class="day-opt-lbl">'+d.type+'</div></div>';
+    }).join('');
+    document.getElementById('modal-del-btn').style.display=log?'block':'none';
+  }
+  document.getElementById('modal').classList.add('show');
+}
+function switchToEdit(){
+  document.getElementById('modal-log-detail').style.display='none';
+  document.getElementById('modal-edit-area').style.display='block';
+  document.getElementById('modal-title').textContent='ジム記録';
   const shown=new Set();
   const g=document.getElementById('modal-day-grid');
   g.innerHTML=Object.values(PROGS).flatMap(p=>p.days).filter(d=>{if(shown.has(d.id))return false;shown.add(d.id);return true;}).map(d=>{
     const c=DAY_COLORS[d.type]||DAY_COLORS['A'];const sel=d.id===modalSelDay?'sel':'';
     return '<div class="day-opt '+sel+'" style="'+(sel?'background:'+c.bg+';border-color:'+c.text:'')+'" onclick="selModalDay(\''+d.id+'\',this)"><div class="day-opt-id" style="color:'+c.text+'">'+d.id+'</div><div class="day-opt-lbl">'+d.type+'</div></div>';
   }).join('');
-  document.getElementById('modal-del-btn').style.display=log?'block':'none';
-  document.getElementById('modal').classList.add('show');
+  document.getElementById('modal-del-btn').style.display='block';
 }
 function selModalDay(id,el){modalSelDay=id;document.querySelectorAll('.day-opt').forEach(x=>{x.classList.remove('sel');x.style.background='';x.style.borderColor='';});const c=DAY_COLORS[id]||DAY_COLORS['A'];el.classList.add('sel');el.style.background=c.bg;el.style.borderColor=c.text;}
 function closeModal(e){if(!e||e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('show');}
