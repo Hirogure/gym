@@ -367,7 +367,11 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 <div id="tab-workout" class="tab active">
 <div class="app">
   <div class="hdr">
-    <div><h1>Power Bear</h1><p id="prog-name-sub">PPL×2 ／ 週6日</p></div>
+    <div>
+      <h1>Power Bear</h1>
+      <p id="prog-name-sub">PPL×2 ／ 週6日</p>
+      <p id="today-date-lbl" style="font-size:13px;font-weight:800;color:var(--acc);margin-top:4px;letter-spacing:.02em"></p>
+    </div>
     <div class="hdr-r"><div class="phase-pill" id="phase-badge">Phase 1</div></div>
   </div>
 
@@ -386,13 +390,6 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="dl-btns"><button class="dl-start" onclick="startDeload()">デロード週を開始</button><button class="dl-later" onclick="dismissDeload()">後で</button></div>
   </div>
 
-  <div class="cond-panel">
-    <div class="cond-hdr">コンディションチェック <span class="cond-badge" id="cond-badge">未入力</span></div>
-    <div class="cond-row"><span class="cond-lbl">疲労度</span><div class="cond-btns" id="cb-fatigue"></div></div>
-    <div class="cond-row"><span class="cond-lbl">睡眠</span><div class="cond-btns" id="cb-sleep"></div></div>
-    <div class="cond-row"><span class="cond-lbl">筋肉痛</span><div class="cond-btns" id="cb-soreness"></div></div>
-    <div class="cond-adv" id="cond-adv"></div>
-  </div>
 
   <div class="nutr-card" id="nutr-card">
     <div class="nutr-ttl">ベアモード 栄養目標</div>
@@ -1154,15 +1151,14 @@ function adjSets(e){
   return base; // 60分: 標準
 }
 function totS(){
-  // ウォームアップ有り種目はそのsetも合算
-  return ex().reduce((a,e)=>a+adjSets(e)+(e.d.includes('W-up')?1:0),0);
+  // W-upはメインセット数のみカウント（W-upは必須ではなく推奨のためブロックしない）
+  return ex().reduce((a,e)=>a+adjSets(e),0);
 }
 function donS(){
   let c=0;
   ex().forEach((e,i)=>{
     const aS=adjSets(e);
     for(let j=0;j<aS;j++)if(sd[i+'_'+j])c++;
-    if(e.d.includes('W-up')&&wsd[i])c++;  // ウォームアップset
   });
   return c;
 }
@@ -1175,11 +1171,19 @@ function updProg(){
   const pct=tot>0?Math.round(don/tot*100):0;
   document.getElementById('pv').textContent=pct+'%';
   document.getElementById('pf').style.width=pct+'%';
-  // 1セットでもこなしたら保存バナー表示（途中保存対応）
   const db=document.getElementById('db');
-  if(pct>=100){db.style.display='block';document.querySelector('#db .done-msg').textContent='🎉 セッション完了！';const sb=document.getElementById('save-btn');if(sb)sb.textContent='記録を保存する';}
-  else if(pct>0){db.style.display='block';document.querySelector('#db .done-msg').textContent='💾 途中保存もできます（'+pct+'% 完了）';const sb=document.getElementById('save-btn');if(sb)sb.textContent='途中保存する';}
-  else{db.style.display='none';}
+  const sb=document.getElementById('save-btn');
+  if(pct>=100||wd){
+    db.style.display='block';
+    document.querySelector('#db .done-msg').textContent='🎉 セッション完了！';
+    if(sb)sb.textContent='記録を保存する';
+  } else if(pct>0){
+    db.style.display='block';
+    document.querySelector('#db .done-msg').textContent='💾 途中保存（'+pct+'% 完了）';
+    if(sb)sb.textContent='途中保存する';
+  } else {
+    db.style.display='none';
+  }
 }
 function updFW(){const p=fwPct();document.getElementById('fwf').style.width=p+'%';document.getElementById('fwp').textContent=p+'%';}
 
@@ -1803,6 +1807,14 @@ function showTab(id){
 }
 
 /* ===== INIT ===== */
+// 今日の日付を表示
+(function(){
+  const now=new Date();
+  const dow=['日','月','火','水','木','金','土'];
+  const lbl=`${now.getMonth()+1}月${now.getDate()}日（${dow[now.getDay()]}）`;
+  const el=document.getElementById('today-date-lbl');
+  if(el)el.textContent='📅 '+lbl;
+})();
 document.getElementById('tip').textContent=PH[1].tip;
 document.getElementById('prog-name-sub').textContent=PROGS[6].sub;
 renderDayTabs();
