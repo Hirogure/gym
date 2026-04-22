@@ -1351,8 +1351,8 @@ function togT(){if(ts===0){skipT();return;}tr=!tr;document.getElementById('ttog'
 function skipT(){clearInterval(ti);tr=false;document.getElementById('tbox').style.display='none';}
 function addT(s){ts+=s;tt+=s;updT();}
 
-function sP(p,el){cp=p;sd={};wsd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
-function sD(idx,el){cd=idx;sd={};wsd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();renderConsecutiveWarning();}
+function sP(p,el){cp=p;sd={};wsd={};nsd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
+function sD(idx,el){cd=idx;sd={};wsd={};nsd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();renderConsecutiveWarning();}
 function togWDetail(){
   const d=document.getElementById('w-detail');
   const a=document.getElementById('w-arrow');
@@ -1563,17 +1563,30 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 /* ===== CALENDAR ===== */
 function initCal(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();}
 function calMove(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();renderCalStats();}
+function isTrainingLog(log){return log&&!log.isRest;}
 function renderCalStats(){
   const today=new Date();let mc=0;const dim=new Date(calYear,calMonth+1,0).getDate();
-  for(let d=1;d<=dim;d++){const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(getLog(ds))mc++;}
+  for(let d=1;d<=dim;d++){const ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const log=getLog(ds);if(isTrainingLog(log))mc++;}
   document.getElementById('st-month').textContent=mc;
-  let tc=0;try{for(let k in localStorage)if(k.startsWith('gym_log_'))tc++;}catch(e){}
+  let tc=0;try{for(let k in localStorage){if(k.startsWith('gym_log_')){const log=ls(k);if(isTrainingLog(log))tc++;}}}catch(e){}
   document.getElementById('st-total').textContent=tc;
-  let streak=0;for(let i=0;i<365;i++){const d=new Date(today);d.setDate(d.getDate()-i);if(getLog(fmtDate(d)))streak++;else if(i>0)break;}
+  let streak=0;for(let i=0;i<365;i++){const d=new Date(today);d.setDate(d.getDate()-i);const log=getLog(fmtDate(d));if(isTrainingLog(log))streak++;else if(i>0)break;}
   document.getElementById('st-streak').textContent=streak;
 }
 function getDayColor(log){if(!log)return null;const t=log.dayType||log.day;return DAY_COLORS[t]||DAY_COLORS[log.day]||null;}
-function renderCalLegend(){document.getElementById('cal-legend').innerHTML=Object.entries(DAY_COLORS).slice(0,6).map(([id,c])=>'<div class="leg-item"><div class="leg-dot" style="background:'+c.bg+';border:1px solid '+c.text+'40"></div>'+id+':'+c.type+'</div>').join('');}
+function renderCalLegend(){
+  // cfreqに合わせた実際のDayラベルを表示
+  const prog=PROGS[cfreq];
+  const items=prog?prog.days.map(d=>{
+    const c=DAY_COLORS[d.type]||DAY_COLORS['A'];
+    // 実際の部位名を短縮表示
+    const shortLbl=d.lbl.replace(/（[^）]*）/g,'').replace(/\(.*?\)/g,'').trim().slice(0,10);
+    return `<div class="leg-item"><div class="leg-dot" style="background:${c.bg};border:1px solid ${c.text}60"></div><span style="color:${c.text}">${d.id}</span>:${shortLbl}</div>`;
+  }):[];
+  // REST凡例を追加
+  items.push('<div class="leg-item"><div class="leg-dot" style="background:#0A1A08;border:1px solid #4ADB6060"></div><span style="color:#4ADB60">REST</span>:休養日</div>');
+  document.getElementById('cal-legend').innerHTML=items.join('');
+}
 function renderCalendar(){
   const first=new Date(calYear,calMonth,1).getDay(),dim=new Date(calYear,calMonth+1,0).getDate(),today=new Date(),todayDs=fmtDate(today);
   document.getElementById('cal-month-lbl').textContent=calYear+'\u5e74 '+(calMonth+1)+'\u6708';
@@ -1738,6 +1751,15 @@ function renderProgressChart(){
 
 /* ===== NECK TRAINING ===== */
 const NECK_PULL_TYPES=['C','F','UB'];
+let nsd={};  // ネックセット完了状態
+
+function tapNeck(ei,si,rest,nm,btn){
+  const k=ei+'_'+si;
+  nsd[k]=!nsd[k];
+  btn.classList.toggle('done',nsd[k]);
+  if(nsd[k]) startT(rest,nm);
+}
+
 function renderNeckSection(day){
   const sec=document.getElementById('neck-section');if(!sec)return;
   const isPull=NECK_PULL_TYPES.includes(day.type)||(day.lbl&&(day.lbl.includes('Pull')||day.lbl.includes('Back')));
@@ -1745,15 +1767,22 @@ function renderNeckSection(day){
   sec.style.display='block';
   const sets=cp>=3?3:2;
   const necks=[
-    {n:'\u30cd\u30c3\u30af\u30a8\u30af\u30b9\u30c6\u30f3\u30b7\u30e7\u30f3',d:sets+'set\u00d712-15rep / \u30d7\u30ec\u30fc\u30c8\u304bDB\u3092\u982d\u306e\u5f8c\u308d\u306b / r:60\u79d2',r:60},
-    {n:'\u30cd\u30c3\u30af\u30d5\u30ec\u30af\u30b7\u30e7\u30f3',d:sets+'set\u00d712-15rep / \u30d7\u30ec\u30fc\u30c8\u304bDB\u3092\u984d\u306b\u5f53\u3066\u308b / r:60\u79d2',r:60}
+    {n:'ネックエクステンション',d:sets+'set×12-15rep / プレートかDBを頭の後ろに / r:60秒',r:60},
+    {n:'ネックフレクション',d:sets+'set×12-15rep / プレートかDBを額に当てる / r:60秒',r:60}
   ];
   const exCard=document.getElementById('neck-exercises');
-  exCard.innerHTML=necks.map(e=>{
-    const base=loadBase(e.n);const nm=e.n;
-    const t=base>0?base+'kg\u301c (+0.5kg)':'\u91cd\u91cf\u5165\u529b\u2192\u8a18\u9332';
-    const bs=Array.from({length:sets},(_,s)=>'<button class="sb" onclick="startT('+e.r+',\''+nm+'\')">  '+(s+1)+'</button>').join('');
-    return '<div class="er"><div class="er-top"><div class="el"><div class="enw"><span class="enm">'+e.n+'</span><span style="font-size:9px;background:#2A0A50;color:#BF5AF2;border-radius:5px;padding:2px 7px;font-weight:800;border:1px solid #6030A0">\u2605NECK</span></div><div class="ed">'+e.d+'</div><div class="wrow"><span class="wlbl">\u91cd\u91cf</span><input type="number" class="bi" placeholder="0" value="'+(base||'')+'" min="0" step="0.5" oninput="saveBase(\''+nm+'\',parseFloat(this.value)||0)"><span class="wunit">kg</span><span class="warr">\u203a</span><span class="wrec p3">'+t+'</span></div></div><div class="sets">'+bs+'</div></div></div>';
+  exCard.innerHTML=necks.map((e,ei)=>{
+    const base=loadBase(e.n);const nm=e.n.replace(/'/g,"\\'");
+    const t=base>0?base+'kg〜 (+0.5kg)':'重量入力→記録';
+    const bs=Array.from({length:sets},(_,si)=>{
+      const done=nsd[ei+'_'+si]?' done':'';
+      return `<button class="sb${done}" onclick="tapNeck(${ei},${si},${e.r},'${nm}',this)">${si+1}</button>`;
+    }).join('');
+    return `<div class="er"><div class="er-top"><div class="el">
+      <div class="enw"><span class="enm">${e.n}</span><span style="font-size:9px;background:#2A0A50;color:#BF5AF2;border-radius:5px;padding:2px 7px;font-weight:800;border:1px solid #6030A0">★NECK</span></div>
+      <div class="ed">${e.d}</div>
+      <div class="wrow"><span class="wlbl">重量</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="0.5" oninput="saveBase('${nm}',parseFloat(this.value)||0)"><span class="wunit">kg</span><span class="warr">›</span><span class="wrec p3">${t}</span></div>
+    </div><div class="sets">${bs}</div></div></div>`;
   }).join('');
 }
 
@@ -1768,7 +1797,7 @@ function showTab(id){
   });
   document.getElementById('tab-'+id).classList.add('active');
   document.getElementById('nb-'+id).classList.add('active');
-  if(id==='calendar'){renderCalendar();renderCalStats();updateWeekGoalProgress();}
+  if(id==='calendar'){renderCalendar();renderCalStats();updateWeekGoalProgress();renderCalLegend();}
   if(id==='report')renderWeeklyReport();
   if(id==='records'){populateExSelect();renderBWSection();renderPBHall();}
 }
