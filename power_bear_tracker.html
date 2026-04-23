@@ -878,6 +878,7 @@ let timeMode=60;  // 今日のトレーニング時間（分）
 let weekGoal=ls('gym_week_goal')||3;  // 週目標日数
 let wsd={};  // ウォームアップセット完了状態
 let todayWeights={};  // 今日の実使用重量 {種目名: kg}
+let condAdjSets=0, condAdjIntervalExtra=0;  // 体調によるset/インターバル調整値
 
 // 筋肉グループ定義（連日同部位チェック用）
 // 📚 同部位は48時間以上空ける（Schoenfeld & Grgic 2019）
@@ -1102,11 +1103,17 @@ const TIME_NOTES={
   90:'最大ボリューム。週1〜2回が上限目安。'
 };
 function setTimeMode(mins,el){
+  // セット進捗がある場合は確認
+  if(donS()>0){
+    if(!confirm('時間モードを変えるとセット進捗がリセットされます。よいですか？'))return;
+  }
   timeMode=mins;
   document.querySelectorAll('.tib').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('time-mode-note').textContent=TIME_NOTES[mins]||'';
-  sd={};wd=false;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
+  sd={};wsd={};nsd={};wd=false;
+  document.getElementById('wc').classList.remove('done');
+  document.getElementById('db').style.display='none';
   render();
 }
 
@@ -1194,12 +1201,13 @@ function updProg(){
 function updFW(){const p=fwPct();document.getElementById('fwf').style.width=p+'%';document.getElementById('fwp').textContent=p+'%';}
 
 function setFreq(f,el){
-  cfreq=f;cd=0;sd={};wd=false;skipT();
+  cfreq=f;cd=0;
   document.querySelectorAll('.ft').forEach(x=>x.classList.remove('active'));el.classList.add('active');
   document.getElementById('prog-name-sub').textContent=curProg().sub;
   renderDayTabs();
-  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
-  render();showToast(curProg().name+'に切替えました');
+  renderCalLegend();
+  resetAll();
+  showToast(curProg().name+'に切替えました');
 }
 
 function renderDayTabs(){
@@ -1370,8 +1378,16 @@ function togT(){if(ts===0){skipT();return;}tr=!tr;document.getElementById('ttog'
 function skipT(){clearInterval(ti);tr=false;document.getElementById('tbox').style.display='none';}
 function addT(s){ts+=s;tt+=s;updT();}
 
-function sP(p,el){cp=p;sd={};wsd={};nsd={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
-function sD(idx,el){cd=idx;sd={};wsd={};nsd={};wd=false;skipT();document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();renderConsecutiveWarning();}
+function sP(p,el){cp=p;sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
+function sD(idx,el){
+  if(donS()>0){
+    if(!confirm('途中のセット進捗がリセットされます。よいですか？'))return;
+  }
+  cd=idx;sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();
+  document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');
+  document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
+  render();renderConsecutiveWarning();
+}
 function togWDetail(){
   const d=document.getElementById('w-detail');
   const a=document.getElementById('w-arrow');
@@ -1456,6 +1472,14 @@ function checkCondComplete(){
 }
 
 function resetAll(){
+  // condStateもリセット
+  condState={fatigue:0,sleep:0,soreness:0};
+  condAdjSets=0; condAdjIntervalExtra=0;
+  initCondUI();
+  const badge=document.getElementById('cond-badge');
+  if(badge){badge.textContent='未入力';badge.style.background='var(--bg3)';badge.style.color='var(--t3)';}
+  const adv=document.getElementById('cond-adv');
+  if(adv){adv.style.display='none';}
   // アコーディオンリセット
   [1,2,3,4].forEach(n=>{
     const el=document.getElementById('acc'+n);
@@ -1469,6 +1493,9 @@ function resetAll(){
   // Step1 nextボタンをリセット
   const btn=document.getElementById('acc1-next');
   if(btn){btn.style.opacity='.4';btn.style.pointerEvents='none';}
+  // Step3 nextボタン（ウォームアップ完了ボタン）もリセット
+  const btn3=document.getElementById('acc3-next');
+  if(btn3){btn3.style.opacity='.5';btn3.style.pointerEvents='none';}
   accStep=1;
   resetD();
 }
@@ -1584,7 +1611,17 @@ function saveWorkout(){
     }
   });
 
-  todayWeights={};  // 保存後にリセット
+  // todayWeightsはDay切り替え・リセット時にクリア（保存後はそのまま残す）
+  // STEP4をdone表示に
+  const acc4=document.getElementById('acc4');
+  if(acc4){
+    acc4.classList.remove('active');
+    acc4.classList.add('done');
+    const s=document.getElementById('acc4-status');
+    const a=document.getElementById('acc4-arrow');
+    if(s)s.textContent='保存済み ✓';
+    if(a)a.textContent='▶';
+  }
   showToast('記録しました ✓');
   if(newPBs.length>0)setTimeout(()=>showPBOverlay(newPBs),600);
   renderCalStats();renderCalendar();renderPBHall();renderBWSection();
@@ -1730,15 +1767,45 @@ function renderWeeklyReport(){
   document.getElementById('rpt-range').textContent=fmt(monday)+' \u2014 '+fmt(sunday);
   document.getElementById('rpt-sub').textContent=monday.getFullYear()+'\u5e74 \u7b2c'+getWeekNum(monday)+'\u9031';
   let days=0,push=0,pull=0,legs=0,fatigues=[],totalSets=0;
-  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const log=getLog(fmtDate(d));if(log){days++;const t=log.dayType||log.day;if('ADUA'.includes(t)||t==='U')push++;else if('CFUB'.includes(t)||t==='C'||t==='F')pull++;else if('BELB'.includes(t)||t==='L')legs++;else if(t==='G'){push++;pull++;legs++;}if(log.fatigue)fatigues.push(log.fatigue);const ph=log.phase||1;const prog=PROGS[log.freq||6];const dayObj=prog?prog.days.find(x=>x.id===log.day):null;if(dayObj)totalSets+=dayObj.ph[ph].reduce((a,e)=>a+e.s,0);}}
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(d.getDate()+i);
+    const log=getLog(fmtDate(d));
+    if(!isTrainingLog(log))continue;  // REST・未記録を除外
+    days++;
+    const t=log.dayType||log.day;
+    const mg=MUSCLE_GROUP[t];  // MUSCLE_GROUPで統一判定
+    if(mg==='push')push++;
+    else if(mg==='pull')pull++;
+    else if(mg==='legs')legs++;
+    else if(mg==='full'){push++;pull++;legs++;}
+    if(log.fatigue)fatigues.push(log.fatigue);
+    const ph=log.phase||1;
+    const prog=PROGS[log.freq||6];
+    const dayObj=prog?prog.days.find(x=>x.id===log.day):null;
+    if(dayObj)totalSets+=dayObj.ph[ph].reduce((a,e)=>a+e.s,0);
+  }
   const avgFat=fatigues.length?(fatigues.reduce((a,b)=>a+b,0)/fatigues.length).toFixed(1):null;
   document.getElementById('rpt-days').textContent=days;document.getElementById('rpt-fatigue').textContent=avgFat||'\u2014';document.getElementById('rpt-vol').textContent=totalSets||'\u2014';
   const maxB=Math.max(push,pull,legs,1);
   ['push','pull','legs'].forEach((k,i)=>{const v=[push,pull,legs][i];document.getElementById('bal-'+k).style.width=Math.round(v/maxB*100)+'%';document.getElementById('bc-'+k).textContent=v;});
   const advices=[];
-  if(days===0)advices.push('\u4eca\u9031\u306f\u307e\u3060\u8a18\u9332\u304c\u3042\u308a\u307e\u305b\u3093\u3002');
-  else{const target=cfreq;if(days<target-1)advices.push('\u4eca\u9031'+days+'\u65e5\u3002\u76ee\u6a19\uff08\u9031'+target+'\u65e5\uff09\u307e\u3067\u3042\u3068'+(target-days)+'\u65e5\u3002');if(push===0)advices.push('Push\u7cfb\u304c\u4eca\u90310\u65e5\u3002\u80f8\u30fb\u80a9\u30fb\u50e7\u5e3d\u7b4b\u3092\u5165\u308c\u307e\u3057\u3087\u3046\u3002');if(pull===0)advices.push('Pull\u7cfb\u304c\u4eca\u90310\u65e5\u3002\u80cc\u4e2d\u30fb\u30ea\u30a2\u30c7\u30eb\u30c8\u30fb\u524d\u8155\u3092\u5165\u308c\u307e\u3057\u3087\u3046\u3002');if(legs===0)advices.push('Legs\u7cfb\u304c\u4eca\u90310\u65e5\u3002\u4e0b\u534a\u8eab\u306f\u30d9\u30a2\u4f53\u578b\u306e\u6838\u5fc3\u3002\u5fc5\u305a\u5165\u308c\u307e\u3057\u3087\u3046\u3002');if(avgFat&&parseFloat(avgFat)>=4)advices.push('\u5e73\u5747\u75b2\u52b4\u5ea6'+avgFat+'\u3002\u30c7\u30ed\u30fc\u30c9\u9031\uff08\u91cd\u91cf40%\u6e1b\uff09\u3092\u5f37\u304f\u63a8\u5968\u3002');if(days>=target-1&&push>0&&pull>0&&legs>0)advices.push('\u4eca\u9031'+days+'\u65e5\u30fb\u5168\u90e8\u4f4d\u30ab\u30d0\u30fc\u3002\u6f38\u9032\u7684\u904e\u8ca0\u8377\uff08+1\u301c2.5kg/\u56de\uff09\u3092\u610f\u8b58\u3057\u3066\u7d99\u7d9a\uff01');}
-  if(!advices.length)advices.push('\u30d0\u30e9\u30f3\u30b9\u826f\u597d\u3002\u3053\u306e\u8abf\u5b50\u3067\u7d99\u7d9a\uff01');
+  const target=weekGoal||3; // ユーザー設定の週目標日数
+  if(days===0){
+    advices.push('今週はまだ記録なし。1回でもやれば習慣の種になる。');
+  } else {
+    // 週目標達成状況（weekGoal基準）
+    const remain=target-days;
+    if(remain>0) advices.push(`今週${days}日 ／ 目標週${target}日まであと${remain}日。`);
+    // 部位バランス（PPL各部位を週2回が最適 - Schoenfeld 2016）
+    if(push===0) advices.push('Push（胸・肩）が0日。上半身の押す動作を入れよう。');
+    if(pull===0) advices.push('Pull（背中）が0日。背中・リアデルトを入れよう。');
+    if(legs===0) advices.push('Legs（脚・臀部）が0日。下半身はベア体型の核心。');
+    // 疲労過多（平均4以上でデロード推奨）
+    if(avgFat&&parseFloat(avgFat)>=4) advices.push(`平均疲労${avgFat}／5 — デロード週（重量40%減）を強く推奨。`);
+    // 全達成
+    if(remain<=0&&push>0&&pull>0&&legs>0) advices.push(`今週${days}日・全部位カバー。漸進的過負荷（+1〜2.5kg/回）を意識して継続！`);
+  }
+  if(!advices.length) advices.push('バランス良好。この調子で継続！');
   document.getElementById('adv-list').innerHTML=advices.map(a=>'<div class="adv-item">'+a+'</div>').join('');
 }
 function getWeekNum(d){const jan1=new Date(d.getFullYear(),0,1);return Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);}
