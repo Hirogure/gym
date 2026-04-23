@@ -455,7 +455,7 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
   <div class="acc-step active" id="acc1">
     <div class="acc-hdr" onclick="accToggle(1)">
       <div class="acc-num">1</div>
-      <div class="acc-title">コンディションチェック</div>
+      <div class="acc-title">コンディションチェック <span class="cond-badge" id="cond-badge">未入力</span></div>
       <div class="acc-status" id="acc1-status">入力中</div>
       <div class="acc-arrow" id="acc1-arrow">▼</div>
     </div>
@@ -1460,9 +1460,7 @@ function resetAll(){
 function resetD(){sd={};wsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
 /* ===== CONDITION ===== */
-function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
-function setCond(key,val){condState[key]=val;const d=ls('gym_cond_'+todayStr())||{};d[key]=val;ls('gym_cond_'+todayStr(),d);initCondUI();updCondAdv();}
-function loadTodayCond(){const d=ls('gym_cond_'+todayStr());if(d){condState.fatigue=d.fatigue||0;condState.sleep=d.sleep||0;condState.soreness=d.soreness||0;}else condState={fatigue:0,sleep:0,soreness:0};}
+function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);if(!w)return;w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
 function condScore(){const f=condState.fatigue,sl=condState.sleep,so=condState.soreness;if(!f&&!sl&&!so)return null;return((f||3)+(6-(sl||3))+(so||3))/3;}
 function updCondAdv(){
   const badge=document.getElementById('cond-badge'),adv=document.getElementById('cond-adv');
@@ -1494,8 +1492,6 @@ function updCondAdv(){
 
 function setCond(key,val){condState[key]=val;const d=ls('gym_cond_'+todayStr())||{};d[key]=val;ls('gym_cond_'+todayStr(),d);initCondUI();updCondAdv();checkCondComplete();}
 function loadTodayCond(){const d=ls('gym_cond_'+todayStr());if(d){condState.fatigue=d.fatigue||0;condState.sleep=d.sleep||0;condState.soreness=d.soreness||0;}else condState={fatigue:0,sleep:0,soreness:0};}
-
-/* ===== DELOAD ===== */
 function checkDeload(){
   const dismissed=ls('gym_deload_dismissed');const banner=document.getElementById('dl-banner');
   if(dismissed){const d=new Date(dismissed);d.setDate(d.getDate()+7);if(new Date()<d){banner.style.display='none';return;}}
