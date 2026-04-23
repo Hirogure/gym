@@ -877,6 +877,7 @@ let modalDs='',modalSelDay='';
 let timeMode=60;  // 今日のトレーニング時間（分）
 let weekGoal=ls('gym_week_goal')||3;  // 週目標日数
 let wsd={};  // ウォームアップセット完了状態
+let todayWeights={};  // 今日の実使用重量 {種目名: kg}
 
 // 筋肉グループ定義（連日同部位チェック用）
 // 📚 同部位は48時間以上空ける（Schoenfeld & Grgic 2019）
@@ -910,6 +911,11 @@ function saveBase(n,v){try{localStorage.setItem(lsKey(n),v);}catch(e){}}
 function isDeloadMode(){return ls('gym_deload_mode')===true;}
 function recText(base,ph){if(!base||base<=0)return null;if(isDeloadMode())return r25(base*.6)+'kg（デロード中）';if(ph===1)return r25(base*.5)+'〜'+r25(base*.6)+'kg';if(ph===2)return r25(base*.7)+'〜'+r25(base*.8)+'kg';return base+'kg〜 (+1〜2.5kg)';}
 function recClass(ph){if(isDeloadMode())return 'wrec pdl';return ph===1?'wrec p1':ph===2?'wrec p2':'wrec p3';}
+function saveTodayWeight(nm,val){
+  if(val&&val>0){todayWeights[nm]=val;}
+  else{delete todayWeights[nm];}
+}
+function getTodayWeight(nm){return todayWeights[nm]||null;}
 function saveExMemo(nm,val){try{if(val&&val.trim()){ls('gym_exmemo_'+nm,val.trim());}else{localStorage.removeItem('gym_exmemo_'+nm);}}catch(e){}}
 function onBaseInput(nm,val,sid){const v=parseFloat(val)||0;saveBase(nm,v>0?v:0);const sp=document.getElementById(sid);if(!sp)return;const t=recText(v,cp);if(t){sp.textContent=t;sp.className=recClass(cp);}else{sp.textContent='MAX入力→推奨';sp.className='wrec none';}}
 
@@ -1243,6 +1249,7 @@ function render(){
     }
     const exMemoKey='gym_exmemo_'+nm;
     const prevExMemo=ls(exMemoKey)||'';
+    const todayWt=getTodayWeight(e.n);
     const bs=Array.from({length:adjS},(_,s)=>{
       const done=sd[i+'_'+s]?' done':'';
       return `<button class="sb${done}" onclick="tapS(${i},${s},${adjInt},'${nm}',this)">${s+1}</button>`;
@@ -1251,7 +1258,15 @@ function render(){
     const hasWU=e.d.includes('W-up');
     const wuDone=wsd[i]?' done':'';
     const wuBtn=hasWU?`<button class="sb wu-btn${wuDone}" onclick="tapWU(${i},this)" title="ウォームアップセット（軽重量×10〜15rep）">W-up</button>`:'';
-    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
+    // 今日の実重量入力欄
+    const todayWtRow=`<div class="wrow" style="margin-top:5px;border-top:1px solid #1a2030;padding-top:5px">
+      <span class="wlbl" style="color:var(--grn);font-weight:800">今日</span>
+      <input type="number" class="bi" style="border-color:#006040" placeholder="0" value="${todayWt||''}" min="0" step="2.5"
+        oninput="saveTodayWeight('${nm}',parseFloat(this.value)||0)">
+      <span class="wunit">kg</span>
+      <span style="font-size:10px;color:#2a6040;flex:1;padding-left:6px">← 実際に使った重量</span>
+    </div>`;
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${todayWtRow}${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
   });
   document.getElementById('dlbl').textContent='Day '+day.id+' — '+day.lbl;
   updFW();updProg();
@@ -1457,7 +1472,7 @@ function resetAll(){
   accStep=1;
   resetD();
 }
-function resetD(){sd={};wsd={};nsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
+function resetD(){sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
 /* ===== CONDITION ===== */
 function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);if(!w)return;w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
@@ -1552,8 +1567,25 @@ function saveWorkout(){
   const ds=todayStr();const note=document.getElementById('memo-input').value.trim();const tags=selTags.map(i=>QUICK_TAGS[i]);
   const day=curDays()[cd];
   setLog(ds,{day:day.id,dayType:day.type,phase:cp,label:day.lbl,freq:cfreq,fatigue:condState.fatigue,sleep:condState.sleep,soreness:condState.soreness,tags,note});
-  const newPBs=[];ex().forEach(e=>{const b=loadBase(e.n);if(b>0){addWH(e.n,ds,b);const pb=getPB(e.n);if(!pb||b>pb.weight){setPB(e.n,b,ds);newPBs.push(e.n);}}});
-  showToast('\u8a18\u9332\u3057\u307e\u3057\u305f \u2713');
+
+  const newPBs=[];
+  ex().forEach(e=>{
+    // 今日の実重量を優先。なければ前回MAXをフォールバック
+    const todayWt=getTodayWeight(e.n);
+    const base=loadBase(e.n);
+    const useWt=todayWt||base;
+    if(useWt>0){
+      addWH(e.n,ds,useWt);  // グラフ用履歴に実重量を記録
+      // 前回MAXを今日の実重量で自動更新（次回のセッションで前回MAXとして表示）
+      if(todayWt&&todayWt>0) saveBase(e.n,todayWt);
+      // PBチェック
+      const pb=getPB(e.n);
+      if(!pb||useWt>pb.weight){setPB(e.n,useWt,ds);newPBs.push(e.n);}
+    }
+  });
+
+  todayWeights={};  // 保存後にリセット
+  showToast('記録しました ✓');
   if(newPBs.length>0)setTimeout(()=>showPBOverlay(newPBs),600);
   renderCalStats();renderCalendar();renderPBHall();renderBWSection();
 }
@@ -1642,7 +1674,7 @@ function openModal(ds,log){
         </div>`:null;
       }).filter(Boolean).join('');
       if(weights){
-        html+=`<div style="margin-bottom:8px;font-size:10px;font-weight:800;color:var(--t4);margin-bottom:6px">使用重量</div>${weights}`;
+        html+=`<div style="margin-bottom:6px;font-size:10px;font-weight:800;color:var(--grn)">💪 実使用重量</div>${weights}`;
       }
     }
     if(log.tags&&log.tags.length){
