@@ -1116,7 +1116,7 @@ function getThisWeekCount(){
   const dow=today.getDay();
   const mon=new Date(today);mon.setDate(today.getDate()-dow+(dow===0?-6:1));
   let count=0;
-  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);if(getLog(fmtDate(d)))count++;}
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const log=getLog(fmtDate(d));if(isTrainingLog(log))count++;}
   return count;
 }
 function updateWeekGoalProgress(){
@@ -1457,13 +1457,14 @@ function resetAll(){
   accStep=1;
   resetD();
 }
-function resetD(){sd={};wsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
+function resetD(){sd={};wsd={};nsd={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
 
 /* ===== CONDITION ===== */
 function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);if(!w)return;w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
 function condScore(){const f=condState.fatigue,sl=condState.sleep,so=condState.soreness;if(!f&&!sl&&!so)return null;return((f||3)+(6-(sl||3))+(so||3))/3;}
 function updCondAdv(){
   const badge=document.getElementById('cond-badge'),adv=document.getElementById('cond-adv');
+  if(!badge||!adv)return;
   const score=condScore();
   condAdjSets=0; condAdjIntervalExtra=0;
   if(score===null){badge.textContent='未入力';badge.style.background='var(--bg3)';badge.style.color='var(--t3)';adv.style.display='none';render();return;}
@@ -1750,7 +1751,7 @@ function renderProgressChart(){
 }
 
 /* ===== NECK TRAINING ===== */
-const NECK_PULL_TYPES=['C','F','UB'];
+const NECK_PULL_TYPES=['C','F','U'];
 let nsd={};  // ネックセット完了状態
 
 function tapNeck(ei,si,rest,nm,btn){
