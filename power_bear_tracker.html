@@ -146,8 +146,8 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .pfc-legend{display:flex;gap:12px;margin-bottom:4px}
 .pfc-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#8A60C8}
 .pfc-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.wgb{flex:1;padding:8px 4px;border:1.5px solid #2A1A50;border-radius:10px;background:#0D0320;font-size:11px;font-weight:800;color:#6A40A8;cursor:pointer;font-family:var(--font);transition:all .15s}
-.wgb.active{background:#2A1A50;border-color:#BF5AF2;color:#BF5AF2}
+.wgb{flex:1;padding:8px 4px;border:1.5px solid #4A2880;border-radius:10px;background:#150828;font-size:11px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s}
+.wgb.active{background:#3A1A70;border-color:#D090FF;color:#FFFFFF}
 .tib{flex:1;padding:8px 3px;border:1.5px solid #0E2A38;border-radius:10px;background:#080F18;font-size:11px;font-weight:800;color:#2A5870;cursor:pointer;font-family:var(--font);transition:all .15s}
 .tib.active{background:#0A2030;border-color:#5BC8FF;color:#5BC8FF}
 .wu-btn{background:#4A4000 !important;border:1.5px solid #808000 !important;color:#FFE040 !important;font-size:10px !important;font-weight:800 !important;min-width:44px}
@@ -429,11 +429,6 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     </div>
   </div>
 
-  <div class="prev-memo" id="prev-memo" style="display:none">
-    <div class="pm-lbl">📋 前回メモ</div>
-    <div class="pm-txt" id="prev-memo-txt"></div>
-    <div style="font-size:9px;color:#3a2858;margin-top:5px;line-height:1.5">💡 メモのコツ：使用重量・セット感覚（余裕あり/ギリギリ）・次回の目標重量を書くと翌回に活きる</div>
-  </div>
 
   <!-- 休養日ガイダンス -->
   <div class="rest-guide" id="rest-guide" style="display:none">
@@ -452,12 +447,12 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
   <button class="rest-btn" onclick="logRestDay()">🌿 今日は休養日にする</button>
 
   <!-- STEP 1: コンディション -->
-  <div class="acc-step active" id="acc1">
+  <div class="acc-step" id="acc1">
     <div class="acc-hdr" onclick="accToggle(1)">
       <div class="acc-num">1</div>
       <div class="acc-title">コンディションチェック <span class="cond-badge" id="cond-badge">未入力</span></div>
-      <div class="acc-status" id="acc1-status">入力中</div>
-      <div class="acc-arrow" id="acc1-arrow">▼</div>
+      <div class="acc-status" id="acc1-status">タップして開く</div>
+      <div class="acc-arrow" id="acc1-arrow">▶</div>
     </div>
     <div class="acc-body">
       <div style="font-size:10px;color:var(--t4);margin-bottom:10px">体調でセット数・インターバルを自動調整します</div>
@@ -597,8 +592,8 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
   <div class="hdr"><div><h1>カレンダー</h1><p>ジム記録・部位管理</p></div></div>
   <!-- 週目標設定 -->
   <div style="background:#0A0520;border:1.5px solid #2A1A50;border-radius:14px;padding:13px 15px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:800;color:#BF5AF2;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">📅 今週の目標日数</div>
-    <div style="font-size:10px;color:#6A40A8;line-height:1.6;margin-bottom:10px">習慣化まで平均66日。週3〜4日から始めて徐々に増やすのが定着の最速ルート。</div>
+    <div style="font-size:10px;font-weight:800;color:#D090FF;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">📅 今週の目標日数</div>
+    <div style="font-size:10px;color:#A880E0;line-height:1.6;margin-bottom:10px">習慣化まで平均66日。週3〜4日から始めて徐々に増やすのが定着の最速ルート。</div>
     <div style="display:flex;gap:6px;margin-bottom:8px">
       <button class="wgb" id="wg3" onclick="setWeekGoal(3,this)">週3日</button>
       <button class="wgb" id="wg4" onclick="setWeekGoal(4,this)">週4日</button>
@@ -606,10 +601,10 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
       <button class="wgb" id="wg6" onclick="setWeekGoal(6,this)">週6日</button>
     </div>
     <div id="week-goal-prog" style="display:flex;align-items:center;gap:10px">
-      <div style="flex:1;height:8px;background:#1A0A30;border-radius:4px;overflow:hidden"><div id="wg-bar" style="height:8px;border-radius:4px;background:var(--pur);transition:width .4s;width:0%"></div></div>
-      <div id="wg-label" style="font-size:11px;font-weight:800;color:#BF5AF2;white-space:nowrap">今週 0 / 3日</div>
+      <div style="flex:1;height:8px;background:#2A1A40;border-radius:4px;overflow:hidden"><div id="wg-bar" style="height:8px;border-radius:4px;background:#D090FF;transition:width .4s;width:0%"></div></div>
+      <div id="wg-label" style="font-size:11px;font-weight:800;color:#D090FF;white-space:nowrap">今週 0 / 3日</div>
     </div>
-    <div id="wg-advice" style="font-size:10px;color:#8A60C8;margin-top:6px;line-height:1.5"></div>
+    <div id="wg-advice" style="font-size:10px;color:#B090D0;margin-top:6px;line-height:1.5"></div>
   </div>
   <div class="cal-stats">
     <div class="stat-card"><div class="stat-num" id="st-month">0</div><div class="stat-unit">日</div><div class="stat-label">今月</div></div>
@@ -658,13 +653,18 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 <div class="app">
   <div class="hdr"><div><h1>記録</h1><p>体重・PB・種目グラフ</p></div></div>
   <div class="rec-section">
-    <div class="rec-section-ttl">体重記録</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0" onclick="toggleBWAcc()">
+      <div class="rec-section-ttl" style="margin-bottom:0">体重記録</div>
+      <span id="bw-acc-arrow" style="font-size:11px;color:var(--t4)">▶ 開く</span>
+    </div>
+    <div id="bw-acc-body" style="display:none;margin-top:12px">
     <div class="bw-row"><input type="number" class="bw-in" id="bw-input" placeholder="70.0" step="0.1" min="0"><span class="bw-unit">kg</span><button class="bw-btn" onclick="saveBodyWeight()">記録</button></div>
     <div class="bw-stats" id="bw-stats" style="display:none">
       <div class="bwst"><div class="bwst-num" id="bw-cur">--</div><div class="bwst-lbl">Current kg</div></div>
       <div class="bwst"><div class="bwst-num up" id="bw-diff">--</div><div class="bwst-lbl">vs Start kg</div></div>
     </div>
     <div id="bw-chart-area"><div class="chart-empty">体重を記録するとグラフが表示されます</div></div>
+    </div>
   </div>
   <div class="rec-section">
     <div class="rec-section-ttl">PBホール 🏆</div>
@@ -704,6 +704,20 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 </nav>
 
 <!-- Modal -->
+<!-- Onboarding Modal -->
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#0D0320;border:1.5px solid #4A2880;border-radius:20px;padding:28px 22px;max-width:340px;width:90%;margin:auto">
+    <div style="font-size:20px;font-weight:900;color:#FFFFFF;margin-bottom:6px;line-height:1.3">🐻 Power Bear へようこそ</div>
+    <div style="font-size:12px;color:#C090F0;margin-bottom:20px;line-height:1.6">まず、今週は週に何日トレーニングしたいですか？<br><span style="font-size:10px;color:#9070B0">後でカレンダータブでいつでも変更できます</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <button onclick="onboardingSelect(3)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週3日<br><span style="font-size:10px;font-weight:400;color:#9070B0">習慣化スタート</span></button>
+      <button onclick="onboardingSelect(4)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週4日<br><span style="font-size:10px;font-weight:400;color:#9070B0">上下分割ペース</span></button>
+      <button onclick="onboardingSelect(5)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週5日<br><span style="font-size:10px;font-weight:400;color:#9070B0">PPL+ペース</span></button>
+      <button onclick="onboardingSelect(6)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週6日<br><span style="font-size:10px;font-weight:400;color:#9070B0">フルPPL×2</span></button>
+    </div>
+    <div style="font-size:9px;color:#6A50A0;text-align:center;line-height:1.5">📚 研究では週3〜4日から始めるのが習慣定着の最速ルートです（Lally 2010）</div>
+  </div>
+</div>
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
@@ -1419,19 +1433,15 @@ function togW(){
 let accStep=1; // 現在のアクティブステップ
 
 function accToggle(n){
-  // ロック中は開かない
   const el=document.getElementById('acc'+n);
-  if(el&&el.classList.contains('locked'))return;
-  // 既に開いている場合は閉じる（完了済みのみ）
-  if(el&&el.classList.contains('done')){
-    const body=el.querySelector('.acc-body');
-    const arrow=document.getElementById('acc'+n+'-arrow');
-    if(body){
-      const isOpen=body.style.display!=='none'&&el.classList.contains('active');
-      // done済みステップのトグル
-      el.classList.toggle('active');
-      if(arrow)arrow.textContent=el.classList.contains('active')?'▼':'▶';
-    }
+  if(!el||el.classList.contains('locked'))return;
+  const isActive=el.classList.contains('active');
+  el.classList.toggle('active',!isActive);
+  const arrow=document.getElementById('acc'+n+'-arrow');
+  if(arrow)arrow.textContent=isActive?'▶':'▼';
+  if(!el.classList.contains('done')){
+    const status=document.getElementById('acc'+n+'-status');
+    if(status)status.textContent=isActive?'タップして開く':'入力中';
   }
 }
 
@@ -1485,10 +1495,12 @@ function resetAll(){
     const el=document.getElementById('acc'+n);
     if(!el)return;
     el.classList.remove('done','active','locked');
-    if(n===1){el.classList.add('active');document.getElementById('acc1-status').textContent='入力中';}
-    else{el.classList.add('locked');document.getElementById('acc'+n+'-status').textContent='ロック中';}
+    if(n===1){
+      // STEP1はデフォルト閉じた状態（active付けない）
+      document.getElementById('acc1-status').textContent='タップして開く';
+    } else {el.classList.add('locked');document.getElementById('acc'+n+'-status').textContent='ロック中';}
     const arrow=document.getElementById('acc'+n+'-arrow');
-    if(arrow)arrow.textContent=n===1?'▼':'▶';
+    if(arrow)arrow.textContent='▶';
   });
   // Step1 nextボタンをリセット
   const btn=document.getElementById('acc1-next');
@@ -1579,6 +1591,22 @@ function dismissDeload(){ls('gym_deload_dismissed',todayStr());document.getEleme
 function checkDeloadEnd(){const end=ls('gym_deload_end');if(end&&new Date()>new Date(end)){ls('gym_deload_mode',false);try{localStorage.removeItem('gym_deload_end');}catch(e){}showToast('\u30c7\u30ed\u30fc\u30c9\u9031\u7d42\u4e86\u3002\u901a\u5e38\u30e2\u30fc\u30c9\u306b\u623b\u308a\u307e\u3057\u305f\u3002');render();}}
 
 /* ===== MEMO & TAGS ===== */
+function onboardingSelect(n){
+  weekGoal=n;ls('gym_week_goal',n);
+  document.getElementById('onboarding-modal').style.display='none';
+  // 選択に対応するwgbボタンをアクティブに
+  document.querySelectorAll('.wgb').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('wg'+n);
+  if(btn)btn.classList.add('active');
+  updateWeekGoalProgress();
+  showToast('週'+n+'日を目標に設定しました ✓');
+}
+function checkOnboarding(){
+  // 初回起動時のみ表示（gym_week_goalが未設定の場合）
+  if(!ls('gym_week_goal')){
+    document.getElementById('onboarding-modal').style.display='flex';
+  }
+}
 function insertMemo(text){
   const ta=document.getElementById('memo-input');
   if(!ta)return;
@@ -1811,6 +1839,15 @@ function renderWeeklyReport(){
 function getWeekNum(d){const jan1=new Date(d.getFullYear(),0,1);return Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);}
 
 /* ===== RECORDS ===== */
+function toggleBWAcc(){
+  const body=document.getElementById('bw-acc-body');
+  const arrow=document.getElementById('bw-acc-arrow');
+  if(!body)return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arrow)arrow.textContent=open?'▶ 開く':'▲ 閉じる';
+  if(!open)renderBWSection();
+}
 function saveBodyWeight(){const v=parseFloat(document.getElementById('bw-input').value);if(!v||v<=0){showToast('\u4f53\u91cd\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044');return;}addBW(todayStr(),v);document.getElementById('bw-input').value='';renderBWSection();showToast('\u8a18\u9332\u3057\u307e\u3057\u305f \u2713');}
 function renderBWSection(){
   const bws=getBWs(),statsEl=document.getElementById('bw-stats'),chartEl=document.getElementById('bw-chart-area');
@@ -1915,7 +1952,8 @@ document.getElementById('tip').textContent=PH[1].tip;
 document.getElementById('prog-name-sub').textContent=PROGS[6].sub;
 renderDayTabs();
 initCal();renderCalLegend();loadTodayCond();initCondUI();updCondAdv();
-checkDeload();checkDeloadEnd();loadPrevMemo();initTagRow();render();
+checkDeload();checkDeloadEnd();initTagRow();render();
+checkOnboarding();
 // 週目標UI初期化
 (function(){
   const wg=ls('gym_week_goal')||3;
