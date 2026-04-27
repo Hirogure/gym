@@ -230,15 +230,16 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .sb:active{transform:scale(.86)}
 
 /* Done */
-.done-banner{background:var(--bg2);border:1.5px solid var(--grn);border-radius:18px;padding:16px;margin-bottom:14px;display:none}
-.done-msg{font-size:17px;font-weight:800;color:var(--grn);text-align:center;margin-bottom:12px}
-.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;justify-content:center}
-.tag-btn{padding:8px 14px;border-radius:20px;border:1.5px solid var(--bd2);background:var(--bg3);font-size:13px;cursor:pointer;font-weight:700;color:var(--t3);font-family:var(--font)}
+.done-banner{background:var(--bg2);border:1.5px solid var(--grn);border-radius:16px;padding:12px 14px;margin-bottom:14px;display:none}
+.done-msg{font-size:14px;font-weight:800;color:var(--grn)}
+.tag-row{display:flex;flex-wrap:nowrap;gap:7px;white-space:nowrap}
+.tag-btn{padding:7px 12px;border-radius:20px;border:1.5px solid var(--bd2);background:var(--bg3);font-size:12px;cursor:pointer;font-weight:700;color:var(--t3);font-family:var(--font);white-space:nowrap;flex-shrink:0}
 .tag-btn.sel{background:var(--acc2);border-color:var(--acc);color:#fff}
-.memo-input{width:100%;border:1.5px solid var(--bd);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--t1);background:var(--bg3);resize:none;height:72px;font-family:var(--font);margin-bottom:12px}
+.qmb{font-size:10px;padding:5px 10px;border-radius:8px;border:1px solid;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0}
+.memo-input{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--t1);background:var(--bg3);resize:none;height:60px;font-family:var(--font);margin-bottom:10px;box-sizing:border-box}
 .memo-input:focus{outline:none;border-color:var(--acc2)}
 .memo-input::placeholder{color:var(--t4)}
-.save-btn{width:100%;padding:14px;background:var(--acc2);border:none;border-radius:14px;font-size:15px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font)}
+.save-btn{width:100%;padding:13px;background:var(--acc2);border:none;border-radius:13px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;font-family:var(--font)}
 .save-btn:active{opacity:.85}
 .rb{width:100%;padding:13px;border:1.5px solid var(--bd);border-radius:14px;background:transparent;font-size:14px;font-weight:700;color:var(--t3);cursor:pointer;margin-top:4px;font-family:var(--font)}
 
@@ -541,22 +542,32 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
         <div class="prog-top"><span class="prog-lbl" id="dlbl">Day A</span><span class="prog-val" id="pv">0%</span></div>
         <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
       </div>
+      <!-- 途中保存バナー（アコーディオン） -->
       <div class="done-banner" id="db">
-        <div class="done-msg">🎉 セッション完了！</div>
-        <div class="tag-row" id="tag-row"></div>
-        <!-- メモ クイック挿入 -->
-        <div style="font-size:9px;color:#4A7090;margin-bottom:5px;font-weight:800">💬 メモ（翌回に活きる3点：使用重量・セット感覚・次回目標）</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
-          <button onclick="insertMemo('次回+2.5kg')" style="font-size:9px;padding:3px 8px;background:#001A10;border:1px solid #006040;border-radius:8px;color:#00C853;cursor:pointer;font-family:var(--font)">次回+2.5kg</button>
-          <button onclick="insertMemo('余裕あり')" style="font-size:9px;padding:3px 8px;background:#001A10;border:1px solid #006040;border-radius:8px;color:#00C853;cursor:pointer;font-family:var(--font)">余裕あり</button>
-          <button onclick="insertMemo('ギリギリだった')" style="font-size:9px;padding:3px 8px;background:#1A0A00;border:1px solid #804000;border-radius:8px;color:#FF9500;cursor:pointer;font-family:var(--font)">ギリギリ</button>
-          <button onclick="insertMemo('フォーム要確認')" style="font-size:9px;padding:3px 8px;background:#1A1000;border:1px solid #806000;border-radius:8px;color:#FFCC00;cursor:pointer;font-family:var(--font)">フォーム要確認</button>
-          <button onclick="insertMemo('重量キープ')" style="font-size:9px;padding:3px 8px;background:#001020;border:1px solid #003060;border-radius:8px;color:#5BC8FF;cursor:pointer;font-family:var(--font)">重量キープ</button>
-          <button onclick="insertMemo('次回同重量で確認')" style="font-size:9px;padding:3px 8px;background:#001020;border:1px solid #003060;border-radius:8px;color:#5BC8FF;cursor:pointer;font-family:var(--font)">次回同重量</button>
-          <button onclick="insertMemo('筋肉痛しっかり来そう')" style="font-size:9px;padding:3px 8px;background:#0A001A;border:1px solid #400080;border-radius:8px;color:#BF5AF2;cursor:pointer;font-family:var(--font)">筋肉痛来そう</button>
+        <!-- ヘッダー：常に見える -->
+        <div id="db-hdr" onclick="toggleSaveBanner()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+          <div class="done-msg" id="db-msg" style="margin:0;font-size:14px">🎉 セッション完了！</div>
+          <span id="db-arrow" style="font-size:11px;color:var(--grn);font-weight:800;white-space:nowrap;padding-left:8px">▼ 保存する</span>
         </div>
-        <textarea class="memo-input" id="memo-input" placeholder="例）チェストプレス70kg → 余裕あり、次回72.5kgへ。ショルダーはフォームが崩れ気味、鏡で確認する。"></textarea>
-        <button class="save-btn" id="save-btn" onclick="saveWorkout()">記録を保存する</button>
+        <!-- 展開エリア -->
+        <div id="db-body" style="display:none;margin-top:12px">
+          <!-- タグ カルーセル（横スクロール） -->
+          <div style="overflow-x:auto;display:flex;gap:7px;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none" id="tag-row"></div>
+          <!-- メモ -->
+          <div style="font-size:9px;color:#4A7090;margin:8px 0 4px;font-weight:800">💬 メモ（重量・感覚・次回目標）</div>
+          <!-- メモクイック挿入：横スクロール -->
+          <div style="overflow-x:auto;display:flex;gap:5px;padding-bottom:5px;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:7px">
+            <button onclick="insertMemo('次回+2.5kg')" class="qmb" style="color:#00C853;border-color:#006040;background:#001A10">+2.5kg</button>
+            <button onclick="insertMemo('余裕あり')" class="qmb" style="color:#00C853;border-color:#006040;background:#001A10">余裕あり</button>
+            <button onclick="insertMemo('ギリギリだった')" class="qmb" style="color:#FF9500;border-color:#804000;background:#1A0A00">ギリギリ</button>
+            <button onclick="insertMemo('フォーム要確認')" class="qmb" style="color:#FFCC00;border-color:#806000;background:#1A1000">フォーム確認</button>
+            <button onclick="insertMemo('重量キープ')" class="qmb" style="color:#5BC8FF;border-color:#003060;background:#001020">重量キープ</button>
+            <button onclick="insertMemo('次回同重量で確認')" class="qmb" style="color:#5BC8FF;border-color:#003060;background:#001020">次回同重量</button>
+            <button onclick="insertMemo('筋肉痛しっかり来そう')" class="qmb" style="color:#BF5AF2;border-color:#400080;background:#0A001A">筋肉痛来そう</button>
+          </div>
+          <textarea class="memo-input" id="memo-input" placeholder="例）チェストプレス70kg・余裕あり、次回+2.5kg。フォーム崩れ気味→鏡確認。"></textarea>
+          <button class="save-btn" id="save-btn" onclick="saveWorkout()">記録を保存する</button>
+        </div>
       </div>
       <div class="sl">ウェイトトレーニング</div>
       <div class="card" id="ec"></div>
@@ -1191,23 +1202,34 @@ function donS(){
 }
 function fwPct(){const e=ex();return Math.round(e.filter(x=>x.fw).length/e.length*100);}
 
+function toggleSaveBanner(){
+  const body=document.getElementById('db-body');
+  const arrow=document.getElementById('db-arrow');
+  if(!body)return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arrow)arrow.textContent=open?'▼ 保存する':'▲ 閉じる';
+}
 function updProg(){
   const tot=totS(),don=donS();
-  // 全セット完了したら自動でwcをチェック
   if(tot>0&&don>=tot&&!wd){wd=true;document.getElementById('wc').classList.add('done');}
   const pct=tot>0?Math.round(don/tot*100):0;
   document.getElementById('pv').textContent=pct+'%';
   document.getElementById('pf').style.width=pct+'%';
   const db=document.getElementById('db');
+  const msg=document.getElementById('db-msg');
   const sb=document.getElementById('save-btn');
+  const arrow=document.getElementById('db-arrow');
   if(pct>=100||wd){
     db.style.display='block';
-    document.querySelector('#db .done-msg').textContent='🎉 セッション完了！';
+    if(msg)msg.textContent='🎉 セッション完了！';
     if(sb)sb.textContent='記録を保存する';
+    if(arrow&&arrow.textContent.includes('保存する'))arrow.textContent='▼ 保存する';
   } else if(pct>0){
     db.style.display='block';
-    document.querySelector('#db .done-msg').textContent='💾 途中保存（'+pct+'% 完了）';
+    if(msg)msg.textContent='💾 途中保存（'+pct+'%）';
     if(sb)sb.textContent='途中保存する';
+    if(arrow&&arrow.textContent.includes('保存する'))arrow.textContent='▼ 保存する';
   } else {
     db.style.display='none';
   }
@@ -1435,6 +1457,11 @@ let accStep=1; // 現在のアクティブステップ
 function accToggle(n){
   const el=document.getElementById('acc'+n);
   if(!el||el.classList.contains('locked'))return;
+  // 保存済み（acc4 done + 保存済みステータス）は再展開しない
+  if(n===4&&el.classList.contains('done')){
+    const s=document.getElementById('acc4-status');
+    if(s&&s.textContent==='保存済み ✓')return;
+  }
   const isActive=el.classList.contains('active');
   el.classList.toggle('active',!isActive);
   const arrow=document.getElementById('acc'+n+'-arrow');
@@ -1511,7 +1538,15 @@ function resetAll(){
   accStep=1;
   resetD();
 }
-function resetD(){sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();selTags=[];document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';document.getElementById('memo-input').value='';initTagRow();render();}
+function resetD(){
+  sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();selTags=[];
+  document.getElementById('wc').classList.remove('done');
+  document.getElementById('db').style.display='none';
+  const dbb=document.getElementById('db-body');if(dbb)dbb.style.display='none';
+  const dba=document.getElementById('db-arrow');if(dba)dba.textContent='▼ 保存する';
+  document.getElementById('memo-input').value='';
+  initTagRow();render();
+}
 
 /* ===== CONDITION ===== */
 function initCondUI(){[['cb-fatigue','fatigue'],['cb-sleep','sleep'],['cb-soreness','soreness']].forEach(([id,key])=>{const w=document.getElementById(id);if(!w)return;w.innerHTML='';for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='cbtn'+(condState[key]===i?' sel':'');b.textContent=i;b.onclick=()=>setCond(key,i);w.appendChild(b);}});}
@@ -1631,9 +1666,9 @@ function saveWorkout(){
     const useWt=todayWt||base;
     if(useWt>0){
       addWH(e.n,ds,useWt);  // グラフ用履歴に実重量を記録
-      // 前回MAXを今日の実重量で自動更新（次回のセッションで前回MAXとして表示）
-      if(todayWt&&todayWt>0) saveBase(e.n,todayWt);
-      // PBチェック
+      // 前回MAXは上書きしない（お休み前の値を基準重量として固定）
+      // phase推奨重量の計算もこの値を使用
+      // PBチェック（過去最高値の更新のみ）
       const pb=getPB(e.n);
       if(!pb||useWt>pb.weight){setPB(e.n,useWt,ds);newPBs.push(e.n);}
     }
@@ -1650,6 +1685,11 @@ function saveWorkout(){
     if(s)s.textContent='保存済み ✓';
     if(a)a.textContent='▶';
   }
+  // 保存後にバナーを折りたたむ
+  const dbb=document.getElementById('db-body');
+  const dba=document.getElementById('db-arrow');
+  if(dbb)dbb.style.display='none';
+  if(dba)dba.textContent='▼ 保存済み ✓';
   showToast('記録しました ✓');
   if(newPBs.length>0)setTimeout(()=>showPBOverlay(newPBs),600);
   renderCalStats();renderCalendar();renderPBHall();renderBWSection();
@@ -1951,7 +1991,7 @@ function showTab(id){
 document.getElementById('tip').textContent=PH[1].tip;
 document.getElementById('prog-name-sub').textContent=PROGS[6].sub;
 renderDayTabs();
-initCal();renderCalLegend();loadTodayCond();initCondUI();updCondAdv();
+initCal();renderCalLegend();loadTodayCond();initCondUI();updCondAdv();checkCondComplete();
 checkDeload();checkDeloadEnd();initTagRow();render();
 checkOnboarding();
 // 週目標UI初期化
