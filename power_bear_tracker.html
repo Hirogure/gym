@@ -381,8 +381,8 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="freq-tabs">
       <div class="ft" onclick="setFreq(3,this)"><div class="fn">3日</div><div class="fl">全身法</div></div>
       <div class="ft" onclick="setFreq(4,this)"><div class="fn">4日</div><div class="fl">上下分割</div></div>
-      <div class="ft" onclick="setFreq(5,this)"><div class="fn">5日</div><div class="fl">PPL+</div></div>
-      <div class="ft active" onclick="setFreq(6,this)"><div class="fn">6日</div><div class="fl">PPL×2</div></div>
+      <div class="ft active" onclick="setFreq(5,this)"><div class="fn">5日</div><div class="fl">PPL+</div></div>
+      <div class="ft" id="ft6" onclick="trySetFreq6(this)"><div class="fn" id="ft6-label">6日 🔒</div><div class="fl" id="ft6-sub">15日達成で解放</div></div>
     </div>
   </div>
 
@@ -723,10 +723,10 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
       <button onclick="onboardingSelect(3)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週3日<br><span style="font-size:10px;font-weight:400;color:#9070B0">習慣化スタート</span></button>
       <button onclick="onboardingSelect(4)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週4日<br><span style="font-size:10px;font-weight:400;color:#9070B0">上下分割ペース</span></button>
-      <button onclick="onboardingSelect(5)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週5日<br><span style="font-size:10px;font-weight:400;color:#9070B0">PPL+ペース</span></button>
-      <button onclick="onboardingSelect(6)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週6日<br><span style="font-size:10px;font-weight:400;color:#9070B0">フルPPL×2</span></button>
+      <button onclick="onboardingSelect(5)" style="padding:16px 8px;background:#150828;border:2px solid #4A2880;border-radius:14px;font-size:14px;font-weight:800;color:#C090F0;cursor:pointer;font-family:var(--font);transition:all .15s;grid-column:1/-1" onmouseover="this.style.borderColor='#D090FF'" onmouseout="this.style.borderColor='#4A2880'">週5日<br><span style="font-size:10px;font-weight:400;color:#9070B0">PPL+ ／ 目標15日達成で週6日が解放！</span></button>
     </div>
-    <div style="font-size:9px;color:#6A50A0;text-align:center;line-height:1.5">📚 研究では週3〜4日から始めるのが習慣定着の最速ルートです（Lally 2010）</div>
+    <div style="font-size:9px;color:#6A50A0;text-align:center;line-height:1.5;margin-bottom:8px">📚 習慣化まで66日（Lally 2010）。まず週3〜5日から定着させよう</div>
+    <div style="font-size:9px;color:#4A3888;text-align:center;line-height:1.5">🔒 週6日プログラムはトレーニング15日達成後に解放されます</div>
   </div>
 </div>
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
@@ -760,9 +760,9 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 <script>
 /* ===== PHASE / TIPS ===== */
 const PH={
-  1:{tip:'⚠️ Phase 1（3週間）：★マーク種目はW-up 1set（空重量×10）必須。コンパウンドのインターバルは150〜180秒。前回MAXを入力すると推奨重量が自動表示されます。'},
-  2:{tip:'📈 Phase 2（2週間）：重量70〜80%。マシン→FW種目の完全置換フェーズ。インターバル継続（コンパウンド150〜180秒）。5週後はデロード週推奨。'},
-  3:{tip:'🔥 Phase 3（Week 6+）：FW主体・漸進的過負荷（毎回+1〜2.5kgまたは+1rep）。PB更新自動検知。6週ごとにデロード週。コンパウンドはインターバル3分維持。'}
+  1:{tip:'🐻 Phase 1（4〜6週）：フォーム習得フェーズ。★W-up 1set（空重量×10）必須。インターバル：コンパウンド150秒・アイソレーション60〜75秒。▶ 次のPhaseへ：同重量で全setを正しいフォームで3回連続こなせたら移行OK。'},
+  2:{tip:'📈 Phase 2（6〜8週）：スミスマシーン本格導入。重量を前Phaseより5〜10%増。インターバル継続（コンパウンド150〜180秒）。▶ 次のPhaseへ：主要スミス種目で3週連続重量が伸びなくなったら移行サイン。デロード週1回挟んでからPhase 3へ。'},
+  3:{tip:'🔥 Phase 3（継続）：スミス＋ケーブル全面活用。毎回+1〜2.5kgまたは+1repを目標に漸進的過負荷。PB更新自動検知。▶ 6週ごとにデロード週（重量40%減・set2/3）を入れてリセット。これが長期継続の鍵。'}
 };
 
 const DAY_COLORS={
@@ -791,110 +791,113 @@ const PROGS={
   3:{name:'週3日',sub:'全身法 ／ 怪我明け最安全ルート',
     days:[
       {id:'G1',lbl:'全身A（胸・背・脚）',type:'G',ph:{
-        1:[{n:'チェストプレス',d:'3set×8-10rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'ラットプルダウン',d:'3set×10-12rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'レッグプレス',d:'3set×12rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'ショルダープレス',d:'3set×10-12rep ／ ★W-up 1set',s:3,fw:0,r:90},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'チェストプレス',d:'3set×8-10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBロウ',d:'3set×10rep ／ ダンベル ★W-up 1set',s:3,fw:1,r:150},{n:'レッグプレス',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBショルダープレス',d:'3set×10rep ／ ダンベル ★W-up 1set',s:3,fw:1,r:150},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBベンチプレス',d:'3set×8rep ／ ダンベル ★W-up 1set必須',s:3,fw:1,r:180},{n:'DBロウ',d:'3set×8rep ／ ダンベル ★W-up 1set・背中の厚み',s:3,fw:1,r:150},{n:'DBスクワット',d:'3set×10rep ／ ダンベル ★W-up 1set必須',s:3,fw:1,r:150},{n:'DBショルダープレス',d:'2set×8rep ／ ダンベル ★W-up 1set',s:2,fw:1,r:150},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}]
+        1:[{n:'チェストプレス',d:'3set×8-10rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'ラットプルダウン',d:'3set×10-12rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'レッグプレス',d:'3set×12rep ／ ★W-up 1set必須',s:3,fw:0,r:120},{n:'DBシュラッグ',d:'3set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンベンチプレス',d:'3set×8-10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'3set×10rep ／ ケーブル高位置 ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンスクワット',d:'3set×10rep ／ スミス ★W-up 1set',s:3,fw:0,r:180},{n:'スミスマシーンシュラッグ',d:'3set×12rep ／ スミス ★KEY:僧帽筋',s:3,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンベンチプレス',d:'4set×8rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'4set×8rep ／ ケーブル ★W-up 1set',s:4,fw:0,r:150},{n:'スミスマシーンスクワット',d:'3set×8rep ／ スミス ★W-up 1set・今週最重量',s:3,fw:0,r:180},{n:'スミスマシーンシュラッグ',d:'3set×12rep ／ スミス ★KEY:僧帽筋',s:3,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}]
       }},
       {id:'G2',lbl:'全身B（肩・腕・臀部）',type:'G',ph:{
-        1:[{n:'ショルダープレス',d:'3set×10-12rep ／ ★W-up 1set必須',s:3,fw:0,r:90},{n:'アームカール',d:'3set×12rep',s:3,fw:0,r:60},{n:'グルート',d:'4set×15rep ／ ★KEY:ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'DBショルダープレス',d:'3set×10rep ／ ダンベル ★W-up 1set',s:3,fw:1,r:150},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:75,key:1},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBショルダープレス',d:'4set×8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:75,key:1},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'DBリアレイズ',d:'4set×12rep ／ ダンベル ★KEY:リアデルト',s:4,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        1:[{n:'ショルダープレス',d:'3set×10-12rep ／ ★W-up 1set必須',s:3,fw:0,r:90},{n:'アームカール',d:'3set×12rep',s:3,fw:0,r:60},{n:'グルート',d:'4set×15rep ／ ★KEY:ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
+        2:[{n:'スミスマシーンオーバーヘッドプレス',d:'3set×10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'ケーブルカール',d:'3set×12rep ／ ケーブル低位置',s:3,fw:0,r:75},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'ケーブルフェイスプル',d:'3set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽',s:3,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60}],
+        3:[{n:'スミスマシーンオーバーヘッドプレス',d:'4set×8rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕',s:3,fw:0,r:75,key:1},{n:'スミスマシーンヒップスラスト',d:'4set×10rep ／ スミス ★KEY:臀筋・最大収縮1秒',s:4,fw:0,r:120,key:1},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル ★KEY:リアデルト+僧帽',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル',s:3,fw:0,r:60}]
       }},
       {id:'G3',lbl:'全身C（コンパウンド集中）',type:'G',ph:{
-        1:[{n:'チェストプレス',d:'4set×8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×10-12rep ／ 収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'レッグカール',d:'3set×12rep',s:3,fw:0,r:120},{n:'DBシュラッグ',d:'3set×15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'チェストプレス',d:'3set×8rep ／ 重め ★W-up 1set',s:3,fw:0,r:150},{n:'DBロウ',d:'4set×8-10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'RDL',d:'3set×12rep ／ ダンベル ★W-up 1set',s:3,fw:1,r:150},{n:'DBシュラッグ',d:'3set×12rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBベンチプレス',d:'3set×6-8rep ／ 今週最重量 ★W-up 1set必須',s:3,fw:1,r:180},{n:'ラットプルダウン',d:'3set×8rep ／ 背中の幅を意識',s:3,fw:0,r:150},{n:'DBロウ',d:'3set×8rep ／ 重め ★W-up 1set',s:3,fw:1,r:150},{n:'RDL',d:'2set×10rep ／ ダンベル ★W-up 1set',s:2,fw:1,r:150},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}]
+        1:[{n:'チェストプレス',d:'4set×8-10rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×10-12rep ／ 収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'レッグカール',d:'3set×12rep',s:3,fw:0,r:120},{n:'DBシュラッグ',d:'3set×15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンベンチプレス',d:'3set×8rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'ケーブルロウ',d:'4set×8-10rep ／ ケーブル ★W-up 1set',s:4,fw:0,r:150},{n:'スミスマシーンRDL',d:'3set×12rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'3set×12rep ／ スミス ★KEY:僧帽筋',s:3,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンベンチプレス',d:'3set×6-8rep ／ スミス ★W-up 1set必須・今週最重量',s:3,fw:0,r:180},{n:'ケーブルラットプルダウン',d:'3set×8rep ／ ケーブル',s:3,fw:0,r:150},{n:'スミスマシーンRDL',d:'3set×8rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'3set×12rep ／ スミス ★KEY:僧帽筋',s:3,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}]
       }}
     ]
   },
   4:{name:'週4日',sub:'上下分割 ／ 各部位週2回',
     days:[
       {id:'UA',lbl:'Upper A（胸・肩・シュラッグ）',type:'U',ph:{
-        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set×12rep ／ 胸の広がり',s:3,fw:0,r:60},{n:'DBシュラッグ',d:'4set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:4,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1}],
-        2:[{n:'チェストプレス',d:'2set×8-10rep',s:2,fw:0,r:150},{n:'DBショルダープレス',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'3set×12rep ／ ダンベル',s:3,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}],3:[{n:'DBベンチプレス',d:'4set×8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'DBロウ',d:'3set×8rep ／ ダンベル ★W-up 1set・背中の厚み',s:3,fw:1,r:150},{n:'ラットプルダウン',d:'3set×8rep ／ 背中の幅を意識',s:3,fw:0,r:150},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY:僧帽筋',s:4,fw:1,r:75,key:1},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:75,key:1}]
+        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'DBシュラッグ',d:'4set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:4,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1}],
+        2:[{n:'スミスマシーンベンチプレス',d:'4set×8-10rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'3set×10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルサイドレイズ',d:'3set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:3,fw:0,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1}],
+        3:[{n:'スミスマシーンベンチプレス',d:'4set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'4set×8rep ／ スミス ★W-up 1set',s:4,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルサイドレイズ',d:'4set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:4,fw:0,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1}]
       }},
       {id:'LA',lbl:'Lower A（前腿・臀部）',type:'L',ph:{
-        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'グルート',d:'4set×15rep ／ ★KEY:ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグプレス',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'ゴブレットスクワット',d:'3set×12rep ／ DB両手保持',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBスクワット',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:180},{n:'ゴブレットスクワット',d:'3set×12rep ／ より重いDB',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}]
+        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'グルート',d:'4set×15rep ／ ★KEY:ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンスクワット',d:'4set×10rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンスクワット',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:5,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋・ベア体型の土台',s:5,fw:0,r:120,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}]
       }},
       {id:'UB',lbl:'Upper B（背中・腕・リアデルト）',type:'U',ph:{
         1:[{n:'ラットプルダウン',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×10-12rep ／ 収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'アームカール',d:'3set×12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'ラットプルダウン',d:'3set×8-10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBロウ',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],3:[{n:'DBベンチプレス',d:'3set×8rep ／ ダンベル ★W-up 1set必須',s:3,fw:1,r:150},{n:'DBロウ',d:'3set×8rep ／ ダンベル ★W-up 1set・背中の厚み',s:3,fw:1,r:150},{n:'ラットプルダウン',d:'4set×8rep ／ 背中の幅を意識',s:4,fw:0,r:150},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:二頭・前腕',s:3,fw:1,r:75,key:1}]
+        2:[{n:'ケーブルラットプルダウン',d:'4set×10rep ／ ケーブル高位置 ★W-up 1set必須',s:4,fw:0,r:150},{n:'ケーブルロウ',d:'4set×10rep ／ ケーブル低位置 ★W-up 1set',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'3set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽',s:3,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60}],
+        3:[{n:'ケーブルラットプルダウン',d:'5set×8rep ／ ケーブル ★W-up 1set必須・背中最大化',s:5,fw:0,r:150},{n:'ケーブルロウ',d:'4set×8-10rep ／ ケーブル ★W-up 1set',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽',s:4,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル',s:3,fw:0,r:60}]
       }},
       {id:'LB',lbl:'Lower B（後腿・体幹）',type:'L',ph:{
-        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグカール',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:120},{n:'RDL',d:'3set×12rep ／ ダンベル ★W-up 1set・背筋注意',s:3,fw:1,r:150},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'RDL',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'DBランジ',d:'3set×12rep（片足）／ ダンベル',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグカール',d:'3set×10rep',s:3,fw:0,r:120},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]      }}
+        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンRDL',d:'4set×10rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'レッグカール',d:'3set×10rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンRDL',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:5,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋',s:5,fw:0,r:120,key:1},{n:'ケーブルレッグカール',d:'3set×12rep ／ ケーブル低位置',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}]
+      }}
     ]
   },
   5:{name:'週5日',sub:'PPL+ ／ 肩・僧帽筋・臀部強化',
     days:[
       {id:'A',lbl:'Push（胸・肩・シュラッグ）',type:'A',ph:{
-        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set×12rep ／ 胸の広がり意識',s:3,fw:0,r:60},{n:'DBシュラッグ',d:'3set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1}],
-        2:[{n:'チェストプレス',d:'3set×8-10rep',s:3,fw:0,r:150},{n:'DBショルダープレス',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'3set×12rep ／ ダンベル',s:3,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}],
-        3:[{n:'DBベンチプレス',d:'4set×8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:180},{n:'DBショルダープレス',d:'4set×8rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'2set×10rep ／ ダンベル',s:2,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}]
+        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'DBシュラッグ',d:'3set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋=腕の太さの2/3',s:3,fw:0,r:60,key:1}],
+        2:[{n:'スミスマシーンベンチプレス',d:'4set×8-10rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'3set×10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12-15rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'ケーブルサイドレイズ',d:'3set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:3,fw:0,r:60,key:1},{n:'ケーブルフェイスプル',d:'2set×15rep ／ ケーブル高位置 肩バランス用',s:2,fw:0,r:60}],
+        3:[{n:'スミスマシーンインクラインプレス',d:'4set×8rep ／ スミス 30〜45度 ★W-up 1set必須',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'4set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:4,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋・最大収縮1秒',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1},{n:'ケーブルサイドレイズ',d:'4set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:4,fw:0,r:60,key:1},{n:'ケーブルフェイスプル',d:'2set×15rep ／ ケーブル高位置 肩バランス用',s:2,fw:0,r:60}]
       }},
       {id:'B',lbl:'Pull（背中・リアデルト・腕）',type:'C',ph:{
         1:[{n:'ラットプルダウン',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×10-12rep ／ 収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'アームカール',d:'3set×12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'ラットプルダウン',d:'3set×8-10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBロウ',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBロウ',d:'5set×8rep ／ ダンベル ★W-up 1set必須',s:5,fw:1,r:150},{n:'ラットプルダウン',d:'4set×8rep ／ 背中の幅を意識',s:4,fw:0,r:150},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:二頭・前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        2:[{n:'ケーブルラットプルダウン',d:'4set×10rep ／ ケーブル高位置 ★W-up 1set必須・背中の幅',s:4,fw:0,r:150},{n:'ケーブルロウ',d:'4set×10rep ／ ケーブル低位置 ★W-up 1set・背中の厚み',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'3set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽上部',s:3,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60}],
+        3:[{n:'ケーブルラットプルダウン',d:'5set×8rep ／ ケーブル ★W-up 1set必須・背中の幅を最大化',s:5,fw:0,r:150},{n:'ケーブルロウ',d:'4set×8-10rep ／ ケーブル ★W-up 1set・肩甲骨寄せ',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル ★KEY:リアデルト+僧帽・ベア厚みの核心',s:4,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕太さ',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル',s:3,fw:0,r:60}]
       }},
       {id:'C',lbl:'Legs（前腿・臀部）',type:'B',ph:{
-        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグプレス',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'ゴブレットスクワット',d:'3set×12rep ／ DB両手保持',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBスクワット',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:180},{n:'ゴブレットスクワット',d:'3set×12rep ／ より重いDB',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}]
+        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンスクワット',d:'4set×10rep ／ スミス ★W-up 1set必須・脚全体+臀筋',s:4,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'レッグエクステンション',d:'3set×12rep ／ トップで1秒',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンスクワット',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:5,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋・ベア体型の土台',s:5,fw:0,r:120,key:1},{n:'ケーブルキックバック',d:'3set×15rep（片足）／ ケーブル低位置 ★KEY:臀筋下部',s:3,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施・重量増加',s:3,fw:0,r:45}]
       }},
       {id:'D',lbl:'Push+Pull（胸+背・ハイブリッド）',type:'D',ph:{
         1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ラットプルダウン',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ローロー',d:'3set×10rep ／ 収縮1秒止め',s:3,fw:0,r:120},{n:'DBシュラッグ',d:'4set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:4,fw:1,r:60,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'チェストプレス',d:'3set×8-10rep',s:3,fw:0,r:150},{n:'DBロウ',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'ラットプルダウン',d:'3set×8rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBベンチプレス',d:'3set×8rep ／ ダンベル ★W-up 1set必須',s:3,fw:1,r:180},{n:'DBロウ',d:'3set×8rep ／ ダンベル ★W-up 1set・背中の厚み',s:3,fw:1,r:150},{n:'ラットプルダウン',d:'3set×8rep ／ 背中の幅を意識',s:3,fw:0,r:150},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY:僧帽筋',s:4,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        2:[{n:'スミスマシーンベンチプレス',d:'3set×8-10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンローバーロウ',d:'3set×10rep ／ スミス ★W-up 1set・背中の厚み',s:3,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'3set×10rep ／ ケーブル高位置・背中の幅',s:3,fw:0,r:120},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60}],
+        3:[{n:'スミスマシーンベンチプレス',d:'3set×8rep ／ スミス ★W-up 1set必須・重め',s:3,fw:0,r:150},{n:'スミスマシーンローバーロウ',d:'3set×8rep ／ スミス ★W-up 1set・最重量',s:3,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'3set×8rep ／ ケーブル・背中の幅',s:3,fw:0,r:120},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル',s:3,fw:0,r:60}]
       }},
       {id:'E',lbl:'Legs+（後腿・RDL）',type:'E',ph:{
-        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグプレス',d:'3set×10rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグカール',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:120},{n:'RDL',d:'3set×12rep ／ ダンベル ★W-up 1set・腰に注意',s:3,fw:1,r:150},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'RDL',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'DBランジ',d:'3set×12rep（片足）／ ダンベル',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグカール',d:'3set×10rep',s:3,fw:0,r:120},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグプレス',d:'3set×10rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンRDL',d:'4set×10rep ／ スミス ★W-up 1set必須・ハム+臀筋+脊柱起立筋',s:4,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'レッグカール',d:'3set×10rep ／ ハム孤立',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンRDL',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量・腰丸めない',s:5,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋・最大収縮1秒',s:5,fw:0,r:120,key:1},{n:'ケーブルレッグカール',d:'3set×12rep ／ ケーブル低位置・ハム全域',s:3,fw:0,r:90},{n:'ケーブルキックバック',d:'3set×15rep（片足）／ ケーブル低位置 ★KEY:臀筋下部',s:3,fw:0,r:60,key:1},{n:'ケーブルクランチ',d:'3set×20rep ／ ケーブル',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}]
       }}
     ]
   },
   6:{name:'週6日',sub:'PPL×2 ／ 各筋群週2回・最大ボリューム',
     days:[
       {id:'A',lbl:'Push（胸・肩・僧帽筋）',type:'A',ph:{
-        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set×12rep ／ 胸の広がり意識',s:3,fw:0,r:60},{n:'DBシュラッグ',d:'3set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1}],
-        2:[{n:'チェストプレス',d:'3set×8-10rep',s:3,fw:0,r:150},{n:'DBショルダープレス',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'3set×12rep ／ ダンベル',s:3,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}],
-        3:[{n:'DBベンチプレス',d:'4set×8rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:180},{n:'DBショルダープレス',d:'4set×8rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'2set×10rep ／ ダンベル',s:2,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}]
+        1:[{n:'チェストプレス',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:90},{n:'DBシュラッグ',d:'3set×12-15rep ／ ダンベル ★KEY:僧帽筋',s:3,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY:肩幅',s:3,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋=腕の太さの2/3',s:3,fw:0,r:60,key:1}],
+        2:[{n:'スミスマシーンベンチプレス',d:'4set×8-10rep ／ スミス ★W-up 1set必須',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'3set×10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12-15rep ／ スミス ★KEY:僧帽筋',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋・肘を体側に固定',s:3,fw:0,r:60,key:1},{n:'ケーブルサイドレイズ',d:'3set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:3,fw:0,r:60,key:1},{n:'ケーブルフェイスプル',d:'2set×15rep ／ ケーブル高位置 肩バランス用・前後の肩の均衡を保つ',s:2,fw:0,r:60}],
+        3:[{n:'スミスマシーンインクラインプレス',d:'4set×8rep ／ スミス 30〜45度 ★W-up 1set必須・上胸〜肩の厚み',s:4,fw:0,r:150},{n:'スミスマシーンオーバーヘッドプレス',d:'4set×8-10rep ／ スミス ★W-up 1set必須・今週最重量を目指す',s:4,fw:0,r:150},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋・最大収縮1秒キープ',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10-12rep ／ ケーブル高位置+ロープ ★KEY:三頭筋・重量増やして腕を太く',s:3,fw:0,r:60,key:1},{n:'ケーブルサイドレイズ',d:'4set×15rep ／ ケーブル低位置 ★KEY:肩幅',s:4,fw:0,r:60,key:1},{n:'ケーブルフェイスプル',d:'2set×15rep ／ ケーブル高位置 肩バランス用',s:2,fw:0,r:60}]
       }},
       {id:'B',lbl:'Legs（前腿・臀部）',type:'B',ph:{
-        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグプレス',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'ゴブレットスクワット',d:'3set×12rep ／ DB両手保持',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBスクワット',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:180},{n:'ゴブレットスクワット',d:'3set×12rep ／ より重いDB',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60}]
+        1:[{n:'レッグプレス',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12-15rep ／ トップで1秒止める',s:3,fw:0,r:60},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・かかとを下ろし切るストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンスクワット',d:'4set×10rep ／ スミス ★W-up 1set必須・脚全体+臀筋同時',s:4,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set必須 ★KEY:臀筋EMG最高（Contreras 2015）',s:4,fw:0,r:120,key:1},{n:'レッグエクステンション',d:'3set×12rep ／ トップで1秒キープ',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・下ろし切ってストレッチ重視',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンスクワット',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量',s:5,fw:0,r:180},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋・ベア体型の土台・バーをヒップに密着',s:5,fw:0,r:120,key:1},{n:'ケーブルキックバック',d:'3set×15rep（片足）／ ケーブル低位置 ★KEY:臀筋下部・ベアラインに直結',s:3,fw:0,r:60,key:1},{n:'レッグエクステンション',d:'3set×12rep',s:3,fw:0,r:75},{n:'アダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施・ゆっくり下ろして最大ストレッチ',s:3,fw:0,r:45}]
       }},
       {id:'C',lbl:'Pull（背中・リアデルト・腕）',type:'C',ph:{
         1:[{n:'ラットプルダウン',d:'4set×8-10rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×10-12rep ／ 収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'アームカール',d:'3set×12rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'ラットプルダウン',d:'3set×8-10rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBロウ',d:'4set×10rep ／ ダンベル ★W-up 1set',s:4,fw:1,r:150},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBロウ',d:'5set×8rep ／ ダンベル ★W-up 1set必須・背中の厚み',s:5,fw:1,r:150},{n:'ラットプルダウン',d:'4set×8rep ／ 背中の幅を意識・ひじを脇腹へ',s:4,fw:0,r:150},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:二頭・前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        2:[{n:'ケーブルラットプルダウン',d:'4set×10rep ／ ケーブル高位置 ★W-up 1set必須・背中の幅',s:4,fw:0,r:150},{n:'ケーブルロウ',d:'4set×10rep ／ ケーブル低位置 ★W-up 1set・背中の厚み・肘を後ろへ',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'3set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽上部・ベア系の厚み核心',s:3,fw:0,r:75,key:1},{n:'ケーブルカール',d:'3set×12rep ／ ケーブル低位置・常時張力で二頭筋',s:3,fw:0,r:60},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル高位置+ロープ・床より高負荷',s:3,fw:0,r:60}],
+        3:[{n:'ケーブルラットプルダウン',d:'5set×8rep ／ ケーブル高位置 ★W-up 1set必須・背中の広がり最大化',s:5,fw:0,r:150},{n:'ケーブルロウ',d:'4set×8-10rep ／ ケーブル低位置 ★W-up 1set・肩甲骨寄せ収縮1秒',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽・ベア厚みの核心',s:4,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕の太さ',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル高位置+ロープ・重量増やして腹筋強化',s:3,fw:0,r:60}]
       }},
       {id:'D',lbl:'Push+（胸重め・シュラッグ集中）',type:'D',ph:{
-        1:[{n:'チェストプレス',d:'4set×6-8rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×8-10rep ／ 重め ★W-up 1set',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set×15rep ／ ストレッチ重視',s:3,fw:0,r:60},{n:'DBシュラッグ',d:'4set×12-15rep ／ ダンベル ★KEY:僧帽筋MAX',s:4,fw:1,r:60,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:60,key:1}],
-        2:[{n:'DBベンチプレス',d:'4set×8-10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'DBショルダープレス',d:'4set×8-10rep ／ 重め ★W-up 1set',s:4,fw:1,r:150},{n:'ペクトラル',d:'3set×12rep ／ 上部意識',s:3,fw:0,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}],
-        3:[{n:'DBベンチプレス',d:'4set×6-8rep ／ 今週最重量 ★W-up 1set必須',s:4,fw:1,r:180},{n:'DBショルダープレス',d:'4set×8rep ／ 重め ★W-up 1set',s:4,fw:1,r:150},{n:'DBフライ',d:'2set×10rep ／ ダンベル ストレッチ',s:2,fw:1,r:75},{n:'DBシュラッグ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'DBサイドレイズ',d:'3set×15rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1}]
+        1:[{n:'チェストプレス',d:'4set×6-8rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:120},{n:'ショルダープレス',d:'4set×8-10rep ／ 重め ★W-up 1set',s:4,fw:0,r:90},{n:'ペクトラル',d:'3set×15rep ／ ストレッチ重視',s:3,fw:0,r:60},{n:'DBシュラッグ',d:'4set×12-15rep ／ ダンベル ★KEY:僧帽筋MAX',s:4,fw:1,r:60,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12-15rep ／ ケーブル高位置+ロープ ★KEY:三頭筋',s:3,fw:0,r:60,key:1}],
+        2:[{n:'スミスマシーンベンチプレス',d:'5set×6-8rep ／ スミス 重め ★W-up 1set必須・週の最重量日',s:5,fw:0,r:180},{n:'スミスマシーンインクラインプレス',d:'3set×10rep ／ スミス 30度 ★W-up 1set・上胸',s:3,fw:0,r:150},{n:'ケーブルフライ',d:'3set×12rep ／ ケーブル・収縮重視',s:3,fw:0,r:75},{n:'スミスマシーンシュラッグ',d:'4set×12rep ／ スミス ★KEY:僧帽筋・高重量で最大発達',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×12rep ／ ケーブル高位置+ロープ ★KEY:三頭筋・重量上げて腕を太く',s:3,fw:0,r:60,key:1}],
+        3:[{n:'スミスマシーンインクラインプレス',d:'5set×6-8rep ／ スミス 30度 ★W-up 1set必須・今週最重量',s:5,fw:0,r:180},{n:'スミスマシーンオーバーヘッドプレス',d:'3set×8-10rep ／ スミス ★W-up 1set',s:3,fw:0,r:150},{n:'ケーブルフライ',d:'3set×12rep ／ ケーブル 収縮1秒・胸の輪郭',s:3,fw:0,r:75},{n:'スミスマシーンシュラッグ',d:'4set×10-12rep ／ スミス ★KEY:僧帽筋・最大収縮2秒キープ',s:4,fw:0,r:75,key:1},{n:'ケーブルトライセップスプッシュダウン',d:'3set×10rep ／ ケーブル高位置+ロープ ★KEY:三頭筋・重量増加・腕太さ仕上げ',s:3,fw:0,r:60,key:1}]
       }},
       {id:'E',lbl:'Legs+（後腿・RDL・体幹）',type:'E',ph:{
-        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグプレス',d:'3set×10rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'レッグカール',d:'3set×10rep ／ ★W-up 1set',s:3,fw:0,r:120},{n:'RDL',d:'3set×12rep ／ ダンベル ★W-up 1set・腰に注意',s:3,fw:1,r:150},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'RDL',d:'4set×10rep ／ ダンベル ★W-up 1set必須',s:4,fw:1,r:150},{n:'DBランジ',d:'3set×12rep（片足）／ ダンベル',s:3,fw:1,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋',s:4,fw:0,r:75,key:1},{n:'レッグカール',d:'3set×10rep',s:3,fw:0,r:120},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        1:[{n:'レッグカール',d:'4set×10-12rep ／ ★W-up 1set必須',s:4,fw:0,r:120},{n:'グルート',d:'4set×15rep ／ ★KEY:臀筋・ベア体型の土台',s:4,fw:0,r:60,key:1},{n:'レッグプレス',d:'3set×10rep',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施・ストレッチ重視',s:3,fw:0,r:45}],
+        2:[{n:'スミスマシーンRDL',d:'4set×10rep ／ スミス ★W-up 1set必須・ハム+臀筋+脊柱起立筋',s:4,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'4set×12rep ／ スミス ★W-up 1set必須 ★KEY:臀筋EMG最高',s:4,fw:0,r:120,key:1},{n:'レッグカール',d:'3set×10rep ／ ハム孤立収縮',s:3,fw:0,r:90},{n:'アブダクター',d:'3set×15rep',s:3,fw:0,r:60},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×15-20rep ／ レッグプレスマシンでつま先立ち実施',s:3,fw:0,r:45}],
+        3:[{n:'スミスマシーンRDL',d:'5set×8rep ／ スミス ★W-up 1set必須・今週最重量・腰を丸めない',s:5,fw:0,r:150},{n:'スミスマシーンヒップスラスト',d:'5set×10rep ／ スミス ★KEY:臀筋・バーをヒップに・最大収縮1秒',s:5,fw:0,r:120,key:1},{n:'ケーブルレッグカール',d:'3set×12rep ／ ケーブル低位置・ハム全域',s:3,fw:0,r:90},{n:'ケーブルキックバック',d:'3set×15rep（片足）／ ケーブル低位置 ★KEY:臀筋下部',s:3,fw:0,r:60,key:1},{n:'ケーブルクランチ',d:'3set×20rep ／ ケーブル 重量増加',s:3,fw:0,r:60},{n:'カーフレイズ',d:'3set×20rep ／ レッグプレスマシンでつま先立ち実施・重量を徐々に増やす',s:3,fw:0,r:45}]
       }},
       {id:'F',lbl:'Pull+（背中重め・リアデルト・前腕）',type:'F',ph:{
         1:[{n:'ラットプルダウン',d:'4set×6-8rep ／ 重め ★W-up 1set必須',s:4,fw:0,r:120},{n:'ローロー',d:'4set×8-10rep ／ 重め・収縮1秒止め ★W-up 1set',s:4,fw:0,r:120},{n:'DBリアレイズ',d:'3set×12-15rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:60,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:前腕',s:3,fw:1,r:60,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        2:[{n:'DBロウ',d:'3set×8-10rep ／ ダンベル ★W-up 1set必須',s:3,fw:1,r:150},{n:'ラットプルダウン',d:'3set×8rep ／ ★W-up 1set',s:3,fw:0,r:150},{n:'DBリアレイズ',d:'4set×12rep ／ ダンベル ★KEY',s:4,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'3set×15rep',s:3,fw:0,r:60}],
-        3:[{n:'DBロウ',d:'5set×8rep ／ ダンベル ★W-up 1set必須・背中の厚み',s:5,fw:1,r:150},{n:'ラットプルダウン',d:'4set×8rep ／ 背中の幅を意識・ひじを脇腹へ',s:4,fw:0,r:150},{n:'DBリアレイズ',d:'3set×12rep ／ ダンベル ★KEY:リアデルト',s:3,fw:1,r:75,key:1},{n:'ハンマーカール',d:'3set×12rep ／ ダンベル ★KEY:二頭・前腕',s:3,fw:1,r:75,key:1},{n:'アブドミナルクランチ',d:'2set×20rep',s:2,fw:0,r:60}]
+        2:[{n:'スミスマシーンローバーロウ',d:'4set×8-10rep ／ スミス ★W-up 1set必須・背中全体の厚み',s:4,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'4set×8rep ／ ケーブル高位置 ★W-up 1set・背中の幅',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽・ベア厚みの核心',s:4,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'3set×12rep ／ ケーブル+ロープ ★KEY:前腕太さ',s:3,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×15rep ／ ケーブル+ロープ',s:3,fw:0,r:60}],
+        3:[{n:'スミスマシーンローバーロウ',d:'5set×6-8rep ／ スミス ★W-up 1set必須・週の最重量背中日',s:5,fw:0,r:150},{n:'ケーブルラットプルダウン',d:'4set×8rep ／ ケーブル ★W-up 1set・肩甲骨下制を意識',s:4,fw:0,r:150},{n:'ケーブルフェイスプル',d:'4set×15rep ／ ケーブル高位置 ★KEY:リアデルト+僧帽・両手外旋',s:4,fw:0,r:75,key:1},{n:'ケーブルハンマーカール',d:'4set×12rep ／ ケーブル+ロープ ★KEY:前腕・二頭',s:4,fw:0,r:75,key:1},{n:'ケーブルクランチ',d:'3set×20rep ／ ケーブル 最高重量で腹筋鍛え上げ',s:3,fw:0,r:60}]
       }}
     ]
   }
 };
 
 /* ===== STATE ===== */
-let cp=1,cd=0,cfreq=6,wd=false,sd={};
+let cp=1,cd=0,cfreq=5,wd=false,sd={};
 let ti=null,ts=0,tt=0,tr=false;
 let selTags=[],condState={fatigue:0,sleep:0,soreness:0};
 let calYear,calMonth,reportWeekOffset=0;
@@ -1300,14 +1303,16 @@ function render(){
       ?`<span style="font-size:9px;background:#1A0000;color:var(--red);border-radius:5px;padding:2px 6px;font-weight:800">${diff}set</span>`
       :'';
     const adjInt=isCompound?e.r+condAdjIntervalExtra:e.r;
-    const wh=getWH(e.n);const prev=wh.length>=2?wh[wh.length-2]:null;const prevWt=prev?prev.weight:null;
-    let trendHtml='',nextHtml='';
-    if(prevWt&&base>0){
-      const d=+(base-prevWt).toFixed(1);
-      const arrow=d>0?'↑ +'+d+'kg':d<0?'↓ '+d+'kg':'→ 同重量';
-      const col=d>0?'var(--grn)':d<0?'var(--red)':'var(--t3)';
-      trendHtml='<div style="font-size:10px;color:'+col+';font-weight:700;margin-top:3px">前々回比: '+arrow+'</div>';
+    const wh=getWH(e.n);
+    let sameWeightAlert='';
+    // 直近3回同じ重量 → 重量アップの促し
+    if(wh.length>=3){
+      const last3=wh.slice(-3).map(x=>x.weight);
+      if(last3[0]===last3[1]&&last3[1]===last3[2]&&last3[0]>0){
+        sameWeightAlert=`<div style="font-size:10px;font-weight:800;color:#FFCC00;background:#1A1400;border:1px solid #4A3800;border-radius:8px;padding:4px 8px;margin-top:5px;display:inline-block">⚡ ${last3[0]}kg を3回連続 → そろそろ重量アップを検討</div>`;
+      }
     }
+    let nextHtml='';
     if(base>0&&score!==null){
       const nxt=score<2?base+2.5:score<3.5?base+2.5:base;
       const lbl=score<2?'次回+2.5kgチャレンジ':score<3.5?'次回+2.5kg目標':'次回同重量(回復優先)';
@@ -1333,7 +1338,7 @@ function render(){
       <span class="wunit">kg</span>
       <span style="font-size:10px;color:#2a6040;flex:1;padding-left:6px">← 実際に使った重量</span>
     </div>`;
-    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">前回MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${todayWtRow}${trendHtml}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">過去MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${todayWtRow}${sameWeightAlert}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
   });
   document.getElementById('dlbl').textContent='Day '+day.id+' — '+day.lbl;
   updFW();updProg();
@@ -1649,6 +1654,78 @@ function dismissDeload(){ls('gym_deload_dismissed',todayStr());document.getEleme
 function checkDeloadEnd(){const end=ls('gym_deload_end');if(end&&new Date()>new Date(end)){ls('gym_deload_mode',false);try{localStorage.removeItem('gym_deload_end');}catch(e){}showToast('\u30c7\u30ed\u30fc\u30c9\u9031\u7d42\u4e86\u3002\u901a\u5e38\u30e2\u30fc\u30c9\u306b\u623b\u308a\u307e\u3057\u305f\u3002');render();}}
 
 /* ===== MEMO & TAGS ===== */
+/* ===== 週6日 アンロック =====
+ * 累計トレーニング15日達成で週6日プログラムを解放
+ * = 週5日×3週間継続の目安 */
+const W6_UNLOCK_DAYS = 15;
+
+function countTotalTrainingDays(){
+  let count=0;
+  try{
+    for(let k in localStorage){
+      if(k.startsWith('gym_log_')){
+        const log=ls(k);
+        if(isTrainingLog(log))count++;
+      }
+    }
+  }catch(e){}
+  return count;
+}
+
+function isWeek6Unlocked(){
+  return !!ls('gym_w6_unlocked');
+}
+
+function checkWeek6Unlock(){
+  if(isWeek6Unlocked())return true;
+  const total=countTotalTrainingDays();
+  if(total>=W6_UNLOCK_DAYS){
+    ls('gym_w6_unlocked',true);
+    return true;
+  }
+  return false;
+}
+
+function trySetFreq6(el){
+  if(checkWeek6Unlock()){
+    setFreq(6,el);
+  } else {
+    const total=countTotalTrainingDays();
+    const remain=W6_UNLOCK_DAYS-total;
+    showToast(`🔒 あと${remain}日のトレーニングで週6日が解放されます（現在${total}日）`);
+  }
+}
+
+function updateW6TabUI(){
+  const unlocked=checkWeek6Unlock();
+  const lbl=document.getElementById('ft6-label');
+  const sub=document.getElementById('ft6-sub');
+  const tab=document.getElementById('ft6');
+  if(!lbl||!sub||!tab)return;
+  if(unlocked){
+    lbl.textContent='6日 ✅';
+    sub.textContent='PPL×2';
+    tab.style.opacity='1';
+    tab.style.cursor='pointer';
+  } else {
+    const total=countTotalTrainingDays();
+    lbl.textContent=`6日 🔒`;
+    sub.textContent=`${total}/${W6_UNLOCK_DAYS}日`;
+    tab.style.opacity='0.55';
+    tab.style.cursor='default';
+  }
+}
+
+function maybeAnnounceW6Unlock(){
+  // 保存直後に解放条件を満たした場合のお祝い
+  if(!ls('gym_w6_announced')&&checkWeek6Unlock()){
+    ls('gym_w6_announced',true);
+    setTimeout(()=>{
+      showToast('🎉 週6日プログラムが解放されました！トレーニングタブから選択できます');
+    },800);
+    updateW6TabUI();
+  }
+}
 function onboardingSelect(n){
   weekGoal=n;ls('gym_week_goal',n);
   document.getElementById('onboarding-modal').style.display='none';
@@ -1683,13 +1760,13 @@ function saveWorkout(){
 
   const newPBs=[];
   ex().forEach(e=>{
-    // 今日の実重量を優先。なければ前回MAXをフォールバック
+    // 今日の実重量を優先。なければ過去MAXをフォールバック
     const todayWt=getTodayWeight(e.n);
     const base=loadBase(e.n);
     const useWt=todayWt||base;
     if(useWt>0){
       addWH(e.n,ds,useWt);  // グラフ用履歴に実重量を記録
-      // 前回MAXは上書きしない（お休み前の値を基準重量として固定）
+      // 過去MAXは上書きしない（お休み前の値を基準重量として固定）
       // phase推奨重量の計算もこの値を使用
       // PBチェック（過去最高値の更新のみ）
       const pb=getPB(e.n);
@@ -1716,6 +1793,8 @@ function saveWorkout(){
   showToast('記録しました ✓');
   if(newPBs.length>0)setTimeout(()=>showPBOverlay(newPBs),600);
   renderCalStats();renderCalendar();renderPBHall();renderBWSection();
+  maybeAnnounceW6Unlock();
+  updateW6TabUI();
 }
 function showPBOverlay(names){document.getElementById('pb-names').innerHTML=names.join('<br>');document.getElementById('pb-overlay').style.display='flex';setTimeout(hidePBOverlay,3500);}
 function hidePBOverlay(){document.getElementById('pb-overlay').style.display='none';}
@@ -2012,11 +2091,17 @@ function showTab(id){
   if(el)el.textContent='📅 '+lbl;
 })();
 document.getElementById('tip').textContent=PH[1].tip;
-document.getElementById('prog-name-sub').textContent=PROGS[6].sub;
+document.getElementById('prog-name-sub').textContent=PROGS[5].sub;
 renderDayTabs();
 initCal();renderCalLegend();loadTodayCond();initCondUI();updCondAdv();checkCondComplete();
 checkDeload();checkDeloadEnd();initTagRow();render();
 checkOnboarding();
+updateW6TabUI();
+// 既存ユーザーが週6日を設定済みなら引き続き使えるようにする
+if(cfreq===6&&!isWeek6Unlocked()&&countTotalTrainingDays()>=W6_UNLOCK_DAYS){
+  ls('gym_w6_unlocked',true);
+  updateW6TabUI();
+}
 // 週目標UI初期化
 (function(){
   const wg=ls('gym_week_goal')||3;
