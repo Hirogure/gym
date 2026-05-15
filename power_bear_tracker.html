@@ -906,6 +906,7 @@ let timeMode=60;  // 今日のトレーニング時間（分）
 let weekGoal=ls('gym_week_goal')||3;  // 週目標日数
 let wsd={};  // ウォームアップセット完了状態
 let todayWeights={};  // 今日の実使用重量 {種目名: kg}
+let todayReps={};     // 今日のrep数 {種目名: rep}
 let condAdjSets=0, condAdjIntervalExtra=0;  // 体調によるset/インターバル調整値
 
 // 筋肉グループ定義（連日同部位チェック用）
@@ -926,7 +927,17 @@ function getLog(ds){return ls('gym_log_'+ds);}
 function setLog(ds,d){ls('gym_log_'+ds,d);}
 function delLog(ds){try{localStorage.removeItem('gym_log_'+ds);}catch(e){}}
 function getWH(nm){return ls('gym_wh_'+nm)||[];}
-function addWH(nm,ds,wt){if(!wt||wt<=0)return;let h=getWH(nm);const i=h.findIndex(x=>x.date===ds);if(i>=0)h[i].weight=wt;else h.push({date:ds,weight:wt});h.sort((a,b)=>a.date.localeCompare(b.date));if(h.length>30)h=h.slice(-30);ls('gym_wh_'+nm,h);}
+function addWH(nm,ds,wt,reps){
+  if(!wt||wt<=0)return;
+  let h=getWH(nm);
+  const i=h.findIndex(x=>x.date===ds);
+  const entry={date:ds,weight:wt};
+  if(reps&&reps>0)entry.reps=reps;
+  if(i>=0)h[i]=entry;else h.push(entry);
+  h.sort((a,b)=>a.date.localeCompare(b.date));
+  if(h.length>30)h=h.slice(-30);
+  ls('gym_wh_'+nm,h);
+}
 function getPB(nm){return ls('gym_pb_'+nm)||null;}
 function setPB(nm,wt,ds){ls('gym_pb_'+nm,{weight:wt,date:ds});}
 function getBWs(){return ls('gym_bw')||[];}
@@ -945,6 +956,38 @@ function saveTodayWeight(nm,val){
   else{delete todayWeights[nm];}
 }
 function getTodayWeight(nm){return todayWeights[nm]||null;}
+
+function saveTodayReps(nm,val){
+  if(val&&val>0)todayReps[nm]=val;
+  else delete todayReps[nm];
+}
+function getTodayReps(nm){return todayReps[nm]||null;}
+
+// この重量で何回目かを重量履歴から自動計算
+function countWeightSessions(nm,weight){
+  if(!weight||weight<=0)return null;
+  const wh=getWH(nm);
+  const count=wh.filter(x=>x.weight===weight).length;
+  return count; // 過去N回 → 今日がN+1回目
+}
+
+// 今日の重量入力時にN回目バッジをリアルタイム更新
+function updateWeightBadge(idx,nm,weight){
+  const el=document.getElementById('wcbadge-'+idx);
+  if(!el)return;
+  const w=parseFloat(weight)||0;
+  if(!w){el.style.display='none';return;}
+  const past=countWeightSessions(nm,w);
+  if(past===null){el.style.display='none';return;}
+  if(past===0){
+    el.textContent='🆕 この重量 初回';
+    el.style.background='#001A33';el.style.color='#5BC8FF';
+  } else {
+    el.textContent=`📊 この重量 ${past+1}回目`;
+    el.style.background='#0A1A0A';el.style.color='#00C853';
+  }
+  el.style.display='inline-block';
+}
 function saveExMemo(nm,val){try{if(val&&val.trim()){ls('gym_exmemo_'+nm,val.trim());}else{localStorage.removeItem('gym_exmemo_'+nm);}}catch(e){}}
 function onBaseInput(nm,val,sid){const v=parseFloat(val)||0;saveBase(nm,v>0?v:0);const sp=document.getElementById(sid);if(!sp)return;const t=recText(v,cp);if(t){sp.textContent=t;sp.className=recClass(cp);}else{sp.textContent='MAX入力→推奨';sp.className='wrec none';}}
 
@@ -1322,6 +1365,19 @@ function render(){
     const exMemoKey='gym_exmemo_'+nm;
     const prevExMemo=ls(exMemoKey)||'';
     const todayWt=getTodayWeight(e.n);
+    const todayRep=getTodayReps(e.n);
+    // 前回の実績（WH最新エントリ）
+    const prevEntry=wh.length>0?wh[wh.length-1]:null;
+    const prevWtRep=prevEntry
+      ?`${prevEntry.weight}kg${prevEntry.reps?` × ${prevEntry.reps}rep`:''}`
+      :null;
+    // この重量で何回目か（過去の重量履歴から自動計算）
+    const pastCount=todayWt?countWeightSessions(e.n,todayWt):null;
+    const wtBadgeTxt=pastCount===null?''
+      :pastCount===0?'🆕 この重量 初回'
+      :`📊 この重量 ${pastCount+1}回目`;
+    const wtBadgeBg=pastCount===0?'#001A33':'#0A1A0A';
+    const wtBadgeColor=pastCount===0?'#5BC8FF':'#00C853';
     const bs=Array.from({length:adjS},(_,s)=>{
       const done=sd[i+'_'+s]?' done':'';
       return `<button class="sb${done}" onclick="tapS(${i},${s},${adjInt},'${nm}',this)">${s+1}</button>`;
@@ -1330,15 +1386,21 @@ function render(){
     const hasWU=e.d.includes('W-up');
     const wuDone=wsd[i]?' done':'';
     const wuBtn=hasWU?`<button class="sb wu-btn${wuDone}" onclick="tapWU(${i},this)" title="ウォームアップセット（軽重量×10〜15rep）">W-up</button>`:'';
-    // 今日の実重量入力欄
-    const todayWtRow=`<div class="wrow" style="margin-top:5px;border-top:1px solid #1a2030;padding-top:5px">
-      <span class="wlbl" style="color:var(--grn);font-weight:800">今日</span>
-      <input type="number" class="bi" style="border-color:#006040" placeholder="0" value="${todayWt||''}" min="0" step="2.5"
-        oninput="saveTodayWeight('${nm}',parseFloat(this.value)||0)">
-      <span class="wunit">kg</span>
-      <span style="font-size:10px;color:#2a6040;flex:1;padding-left:6px">← 実際に使った重量</span>
+    // 今日の重量 × rep数 + N回目バッジ（1行コンパクト）
+    const todayWtRow=`<div style="margin-top:5px;border-top:1px solid #1a2030;padding-top:6px">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+        <span class="wlbl" style="color:var(--grn);font-weight:800;flex-shrink:0">今日</span>
+        <input type="number" class="bi" style="border-color:#006040;width:52px" placeholder="kg" value="${todayWt||''}" min="0" step="2.5"
+          oninput="saveTodayWeight('${nm}',parseFloat(this.value)||0);updateWeightBadge(${i},'${nm}',this.value)">
+        <span class="wunit">kg</span>
+        <span style="font-size:12px;color:#3A5060;margin:0 1px">×</span>
+        <input type="number" class="bi" style="border-color:#006040;width:46px" placeholder="rep" value="${todayRep||''}" min="1" max="30" step="1"
+          oninput="saveTodayReps('${nm}',parseInt(this.value)||0)">
+        <span class="wunit" style="font-size:10px">rep</span>
+        <span id="wcbadge-${i}" style="font-size:9px;font-weight:800;border-radius:6px;padding:2px 7px;white-space:nowrap;background:${wtBadgeBg};color:${wtBadgeColor};display:${wtBadgeTxt?'inline-block':'none'}">${wtBadgeTxt}</span>
+      </div>
     </div>`;
-    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">過去MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${todayWtRow}${sameWeightAlert}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回+2.5kg）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
+    w.innerHTML=`<div class="er-top"><div class="el"><div class="enw"><span class="enm">${e.n}</span>${fwBadge}${keyBadge}${adjBadge}</div><div class="ed">${e.d}</div><div class="wrow"><span class="wlbl">過去MAX</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="2.5" oninput="onBaseInput('${nm}',this.value,'${sid}')"><span class="wunit">kg</span><span class="warr">›</span><span id="${sid}" class="${rc}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${rt}</span></div>${prevWtRep?`<div style="font-size:10px;color:#5BC8FF;font-weight:700;margin-top:3px;padding:3px 8px;background:#001228;border-radius:6px;display:inline-block">📌 前回: ${prevWtRep}</div>`:''  }${todayWtRow}${sameWeightAlert}${nextHtml}${prevExMemo?'<div class="ex-prev-memo">💬 前回メモ: '+prevExMemo+'</div>':''}<div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: フォーム改善・次回の目標）" value="${prevExMemo}" oninput="saveExMemo('${nm}',this.value)"></div></div><div class="sets">${wuBtn}${bs}</div></div>`;    card.appendChild(w);
   });
   document.getElementById('dlbl').textContent='Day '+day.id+' — '+day.lbl;
   updFW();updProg();
@@ -1442,12 +1504,12 @@ function togT(){if(ts===0){skipT();return;}tr=!tr;document.getElementById('ttog'
 function skipT(){clearInterval(ti);tr=false;document.getElementById('tbox').style.display='none';}
 function addT(s){ts+=s;tt+=s;updT();}
 
-function sP(p,el){cp=p;sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
+function sP(p,el){cp=p;sd={};wsd={};nsd={};todayWeights={};todayReps={};wd=false;skipT();document.querySelectorAll('.pht').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('tip').textContent=PH[p].tip;document.getElementById('phase-badge').textContent='Phase '+p;document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';render();}
 function sD(idx,el){
   if(donS()>0){
     if(!confirm('途中のセット進捗がリセットされます。よいですか？'))return;
   }
-  cd=idx;sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();
+  cd=idx;sd={};wsd={};nsd={};todayWeights={};todayReps={};wd=false;skipT();
   document.querySelectorAll('.dt').forEach(d=>d.classList.remove('active'));el.classList.add('active');
   document.getElementById('wc').classList.remove('done');document.getElementById('db').style.display='none';
   render();renderConsecutiveWarning();
@@ -1567,7 +1629,7 @@ function resetAll(){
   resetD();
 }
 function resetD(){
-  sd={};wsd={};nsd={};todayWeights={};wd=false;skipT();selTags=[];
+  sd={};wsd={};nsd={};todayWeights={};todayReps={};wd=false;skipT();selTags=[];
   document.getElementById('wc').classList.remove('done');
   document.getElementById('db').style.display='none';
   const dbb=document.getElementById('db-body');if(dbb)dbb.style.display='none';
@@ -1765,7 +1827,8 @@ function saveWorkout(){
     const base=loadBase(e.n);
     const useWt=todayWt||base;
     if(useWt>0){
-      addWH(e.n,ds,useWt);  // グラフ用履歴に実重量を記録
+      const useReps=getTodayReps(e.n)||null;
+      addWH(e.n,ds,useWt,useReps);  // 実重量＋rep数を記録
       // 過去MAXは上書きしない（お休み前の値を基準重量として固定）
       // phase推奨重量の計算もこの値を使用
       // PBチェック（過去最高値の更新のみ）
@@ -1858,10 +1921,15 @@ function openModal(ds,log){
     // 過去記録の表示モード
     document.getElementById('modal-title').textContent='📋 '+dateStr+' の記録';
     const c=DAY_COLORS[log.dayType||log.day]||DAY_COLORS['A'];
+    const phaseNum=log.phase||1;
+    const phaseIcon=['','🐻','📈','🔥'][phaseNum]||'🐻';
+    const phaseColors=['','#001A33','#001A0A','#1A0500'];
+    const phaseTextColors=['','#5BC8FF','#00E676','#FF6030'];
     let html='';
     html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
       <span style="background:${c.bg};color:${c.text};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;border:1px solid ${c.text}40">${log.day||'?'} ${c.type}</span>
-      ${log.label?`<span style="font-size:11px;color:var(--t3)">${log.label}</span>`:''}
+      <span style="background:${phaseColors[phaseNum]};color:${phaseTextColors[phaseNum]};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;border:1px solid ${phaseTextColors[phaseNum]}40">${phaseIcon} Phase ${phaseNum}</span>
+      ${log.label?`<span style="font-size:10px;color:var(--t3)">${log.label}</span>`:''}
     </div>`;
     if(log.fatigue||log.sleep||log.soreness){
       html+=`<div style="font-size:10px;color:var(--t4);margin-bottom:8px">疲労:${log.fatigue||'-'} / 睡眠:${log.sleep||'-'} / 筋肉痛:${log.soreness||'-'}</div>`;
@@ -1877,7 +1945,7 @@ function openModal(ds,log){
         const entry=wh.find(x=>x.date===ds);
         return entry?`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #0E1E38">
           <span style="color:var(--t2)">${e.n}</span>
-          <span style="color:var(--acc);font-weight:800">${entry.weight}kg</span>
+          <span style="color:var(--acc);font-weight:800">${entry.weight}kg${entry.reps?` × ${entry.reps}rep`:''}</span>
         </div>`:null;
       }).filter(Boolean).join('');
       if(weights){
@@ -2053,6 +2121,7 @@ function renderNeckSection(day){
   exCard.innerHTML=necks.map((e,ei)=>{
     const base=loadBase(e.n);const nm=e.n.replace(/'/g,"\\'");
     const t=base>0?base+'kg〜 (+0.5kg)':'重量入力→記録';
+    const prevMemo=ls('gym_exmemo_'+e.n)||'';
     const bs=Array.from({length:sets},(_,si)=>{
       const done=nsd[ei+'_'+si]?' done':'';
       return `<button class="sb${done}" onclick="tapNeck(${ei},${si},${e.r},'${nm}',this)">${si+1}</button>`;
@@ -2061,6 +2130,8 @@ function renderNeckSection(day){
       <div class="enw"><span class="enm">${e.n}</span><span style="font-size:9px;background:#2A0A50;color:#BF5AF2;border-radius:5px;padding:2px 7px;font-weight:800;border:1px solid #6030A0">★NECK</span></div>
       <div class="ed">${e.d}</div>
       <div class="wrow"><span class="wlbl">重量</span><input type="number" class="bi" placeholder="0" value="${base||''}" min="0" step="0.5" oninput="saveBase('${nm}',parseFloat(this.value)||0)"><span class="wunit">kg</span><span class="warr">›</span><span class="wrec p3">${t}</span></div>
+      ${prevMemo?`<div class="ex-prev-memo">💬 前回: ${prevMemo}</div>`:''}
+      <div class="ex-memo-row"><input type="text" class="ex-memo-in" placeholder="一言メモ（例: 可動域が広がった・次回+0.5kg）" value="${prevMemo}" oninput="saveExMemo('${nm}',this.value)"></div>
     </div><div class="sets">${bs}</div></div></div>`;
   }).join('');
 }
