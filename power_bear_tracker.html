@@ -360,6 +360,19 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
 .pb-tap{font-size:12px;color:var(--t4);margin-top:28px}
 .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--t1);font-size:14px;font-weight:700;padding:13px 24px;border-radius:24px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;border:1px solid var(--bd2);font-family:var(--font)}
 .toast.show{opacity:1}
+/* POWER BEAR BACKUP: styles */
+.backup-card{background:var(--bg2);border:1.5px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px}
+.backup-card h2{font-size:15px;color:var(--t1);margin-bottom:8px}
+.backup-note,.backup-status,.backup-count{font-size:12px;color:var(--t2);line-height:1.7;overflow-wrap:anywhere}
+.backup-count{margin:10px 0;font-weight:700}
+.backup-btn{width:100%;min-height:48px;border:0;border-radius:12px;background:var(--acc2);color:#fff;font:700 14px var(--font);padding:12px;cursor:pointer}
+.backup-btn:disabled{opacity:.55;cursor:wait}
+.backup-btn:focus-visible,.backup-card summary:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.backup-status{margin-top:10px;min-height:1.7em}
+.backup-card details{margin-top:12px}
+.backup-card summary{font-size:12px;color:var(--acc);cursor:pointer;padding:8px 0}
+.backup-card details .backup-note{margin-bottom:10px}
+/* POWER BEAR BACKUP: styles end */
 </style>
 </head>
 <body>
@@ -691,6 +704,22 @@ body{background:var(--bg);font-family:var(--font);font-size:16px;padding-bottom:
     <div class="pst"><div class="pst-num" id="ps-diff">—</div><div class="pst-unit">kg</div><div class="pst-lbl">Progress</div></div>
   </div>
   <div class="chart-card"><div class="chart-ttl">重量推移（直近10回）</div><div id="chart-area"><div class="chart-empty">種目を選択してください</div></div></div>
+  <!-- POWER BEAR BACKUP: panel -->
+  <section class="backup-card" id="backup-card" aria-labelledby="backup-title">
+    <h2 id="backup-title">バックアップ</h2>
+    <p class="backup-note">この画面に保存されている Power Bear の記録・設定を JSON ファイルに書き出します。記録やメモを含むため、自分の「ファイル」に保管してください。元の記録は変更しません。</p>
+    <p class="backup-count" id="backup-count">対象：保存ボタンで確認（保存項目の数）</p>
+    <button class="backup-btn" id="backup-save" type="button" aria-describedby="backup-count backup-status">バックアップを保存</button>
+    <p class="backup-status" id="backup-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <details id="backup-help" hidden>
+      <summary>保存先が見つからない場合</summary>
+      <p class="backup-note">iPhone では「ファイル」アプリの「ダウンロード」などを確認してください。見つからない場合は、下のボタンで共有シートを開き「ファイルに保存」を選んでください。送信先のアプリや連絡先は選ばないでください。</p>
+      <p class="backup-note" id="backup-filename"></p>
+      <button class="backup-btn" id="backup-share" type="button" hidden>共有シートで「ファイルに保存」</button>
+      <p class="backup-note" id="backup-share-note"></p>
+    </details>
+  </section>
+  <!-- POWER BEAR BACKUP: panel end -->
 </div>
 </div>
 
@@ -2184,5 +2213,181 @@ if(cfreq===6&&!isWeek6Unlocked()&&countTotalTrainingDays()>=W6_UNLOCK_DAYS){
   updateWeekGoalProgress();
 })();
 </script>
+<!-- POWER BEAR BACKUP: script -->
+<script>
+// Export only. No storage writes, migration, import, network, or automatic sharing.
+(() => {
+  'use strict';
+  const fixedKeys=new Set([
+    'gym_bw','gym_week_goal','gym_deload_mode','gym_last_deload',
+    'gym_deload_end','gym_deload_dismissed','gym_w6_unlocked','gym_w6_announced'
+  ]);
+  // Exact exercise names in the reviewed main source (40 program + 2 neck).
+  const exerciseNames=[
+    'DBRDL','DBオーバーヘッドトライセップスエクステンション','DBサイドレイズ',
+    'DBシュラッグ','DBショルダープレス','DBリアレイズ','アダクター','アブダクター',
+    'アブドミナルクランチ','アームカール','カーフレイズ','グルート',
+    'ケーブルオーバーヘッドトライセップスエクステンション','ケーブルカール',
+    'ケーブルキックバック','ケーブルクランチ','ケーブルトライセップスプッシュダウン',
+    'ケーブルハンマーカール','ケーブルフェイスプル','ケーブルフライ',
+    'ケーブルラットプルダウン','ケーブルレッグカール','ケーブルロウ','ショルダープレス',
+    'スミスマシーンRDL','スミスマシーンインクラインプレス',
+    'スミスマシーンオーバーヘッドプレス','スミスマシーンスクワット',
+    'スミスマシーンヒップスラスト','スミスマシーンベンチプレス',
+    'スミスマシーンローバーロウ','チェストプレス','ネックエクステンション',
+    'ネックフレクション','ハンマーカール','ペクトラル','ペクトラル（バタフライ）',
+    'ラットプルダウン','レッグエクステンション','レッグカール','レッグプレス','ローロー'
+  ];
+  const exerciseKeys=new Set(exerciseNames.flatMap(name=>
+    ['gym_wh_','gym_pb_','gym_exmemo_','pbm_'].map(prefix=>prefix+name)));
+  const card=document.getElementById('backup-card');
+  const saveButton=document.getElementById('backup-save');
+  const shareButton=document.getElementById('backup-share');
+  const countLabel=document.getElementById('backup-count');
+  const status=document.getElementById('backup-status');
+  const help=document.getElementById('backup-help');
+  let busy=false,draft=null;
+
+  function allowedKey(key){
+    if(fixedKeys.has(key)||exerciseKeys.has(key))return true;
+    const match=/^gym_(?:log|cond)_(\d{4}-\d{2}-\d{2})$/.exec(key);
+    if(!match||match[0]!==key)return false;
+    const date=new Date(match[1]+'T00:00:00Z');
+    return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===match[1];
+  }
+  function allowedKeys(storage){
+    const keys=[];
+    // Inspect key names only; never read the values of non-allowlisted keys.
+    for(let i=0;i<storage.length;i++){
+      const key=storage.key(i);
+      if(typeof key==='string'&&allowedKey(key))keys.push(key);
+    }
+    return [...new Set(keys)].sort();
+  }
+  function showCount(count){
+    countLabel.textContent='対象：'+count+'件（保存項目の数）';
+  }
+  function refreshCount(){
+    if(busy)return;
+    try{showCount(allowedKeys(window.localStorage).length);}
+    catch(e){countLabel.textContent='対象件数を確認できません。保存ボタンで再試行してください。';}
+  }
+  function snapshot(){
+    const storage=window.localStorage;
+    const keys=allowedKeys(storage);
+    const values=Object.create(null);
+    for(const key of keys){
+      const value=storage.getItem(key);
+      if(value===null)throw new Error('backup_changed');
+      values[key]=value; // Preserve the raw string, including non-JSON / empty values.
+    }
+    const currentKeys=allowedKeys(storage);
+    if(keys.length!==currentKeys.length||keys.some((key,i)=>
+      key!==currentKeys[i]||storage.getItem(key)!==values[key])){
+      throw new Error('backup_changed');
+    }
+    return {keys,values};
+  }
+  function setBusy(value){
+    busy=value;
+    saveButton.disabled=value;
+    shareButton.disabled=value;
+    saveButton.textContent=value?'処理中…':'バックアップを保存';
+    card.setAttribute('aria-busy',String(value));
+  }
+  function release(){setTimeout(()=>setBusy(false),1200);}
+  function shareFile(blob,filename){
+    try{
+      if(typeof File!=='function'||typeof navigator.share!=='function'||
+        typeof navigator.canShare!=='function')return null;
+      const file=new File([blob],filename,{type:'application/json'});
+      return navigator.canShare({files:[file]})?file:null;
+    }catch(e){return null;}
+  }
+  function showFallback(){
+    help.hidden=false;
+    document.getElementById('backup-filename').textContent='今回のファイル：'+draft.filename;
+    shareButton.hidden=!draft.file;
+    document.getElementById('backup-share-note').textContent=draft.file?
+      'このボタンは今回作成した同じ JSON を共有シートに渡します。保存後は「ファイル」アプリで確認してください。':
+      'この端末では JSON ファイルの共有シートを利用できません。ダウンロードの保存先を確認してください。';
+  }
+  function saveBackup(){
+    if(busy)return;
+    setBusy(true);
+    draft=null;
+    help.hidden=true;
+    help.open=false;
+    let stage='read',url=null,link=null;
+    try{
+      const data=snapshot();
+      showCount(data.keys.length);
+      if(!data.keys.length){
+        status.textContent='バックアップ対象は0件です。ファイルは作成していません。';
+        return;
+      }
+      stage='file';
+      const now=new Date();
+      const filename='power-bear-backup-'+now.toISOString().replace(/[:.]/g,'-')+'.json';
+      const payload={
+        format:'power-bear-backup',formatVersion:1,createdAt:now.toISOString(),
+        source:{repository:'Hirogure/gym',baseCommit:'e1e81bea7ea0226df2f3be014290495c91625f12',
+          baseBlob:'3a54b3e17bc2c6cae212584aa1ce493a4760abcf',keyPolicy:'gym-main-2026-05-21-v1'},
+        keyCount:data.keys.length,localStorage:data.values
+      };
+      const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json;charset=utf-8'});
+      draft={filename,file:shareFile(blob,filename)};
+      showFallback();
+      stage='download';
+      link=document.createElement('a');
+      if(!('download' in link))throw new Error('backup_download');
+      url=URL.createObjectURL(blob);
+      link.href=url;
+      link.download=filename;
+      link.hidden=true;
+      document.body.appendChild(link);
+      link.click(); // Synchronous within the user's click; no await before download.
+      // Keep the URL alive while Safari handles the download / preview.
+      const pendingUrl=url;
+      setTimeout(()=>URL.revokeObjectURL(pendingUrl),60000);
+      url=null;
+      status.textContent=data.keys.length+'件の JSON のダウンロードを要求しました。保存・キャンセルの結果はこの画面では確認できません。「ファイル」アプリで確認してください。';
+    }catch(e){
+      if(stage==='read'){
+        countLabel.textContent='対象件数：未確定';
+        status.textContent=e&&e.message==='backup_changed'?
+          '作成中に記録が変わりました。他の画面での記録操作を終えて再試行してください。ファイルは作成していません。':
+          '保存領域を読み取れませんでした。ファイルは作成していません。この画面で再試行してください。';
+      }else if(stage==='download'){
+        status.textContent='ダウンロードを開始できませんでした。「保存先が見つからない場合」を開いて、共有シートによる「ファイルに保存」を確認してください。';
+      }else{
+        status.textContent='JSON ファイルを作成できませんでした。もう一度お試しください。';
+      }
+    }finally{
+      if(link)link.remove();
+      if(url)URL.revokeObjectURL(url);
+      release();
+    }
+  }
+  async function shareBackup(){
+    if(busy||!draft||!draft.file)return;
+    setBusy(true);
+    status.textContent='共有シートで「ファイルに保存」を選んでください。';
+    try{
+      // Only a direct press of the fallback button opens the OS chooser.
+      await navigator.share({files:[draft.file]});
+      status.textContent='共有シートの操作が終了しました。保存完了はこの画面では確認できません。「ファイル」アプリで JSON を確認してください。';
+    }catch(e){
+      status.textContent=e&&e.name==='AbortError'?
+        '共有シートが閉じられました（キャンセル、または保存先なし）。必要ならもう一度お試しください。':
+        '共有シートを開けないか、ファイルを渡せませんでした。再試行するか、ダウンロードの保存先を確認してください。';
+    }finally{release();}
+  }
+  saveButton.addEventListener('click',saveBackup);
+  shareButton.addEventListener('click',shareBackup);
+  document.getElementById('nb-records').addEventListener('click',refreshCount);
+})();
+</script>
+<!-- POWER BEAR BACKUP: script end -->
 </body>
 </html>
