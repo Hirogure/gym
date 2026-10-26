@@ -25,6 +25,19 @@
  .current-set{box-shadow:inset 4px 0 #657c3e}.current-exercise{border:2px solid #657c3e}.set-extra summary{min-height:48px;padding:12px 0;font-size:13px;color:#37432e}.skipped{opacity:.7}.backup-summary{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}.controls{flex-wrap:wrap}button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:540px){.fieldgrid.three{grid-template-columns:1fr 1fr}.fieldgrid{grid-template-columns:1fr 1fr}.config .fieldgrid{grid-template-columns:1fr}.tabbar{padding-bottom:env(safe-area-inset-bottom)}.timer{max-width:calc(100vw - 20px)}.card{min-width:0}.btn{white-space:normal;min-height:48px}}
 /* PRODUCTION MIGRATION UI */
 .production-panel{max-width:1120px;margin:20px auto 0;padding:20px 24px;border:1px solid #bcc9ad;border-radius:18px;background:#fffef8;overflow-wrap:anywhere}.production-label{font-size:12px;font-weight:800;letter-spacing:.08em}.production-panel h1{font-size:24px}.production-panel p{line-height:1.7}.confirm-row{display:flex;align-items:center;gap:12px;margin:16px 0}.confirm-row input{width:24px;min-height:24px;flex:0 0 24px;margin:0}.legacy-history summary{padding:12px 0;min-height:48px;cursor:pointer;overflow-wrap:anywhere}.legacy-value{border-top:1px solid #dce2d4}.legacy-value pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;background:#f4f6ef;padding:12px;border-radius:9px;max-height:360px;overflow:auto}.review-summary{white-space:pre-wrap;line-height:1.8}.production-panel button[hidden]{display:none}#production-download{font-size:13px;line-height:1.7}.restart-gate{margin-bottom:18px}@media(max-width:650px){.production-panel{margin:12px;padding:16px}.production-panel h1{font-size:21px}.production-panel .controls{gap:10px}.production-panel .btn{width:100%}}
+</style><style id="legacy-reference-style-20261026">
+.pb-legacy-ref{box-sizing:border-box;max-width:100%;margin:14px 0 18px;padding:14px;border:1px solid #bdccb1;border-radius:12px;background:#f1f5ec;color:#25312d;overflow-wrap:anywhere}
+.pb-legacy-ref h3{margin:0 0 8px;font-size:16px;line-height:1.5}
+.pb-legacy-ref p{margin:8px 0;font-size:14px;line-height:1.6}
+.pb-legacy-ref table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:14px;line-height:1.6}
+.pb-legacy-ref caption{text-align:left;padding:8px 0;font-size:13px;font-weight:600}
+.pb-legacy-ref th,.pb-legacy-ref td{padding:9px 5px;text-align:left;vertical-align:top;border-bottom:1px solid #cbd8c0;overflow-wrap:anywhere}
+.pb-legacy-ref th:first-child{width:44%}
+.pb-legacy-ref th:nth-child(2),.pb-legacy-ref th:nth-child(3){width:28%}
+.exercise .pb-legacy-ref summary{display:block;min-height:48px;padding:12px 0;cursor:pointer;font-size:14px;line-height:1.6;list-style:revert}
+.exercise .pb-legacy-ref summary:after{display:none}
+.pb-legacy-ref-more{margin-top:8px}
+
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
 <!-- RECEIVED V6 ENGINE - unchanged -->
@@ -728,4 +741,114 @@ access();home();
 })();
 
 </script>
-</body></html>
+<script id="legacy-reference-script-20261026">
+/* Read-only legacy reference. No migration, copy, recommendation or persistence. */
+(function (root, factory) {
+  'use strict';
+  const api = factory();
+  if (typeof module === 'object' && module.exports) {
+    module.exports = api;
+    return;
+  }
+  if (root.PowerBearLegacyReference?.version === api.version) return;
+  root.PowerBearLegacyReference = api;
+  if (typeof exerciseCard !== 'function' || typeof PowerBearStorage === 'undefined') return;
+  const originalCard = exerciseCard;
+  exerciseCard = function (exercise, index) {
+    const original = originalCard(exercise, index);
+    const marker = '</summary>';
+    if (!original.includes(marker)) return original;
+    let reference;
+    try {
+      reference = api.render(api.collect(PowerBearStorage.archiveView(storage), exercise));
+    } catch (_) {
+      reference = '<aside class="pb-legacy-ref"><h3>旧アプリの記録（参照のみ）</h3><p>旧記録を読み取れません。保存内容は変更していません。</p></aside>';
+    }
+    return original.replace(marker, marker + reference);
+  };
+})(globalThis, function () {
+  'use strict';
+  const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+  const canonical = value => Array.isArray(value) ? '[' + value.map(canonical).join(',') + ']'
+    : object(value) ? '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + canonical(value[key])).join(',') + '}' : JSON.stringify(value);
+  function valueText(row, key) {
+    if (!own(row, key) || row[key] === null || row[key] === '') return '不明（未保存）';
+    const value = row[key];
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value) + (value < 0 || key === 'reps' && !Number.isInteger(value) ? '（保存値・要確認）' : '');
+    }
+    if (typeof value === 'string') return value.trim() ? value + '（保存文字列・要確認）' : '不明（未保存）';
+    return '不明（形式未確認）';
+  }
+  function dateText(row) {
+    if (!own(row, 'date') || row.date === null || row.date === '') return '不明（未保存）';
+    return typeof row.date === 'string' ? row.date : '不明（形式未確認）';
+  }
+  function sortTime(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value)) return -Infinity;
+    const time = Date.parse(value.length === 10 ? value + 'T00:00:00Z' : value);
+    return Number.isFinite(time) ? time : -Infinity;
+  }
+  function collect(snapshots, exercise) {
+    const name = exercise?.name;
+    const expectedId = 'original:' + name;
+    const model = {name, rows:[], matchedSnapshots:0, duplicateCopies:0, invalidValues:0, multipleSameDate:false, status:'none'};
+    // Only original, exactly named exercises. No aliases, fuzzy names or machine matching.
+    if (typeof name !== 'string' || !name || exercise.exerciseId !== expectedId
+        || exercise.config?.exerciseId !== expectedId || exercise.config?.exerciseName !== name) {
+      model.status = 'identity-mismatch';
+      return model;
+    }
+    const key = 'gym_wh_' + name;
+    const unique = new Map();
+    for (const snapshot of Array.isArray(snapshots) ? snapshots : []) {
+      if (!object(snapshot?.raw) || !own(snapshot.raw, key)) continue;
+      model.matchedSnapshots++;
+      let entries;
+      try { entries = JSON.parse(snapshot.raw[key]); } catch (_) { model.invalidValues++; continue; }
+      if (!Array.isArray(entries)) { model.invalidValues++; continue; }
+      const occurrences = new Map();
+      for (const row of entries) {
+        if (!object(row)) { model.invalidValues++; continue; }
+        const fingerprint = canonical(row);
+        const occurrence = (occurrences.get(fingerprint) || 0) + 1;
+        occurrences.set(fingerprint, occurrence);
+        // Across snapshots, retain the maximum multiplicity. Never erase repeated rows within one snapshot.
+        const identity = fingerprint + '\u0000' + occurrence;
+        if (unique.has(identity)) { model.duplicateCopies++; continue; }
+        unique.set(identity, {date:dateText(row), weight:valueText(row, 'weight'), reps:valueText(row, 'reps'), time:sortTime(row.date), order:unique.size});
+      }
+    }
+    model.rows = [...unique.values()].sort((a,b) => a.time === b.time ? a.order - b.order : a.time > b.time ? -1 : 1);
+    const dates = new Set();
+    for (const row of model.rows) {
+      if (row.time === -Infinity) continue;
+      if (dates.has(row.date)) model.multipleSameDate = true;
+      dates.add(row.date);
+    }
+    model.status = model.rows.length ? 'available' : model.invalidValues ? 'unreadable' : 'none';
+    return model;
+  }
+  function table(rows, caption) {
+    return '<table><caption>' + escape(caption) + '</caption><thead><tr><th scope="col">日付</th><th scope="col">重量<br>（旧表示値）</th><th scope="col">回数</th></tr></thead><tbody>'
+      + rows.map(row => '<tr><td>' + escape(row.date) + '</td><td>' + escape(row.weight) + '</td><td>' + escape(row.reps) + '</td></tr>').join('') + '</tbody></table>';
+  }
+  function render(model) {
+    const heading = '<h3>旧アプリの記録（参照のみ）</h3>';
+    if (model.status === 'identity-mismatch') return '<aside class="pb-legacy-ref">' + heading + '<p>種目の識別情報が一致しないため、旧記録を自動対応していません。</p></aside>';
+    if (model.status !== 'available') return '<aside class="pb-legacy-ref">' + heading + '<p>' + (model.status === 'unreadable' ? '同名の旧記録に、表示形式を確認できない値があります。「履歴」の旧記録の控えはそのまま保持しています。' : 'この種目名に完全一致する旧重量履歴はありません。別名・別種目の記録は自動対応しません。') + '</p></aside>';
+    return '<aside class="pb-legacy-ref" aria-label="' + escape(model.name) + 'の旧記録">' + heading
+      + '<p class="pb-legacy-ref-note">出典：旧アプリから保持した重量履歴。同じ種目名の記録です。機器・設定・単位の一致は未確認です。今日の推奨重量・前回コピーには使用しません。</p>'
+      + table(model.rows.slice(0,3), '日付が新しい旧記録 · 全' + model.rows.length + '件')
+      + (model.rows.length > 3 ? '<details class="pb-legacy-ref-more"><summary>それ以前の旧記録も見る（' + (model.rows.length - 3) + '件）</summary>' + table(model.rows.slice(3), 'それ以前の旧記録') + '</details>' : '')
+      + (model.multipleSameDate ? '<p class="pb-legacy-ref-note">同じ日付の複数の保存値は別行で残しています。どれを採用するかは判定していません。</p>' : '')
+      + (model.duplicateCopies ? '<p class="pb-legacy-ref-note">複数の控えにある同一内容は、表示上だけ重複をまとめています。元の控えは変更していません。</p>' : '')
+      + (model.invalidValues ? '<p class="pb-legacy-ref-note">形式未確認の値もあります。「履歴」の旧記録の控えに原文を保持しています。</p>' : '')
+      + '</aside>';
+  }
+  return Object.freeze({version:'legacy-reference-20261026-1',collect,render});
+});
+
+</script></body></html>
