@@ -176,6 +176,33 @@ header .bear{display:none}.brand{letter-spacing:0;color:#263a4d}
 .pb-exercise-memo textarea{display:block;width:100%;min-height:64px;max-height:180px;resize:vertical;margin-top:6px;padding:9px 10px;border:1px solid #bdcbd3;border-radius:9px;background:#fff;color:var(--ink);font:inherit;font-weight:400;line-height:1.5}
 @media(max-width:650px){.reentry-block-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reentry-block-btn{padding:9px}.reentry-block-btn small{font-size:11px}.reentry-active .exercise{padding:13px}}
 @media(max-width:350px){.reentry-block-grid{grid-template-columns:1fr}.reentry-block-btn{padding:9px 11px}.reentry-block-btn span,.reentry-block-btn small{font-size:13px;line-height:1.45}}
+/* Compact the frequently repeated set row while preserving 44px controls. */
+.reentry-original-jump{min-height:44px;padding:8px 12px;font-size:13px}
+.reentry-active .setblock{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(76px,90px);align-items:center;gap:4px 7px;padding:6px 8px;margin:5px 0}
+.reentry-active .setblock>.row{display:contents}
+.reentry-active .setblock>.row>strong{grid-column:1;grid-row:1;font-size:12px;line-height:1.3;white-space:nowrap}
+.reentry-active .setblock>.fieldgrid.three{grid-column:2;grid-row:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:0}
+.reentry-active .setblock>.fieldgrid.three label{font-size:11px;line-height:1.2;white-space:nowrap}
+.reentry-active .setblock>.fieldgrid.three input{box-sizing:border-box;width:100%;min-width:0;min-height:44px;margin:2px 0 0;padding:5px 4px;font-size:16px;font-variant-numeric:tabular-nums}
+.reentry-active .setblock>.row>.check{grid-column:3;grid-row:1;min-width:0;width:100%;min-height:44px;padding:4px 3px;font-size:12px;line-height:1.2;white-space:nowrap}
+.reentry-active .setblock>.set-extra{grid-column:1/-1;grid-row:2;margin:0}
+.reentry-active .setblock>.set-extra>summary{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:6px 4px;margin:0;font-size:12px}
+.reentry-active .setblock>[data-copylast]{grid-column:1/-1;grid-row:3;min-height:44px;margin:0;padding:6px 9px;font-size:12px}
+.reentry-active .setblock>.small{grid-column:1/-1;grid-row:4;margin:0}
+@media(max-width:350px){
+ .reentry-block-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .reentry-block-btn{padding:8px 7px;min-height:77px}
+ .reentry-block-btn strong{font-size:14px}
+ .reentry-block-btn span{font-size:11px;line-height:1.3}
+ .reentry-block-btn small{display:none}
+ .reentry-active .setblock{grid-template-columns:1fr 88px;gap:3px 6px}
+ .reentry-active .setblock>.row>strong{grid-column:1;grid-row:1}
+ .reentry-active .setblock>.row>.check{grid-column:2;grid-row:1}
+ .reentry-active .setblock>.fieldgrid.three{grid-column:1/-1;grid-row:2}
+ .reentry-active .setblock>.set-extra{grid-row:3}
+ .reentry-active .setblock>[data-copylast]{grid-row:4}
+ .reentry-active .setblock>.small{grid-row:5}
+}
 
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
@@ -1069,11 +1096,25 @@ const BLOCKS=[
  {id:'UA',name:'上半身A',priority:1,items:[['チェストプレス',8,12],['ラットプルダウン',8,12],['ショルダープレス',8,12],['アームカール',10,15]]},
  {id:'LA',name:'下半身A',priority:0,items:[['レッグプレス',10,15],['レッグカール',10,15],['グルート',10,15],['アブドミナルクランチ',10,15]]},
  {id:'UB',name:'上半身B',priority:0,items:[['ローロー',8,12],['チェストプレス',8,12],['ショルダープレス',8,12],['ケーブルトライセップスプッシュダウン',10,15]]},
- {id:'LB',name:'下半身B',priority:1,items:[['レッグプレス',10,15],['レッグカール',10,15],['グルート',10,15],['レッグエクステンション',10,15]]}
+ {id:'LB',name:'下半身B',priority:1,items:[['レッグカール',10,15],['グルート',10,15],['レッグエクステンション',10,15],['レッグプレス',10,15]]}
+];
+/* Keep the existing machine-based return block intact for saved preferences and drafts.
+   Later stages are opt-in, use only exact original catalog identities, and never prefill loads. */
+const TRANSITION_BLOCKS=[
+ {id:'UA',name:'上半身A',priority:1,items:[['チェストプレス',8,12],['ラットプルダウン',8,12],['DBショルダープレス',8,12],['ケーブルトライセップスプッシュダウン',10,15]]},
+ {id:'LA',name:'下半身A',priority:0,items:[['スミスマシーンスクワット',8,12],['レッグカール',10,15],['グルート',10,15],['ケーブルクランチ',10,15]]},
+ {id:'UB',name:'上半身B',priority:0,items:[['ローロー',8,12],['チェストプレス',8,12],['DBリアレイズ',10,15],['ケーブルカール',10,15]]},
+ {id:'LB',name:'下半身B',priority:1,items:[['レッグプレス',10,15],['DBRDL',8,12],['グルート',10,15],['レッグエクステンション',10,15]]}
+];
+const BUILD_BLOCKS=[
+ {id:'UA',name:'上半身A',priority:0,items:[['スミスマシーンベンチプレス',8,12],['DBショルダープレス',8,12],['ケーブルラットプルダウン',8,12],['ケーブルトライセップスプッシュダウン',10,15]]},
+ {id:'LA',name:'下半身A',priority:0,items:[['スミスマシーンスクワット',8,12],['DBRDL',8,12],['ケーブルキックバック',10,15],['レッグエクステンション',10,15]]},
+ {id:'UB',name:'上半身B',priority:0,items:[['スミスマシーンインクラインプレス',8,12],['DBリアレイズ',10,15],['ケーブルロウ',8,12],['ケーブルカール',10,15]]},
+ {id:'LB',name:'下半身B',priority:0,items:[['スミスマシーンヒップスラスト',8,12],['レッグプレス',10,15],['ケーブルクランチ',10,15],['レッグカール',10,15]]}
 ];
 const LIGHT={id:'E',name:'軽い補助（任意）',priority:-1,items:[['ローロー',10,15],['アームカール',10,15],['アブドミナルクランチ',10,15]]};
 const defaults=()=>({version:VERSION,frequency:4,slots:4,stretchMinutes:10,stage:'return'});
-function normalize(p){if(!p||p.version!==1||![3,4,5].includes(p.frequency)||![3,4].includes(p.slots)||![5,10].includes(p.stretchMinutes)||!['return','steady'].includes(p.stage))throw Error('再開メニュー設定の形式を確認できません。既存設定を保持します。');return{version:1,frequency:p.frequency,slots:p.slots,stretchMinutes:p.stretchMinutes,stage:p.stage};}
+function normalize(p){if(!p||p.version!==1||![3,4,5].includes(p.frequency)||![3,4].includes(p.slots)||![5,10].includes(p.stretchMinutes)||!['return','steady','transition','build'].includes(p.stage))throw Error('再開メニュー設定の形式を確認できません。既存設定を保持します。');return{version:1,frequency:p.frequency,slots:p.slots,stretchMinutes:p.stretchMinutes,stage:p.stage};}
 function preferences(app){if(!own(app,KEY))return{ok:true,value:defaults()};try{return{ok:true,value:normalize(app[KEY])};}catch(e){return{ok:false,error:e.message,value:defaults()};}}
 function nextBlock(history){
  const valid=(Array.isArray(history)?history:[]).filter(h=>h&&!h.deleted&&h.schemaVersion===2&&h.source==='production-entered'&&h.reentryMeta?.version===1&&h.reentryMeta.kind==='cycle'&&Number.isInteger(h.reentryMeta.block)&&h.reentryMeta.block>=0&&h.reentryMeta.block<4&&Number.isFinite(Date.parse(h.date))&&(h.exercises||[]).some(e=>!e.deleted&&(e.sets||[]).some(s=>!s.deleted&&!s.skipped&&s.done&&s.kind==='working'&&Number.isFinite(s.weight)&&Number.isInteger(s.reps)&&s.reps>0)));
@@ -1082,11 +1123,12 @@ function nextBlock(history){
 function estimate(items){const count=items.length,sets=items.reduce((n,e)=>n+e.sets,0);return Math.round((3+count*1.25+sets+items.reduce((n,e)=>n+Math.max(0,e.sets-1)*e.restSeconds/60,0)+Math.max(0,count-1)*1.5+5)*100)/100;}
 function plan(input,block){
  const p=normalize(input),light=block==='light';if(light&&p.frequency!==5)throw Error('軽い補助日は週5の任意枠です。');if(!light&&(!Number.isInteger(block)||block<0||block>3))throw Error('メニュー区分が不正です。');
- const def=light?LIGHT:BLOCKS[block],items=def.items.slice(0,light?3:p.slots).map(([name,repMin,repMax])=>({name,repMin,repMax,sets:light?1:2,restSeconds:120})),budget=45-p.stretchMinutes;
+ const stageBlocks=p.stage==='build'?BUILD_BLOCKS:p.stage==='transition'?TRANSITION_BLOCKS:BLOCKS;
+ const def=light?LIGHT:stageBlocks[block],items=def.items.slice(0,light?3:p.slots).map(([name,repMin,repMax])=>({name,repMin,repMax,sets:light?1:2,restSeconds:120})),budget=45-p.stretchMinutes;
  let extraAdded=false,extraSkipped=false;
- if(!light&&p.stage==='steady'){const trial=clone(items);trial[def.priority].sets++;if(estimate(trial)<=budget){items[def.priority].sets++;extraAdded=true;}else extraSkipped=true;}
+ if(!light&&['steady','build'].includes(p.stage)){const trial=clone(items);trial[def.priority].sets++;if(estimate(trial)<=budget){items[def.priority].sets++;extraAdded=true;}else extraSkipped=true;}
  const minutes=estimate(items);if(minutes>budget)throw Error('時間枠を超える計画を停止しました。');
- return{version:1,kind:light?'light':'cycle',block:light?null:block,day:def.id,label:def.name,items,sets:items.reduce((n,e)=>n+e.sets,0),strengthMinutes:budget,estimatedMinutes:minutes,extraAdded,extraSkipped,goalRir:light||p.stage==='return'?[3,4]:[2,3],frequency:p.frequency,stage:p.stage,stretchMinutes:p.stretchMinutes};
+ return{version:1,kind:light?'light':'cycle',block:light?null:block,day:def.id,label:def.name,items,sets:items.reduce((n,e)=>n+e.sets,0),strengthMinutes:budget,estimatedMinutes:minutes,extraAdded,extraSkipped,goalRir:light||p.stage==='return'||p.stage==='transition'?[3,4]:[2,3],frequency:p.frequency,stage:p.stage,stretchMinutes:p.stretchMinutes};
 }
 function week(input,start){const p=normalize(input),main=p.frequency===5?4:p.frequency;const visits=Array.from({length:main},(_,i)=>plan(p,(start+i)%4));if(p.frequency===5)visits.push(plan(p,'light'));return{visits,nextBlock:(start+main)%4,sets:visits.reduce((n,x)=>n+x.sets,0),strengthMinutes:visits.reduce((n,x)=>n+x.estimatedMinutes,0)};}
 function catalogEntry(catalog,name){for(const p of Object.values(catalog))for(const d of p.days)for(const es of Object.values(d.ph)){const found=es.find(e=>e.n===name);if(found)return clone(found);}throw Error('原本にない種目は追加しません：'+name);}
@@ -1097,7 +1139,7 @@ function prepare(app,input,block,{catalog,now,id}={}){
  try{
   const p=normalize(input),planned=plan(p,block);if(!Number.isFinite(now)||typeof id!=='string'||!id.trim())throw Error('新しい記録の識別情報を確認できません。');
   const next=clone(app);next[KEY]={...(own(app,KEY)?clone(app[KEY]):{}),...p};
-  next.draft={id,schemaVersion:2,started:now,frequency:p.frequency,day:planned.day,phase:1,label:'再開期v1・'+planned.label+'／'+(p.stage==='return'?'慣らし':'定着'),rest:120,timerEnd:0,
+  next.draft={id,schemaVersion:2,started:now,frequency:p.frequency,day:planned.day,phase:1,label:'再開期v1・'+planned.label+'／'+({return:'慣らし',steady:'定着',transition:'移行',build:'主軸'}[p.stage]),rest:120,timerEnd:0,
    reentryMeta:{version:1,kind:planned.kind,block:planned.block,stage:p.stage,plannedFrequency:p.frequency,plannedStrengthMinutes:planned.strengthMinutes,estimatedMinutes:planned.estimatedMinutes,plannedRunningMinutes:15,plannedStretchMinutes:p.stretchMinutes,estimateVersion:1},
    exercises:planned.items.map(item=>{const original=catalogEntry(catalog,item.name);return{name:item.name,exerciseId:'original:'+item.name,config:configFor(app,item.name),planKey:'reentry:v1:'+JSON.stringify([planned.kind,planned.block,p.stage,item.name]),plan:{load:null,sets:item.sets,repMin:item.repMin,repMax:item.repMax},
     definition:{n:item.name,s:item.sets,r:120,d:'再開期の候補：'+item.sets+'set×'+item.repMin+'-'+item.repMax+'rep。目安の余力は'+planned.goalRir[0]+'-'+planned.goalRir[1]+'回。原本の予定とは別です。'},originalDefinition:original,reentryMeta:{version:1,goalRir:clone(planned.goalRir)},
@@ -1125,7 +1167,9 @@ toast=function(message){
  close.onclick=()=>box.classList.add('hidden');box.appendChild(close);
 };
 const option=(values,v)=>values.map(([x,label])=>'<option value="'+escR(x)+'"'+(String(x)===String(v)?' selected':'')+'>'+escR(label)+'</option>').join('');
-const blockPurpose=['胸・背中の縦引き・肩、4種目なら腕','脚とお尻、4種目なら体幹','背中の横引き・胸・肩、4種目なら腕','脚とお尻、4種目なら前腿'];
+const displayName=name=>name==='チェストプレス'?'チェストプレス（マシン）':name;
+const blockPurpose=stage=>stage==='return'||stage==='steady'?['胸プレス・縦引き','脚プレス・後腿','横引き・胸プレス','後腿・臀部・前腿']:stage==='transition'?['胸プレス・DB肩','Smith脚・後腿','横引き・DB肩後部','DB後腿・脚プレス']:['Smith胸・DB肩','Smith脚・DB後腿','横引き・Smith胸','Smith臀部・後腿'];
+const blockDisplayOrder=[0,2,1,3];
 function latestWeightHtml(m){
  if(!m.identityOk)return '<p class="pb-last-weight">直近重量：種目と設定を照合できません。</p>';
  const candidates=[];
@@ -1149,17 +1193,17 @@ home=function(){
  function render(){
   let planned,weekly;try{planned=R.plan(prefs,block);weekly=R.week(prefs,block==='light'?R.nextBlock(state.history):block);}catch(e){panel.textContent=e.message;return;}
   const optionsOpen=!!document.getElementById('reentry-options')?.open;
-  const snapshots=P.archiveView(storage),stageText=prefs.stage==='return'?'慣らし：余力3〜4回':'定着：余力2〜3回（手動選択・自動昇格なし）';
+  const snapshots=P.archiveView(storage),stageText=prefs.stage==='return'?'慣らし：マシン中心・余力3〜4回':prefs.stage==='steady'?'以前の定着案：マシン中心・余力2〜3回':prefs.stage==='transition'?'移行：Smith／DBを各日に1種目程度・各2セット・余力3〜4回':'主軸：Smith／DB中心・ケーブル仕上げ・余力2〜3回';
   panel.innerHTML='<div class="reentry-heading"><span class="reentry-eyebrow">今日のメニュー</span><h1>再開期のトレーニング</h1><p>週4回を基準に、週3〜5回を選べます。</p></div><p class="save-status" role="status"></p>'
    +'<div class="reentry-primary"><p class="reentry-kicker">'+(state.draft?'保存中の下書き':'次回の候補')+'</p><h2>'+(state.draft?'続きから始める':escR(planned.label))+'</h2><p>'+(state.draft?escR(state.draft.label||'入力途中の内容を保持中')+'。内容を変えずに開きます。':planned.items.length+'種目・'+planned.sets+'セット ／ 筋トレ目安 約'+Math.ceil(planned.estimatedMinutes)+'分')+'</p><button type="button" class="btn full" id="reentry-start"'+(!read.ok?' disabled':'')+'>'+(state.draft?'下書きを開く →':'この内容で始める →')+'</button><p id="reentry-result" role="status"></p></div>'
    +(!read.ok?'<p role="alert">'+escR(read.error)+'</p>':'')
    +'<div class="reentry-frequency"><p class="reentry-kicker">今週の予定回数</p><div class="reentry-frequency-buttons" role="group" aria-label="今週の予定回数">'+[3,4,5].map(n=>'<button type="button" class="reentry-freq-btn" id="reentry-freq-'+n+'" aria-pressed="'+(prefs.frequency===n)+'">週'+n+'回</button>').join('')+'</div><p class="reentry-hint">'+(state.draft?'下書きには反映しません。次の新規開始の候補です。':'週3なら残りは翌週へ。週5回目の補助日は任意です。')+'</p></div>'
-   +'<details class="reentry-options" id="reentry-options"'+(optionsOpen?' open':'')+'><summary>種目数・時間・段階を変更</summary><div class="fieldgrid"><label>今週の予定回数<select id="reentry-frequency">'+option([[3,'週3回'],[4,'週4回（基準）'],[5,'週5回（補助日は任意）']],prefs.frequency)+'</select></label><label>1回の種目数<select id="reentry-slots">'+option([[3,'3種目から'],[4,'4種目まで']],prefs.slots)+'</select></label><label>60分の配分<select id="reentry-stretch">'+option([[10,'ラン15・ストレッチ10・筋トレ35分'],[5,'ラン15・ストレッチ5・筋トレ40分']],prefs.stretchMinutes)+'</select></label><label>本人が選ぶ段階<select id="reentry-stage">'+option([['return','慣らし（各2セット）'],['steady','定着（時間内で優先1種目だけ追加）']],prefs.stage)+'</select></label></div></details>'
-   +'<div class="reentry-blocks" role="group" aria-label="今回の区分"><p class="reentry-kicker">今回の区分を選ぶ</p><p class="reentry-hint">A・Bは順番の名前です。各日の主な種目は次のとおりです。</p><div class="reentry-block-grid">'+R.blockNames.map((name,i)=>{const names=R.plan({...prefs,slots:4},i).items.map(x=>x.name);return '<button type="button" class="reentry-block-btn" id="reentry-block-'+i+'" aria-pressed="'+(block===i)+'"><strong>'+escR(name)+'</strong><span>'+escR(blockPurpose[i])+'</span><small>'+escR(names.slice(0,3).join('・'))+'<br>4種目目：'+escR(names[3])+'</small></button>';}).join('')+(prefs.frequency===5?'<button type="button" class="reentry-block-btn" id="reentry-block-light" aria-pressed="'+(block==='light')+'"><strong>軽い補助（任意）</strong><span>回復に余裕がある第5回の候補</span><small>ローロー・アームカール・アブドミナルクランチ</small></button>':'')+'</div></div>'
+   +'<details class="reentry-options" id="reentry-options"'+(optionsOpen?' open':'')+'><summary>種目数・時間・段階を変更</summary><div class="fieldgrid"><label>今週の予定回数<select id="reentry-frequency">'+option([[3,'週3回'],[4,'週4回（基準）'],[5,'週5回（補助日は任意）']],prefs.frequency)+'</select></label><label>1回の種目数<select id="reentry-slots">'+option([[3,'3種目から'],[4,'4種目まで']],prefs.slots)+'</select></label><label>60分の配分<select id="reentry-stretch">'+option([[10,'ラン15・ストレッチ10・筋トレ35分'],[5,'ラン15・ストレッチ5・筋トレ40分']],prefs.stretchMinutes)+'</select></label><label>本人が選ぶ段階<select id="reentry-stage">'+option([['return','慣らし：マシン中心'],['steady','以前の定着案：マシン中心'],['transition','移行：Smith／DBを少しずつ'],['build','主軸：Smith／DB＋ケーブル']],prefs.stage)+'</select></label></div></details>'
+   +'<div class="reentry-blocks" role="group" aria-label="今回の区分"><p class="reentry-kicker">今回の区分を選ぶ</p><p class="reentry-hint">上段は上半身A／B、下段は下半身A／B。交互に進め、週3回なら残りは翌週へ。</p><div class="reentry-block-grid">'+blockDisplayOrder.map(i=>{const name=R.blockNames[i],names=R.plan({...prefs,slots:4},i).items.map(x=>displayName(x.name));return '<button type="button" class="reentry-block-btn" id="reentry-block-'+i+'" aria-pressed="'+(block===i)+'"><strong>'+escR(name)+'</strong><span>'+escR(blockPurpose(prefs.stage)[i])+'</span><small>'+escR(names.slice(0,3).join('・'))+'<br>4種目目：'+escR(names[3])+'</small></button>';}).join('')+(prefs.frequency===5?'<button type="button" class="reentry-block-btn" id="reentry-block-light" aria-pressed="'+(block==='light')+'"><strong>軽い補助（任意）</strong><span>回復に余裕がある第5回の候補</span><small>ローロー・アームカール・アブドミナルクランチ</small></button>':'')+'</div><p class="reentry-hint">チェストプレスはマシン。Smith ベンチは別種目・別の記録です。元メニューの DB／Smith 種目も削除していません。</p><button type="button" class="btn secondary reentry-original-jump" id="reentry-original-jump">DB・Smith を含む元メニューを見る</button></div>'
    +'<h2 class="reentry-plan-title">'+(state.draft?'次回の候補：':'')+escR(planned.label)+' · '+planned.items.length+'種目／'+planned.sets+'セット</h2><p>'+stageText+'。休息は原則2分、必要なら延長。</p><p><strong>筋トレ枠'+planned.strengthMinutes+'分／机上目安 約'+Math.ceil(planned.estimatedMinutes)+'分</strong>（準備・移動・休息・待ち余白5分込み。実測・保証ではありません）</p>'
    +(planned.extraSkipped?'<p>この時間枠では追加セットを入れず、各2セットを維持します。</p>':'')
    +(planned.kind==='light'?'<p>第5回を重い筋トレ日にする必要はありません。回復が不十分ならこの補助枠は使わず、実施していない記録は作りません。</p>':'')
-   +'<ol class="reentry-list">'+planned.items.map(e=>'<li><strong>'+escR(e.name)+'</strong><p>'+e.sets+'セット × '+e.repMin+'〜'+e.repMax+'回／休息2分</p>'+compactFor({name:e.name,exerciseId:'original:'+e.name,config:R.configFor(state,e.name)},snapshots)+'</li>').join('')+'</ol>'
+   +'<ol class="reentry-list">'+planned.items.map(e=>'<li><strong>'+escR(displayName(e.name))+'</strong><p>'+e.sets+'セット × '+e.repMin+'〜'+e.repMax+'回／休息2分</p>'+compactFor({name:e.name,exerciseId:'original:'+e.name,config:R.configFor(state,e.name)},snapshots)+'</li>').join('')+'</ol>'
    +'<p>不足時間は最後の補助種目を見送るなどで調整し、休憩を削って詰め込みません。kg・実施回数・実施余力は自動入力しません。</p>'
    +'<details class="reentry-week"><summary>今週の配分と繰り越し</summary><ol>'+weekly.visits.map(p=>'<li>'+escR(p.label)+'：'+p.sets+'セット（約'+Math.ceil(p.estimatedMinutes)+'分）</li>').join('')+'</ol><p>計'+weekly.sets+'セット。通常区分の次は「'+escR(R.blockNames[weekly.nextBlock])+'」。週3で残った区分は次週に回し、埋め合わせで詰め込みません。補助日は通常区分の順番を進めません。</p></details>'
    +'<p class="reentry-warning">数か月ぶりの再開向けの候補です。現在の痛み・制限は未確認。痛みや強い疲労がある場合は中止・見送りを優先してください。</p>'
@@ -1167,6 +1211,7 @@ home=function(){
   const fields=[['reentry-frequency','frequency'],['reentry-slots','slots'],['reentry-stretch','stretchMinutes'],['reentry-stage','stage']];
   fields.forEach(([id,key])=>{document.getElementById(id).onchange=e=>{prefs={...prefs,[key]:key==='stage'?e.target.value:+e.target.value};if(prefs.frequency!==5&&block==='light')block=R.nextBlock(state.history);render();};});
   for(const n of [3,4,5])document.getElementById('reentry-freq-'+n).onclick=()=>{if(prefs.frequency===n)return;prefs={...prefs,frequency:n};if(n!==5&&block==='light')block=R.nextBlock(state.history);render();document.getElementById('reentry-freq-'+n)?.focus?.();};
+  document.getElementById('reentry-original-jump').onclick=()=>{legacy.open=true;legacy.scrollIntoView?.({block:'start',behavior:'smooth'});};
   for(let i=0;i<4;i++)document.getElementById('reentry-block-'+i).onclick=()=>{if(block===i)return;block=i;render();document.getElementById('reentry-block-'+i)?.focus?.();};
   if(prefs.frequency===5)document.getElementById('reentry-block-light').onclick=()=>{if(block==='light')return;block='light';render();document.getElementById('reentry-block-light')?.focus?.();};
   document.getElementById('reentry-start').onclick=()=>{if(state.draft){workout();return;}const prepared=R.prepare(state,prefs,block,{catalog:ORIGINAL_PROGS,now:Date.now(),id:uid()});if(!prepared.ok){document.getElementById('reentry-result').textContent=prepared.error;return;}if(save(prepared.next)){currentChecks={};undo=null;workout();}else document.getElementById('reentry-result').textContent='保存できなかったため、元の記録と設定を保持しています。';};
@@ -1175,11 +1220,11 @@ home=function(){
  render();
 };
 const oldCard=exerciseCard;
-exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));
+exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));if(e.name==='チェストプレス')html=html.replace('<h2>チェストプレス</h2>','<h2>チェストプレス（マシン）</h2>');
  const memo='<label class="pb-exercise-memo">この種目のメモ（自動保存）<textarea data-exercise-memo="'+i+'" maxlength="600" placeholder="フォームやマシンの位置など、あとで見返したいこと">'+escR(e.memo||'')+'</textarea></label>';
  html=html.replace('<details class="pb-tools">',memo+'<details class="pb-tools">').replaceAll('RIR（任意）','余力（あと何回できそう？・任意）');
- html=html.replace(/<details class="set-extra"><summary>[^<]*<\/summary>/g,'<details class="set-extra"><summary>体調・フォームの詳細（任意）</summary>');
- if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
+ html=html.replace(/<details class="set-extra"><summary>[^<]*<\/summary>/g,'<details class="set-extra"><summary aria-label="体調・フォームの詳細（任意）">詳細</summary>');
+ if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replaceAll('実際の回数<input','回数<input').replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="回数"');};
 const oldWorkout=workout;
 workout=function(){const extraOpen=[...document.querySelectorAll('#today .exercise .pb-entry-extras')].map(d=>d.open);oldWorkout();const today=document.getElementById('today'),active=state.draft?.schemaVersion===2;today.classList?.toggle('reentry-active',active);if(!active)return;
  const title=today.querySelector(':scope > .row h1');if(title)title.textContent='セットを記録';
@@ -1191,7 +1236,7 @@ workout=function(){const extraOpen=[...document.querySelectorAll('#today .exerci
  today.querySelectorAll('[data-exercise-memo]').forEach(el=>{el.oninput=()=>{const e=state.draft?.exercises?.[+el.dataset.exerciseMemo];if(!e||el.value===e.memo)return;e.memo=el.value;undo=null;save();};});
  today.querySelectorAll('[data-copylast]').forEach(button=>{const [i,j]=button.dataset.copylast.split(',').map(Number),e=state.draft?.exercises?.[i],s=e?.sets?.[j];button.hidden=!s||s.done||s.skipped||!e.sets.slice(0,j).some(prior=>prior.done&&!prior.skipped&&prior.kind===s.kind&&Number.isFinite(prior.weight)&&Number.isInteger(prior.reps)&&prior.reps>0);});
  today.querySelectorAll('[data-copy]').forEach(button=>{const e=state.draft?.exercises?.[+button.dataset.copy];if(e&&!records().some(session=>PowerBearAdvice.comparable(e.config,session.config)&&PowerBearAdvice.workingSets(session).length>0))button.hidden=true;});
- today.querySelectorAll('.set-extra').forEach(details=>{const summary=details.querySelector('summary');if(summary)summary.textContent='体調・フォームの詳細（任意）';details.querySelectorAll('[data-set]').forEach(el=>{if(!el.onchange)return;const old=el.onchange;el.onchange=()=>{old();summary.textContent='体調・フォームの詳細（任意）';};});});
+ today.querySelectorAll('.set-extra').forEach(details=>{const summary=details.querySelector('summary');if(summary){summary.textContent='詳細';summary.setAttribute('aria-label','体調・フォームの詳細（任意）');}details.querySelectorAll('[data-set]').forEach(el=>{if(!el.onchange)return;const old=el.onchange;el.onchange=()=>{old();summary.textContent='詳細';};});});
  const syncInput=input=>{const [i,j,key]=input.dataset.set.split(','),set=state.draft?.exercises?.[i]?.sets?.[j];if(set&&input.value!==String(inputValue(set[key])))input.onchange?.();};
  today.querySelectorAll('[data-check]').forEach(button=>{const original=button.onclick;button.onclick=()=>{const [i,j]=button.dataset.check.split(','),set=state.draft?.exercises?.[i]?.sets?.[j];if(set&&!set.done)for(const key of ['weight','reps']){const input=today.querySelector('[data-set="'+i+','+j+','+key+'"]');if(input)syncInput(input);}original?.();};});
  for(const id of ['back','finish']){const button=today.querySelector('#'+id);if(!button)continue;const original=button.onclick;button.onclick=()=>{today.querySelectorAll('[data-set]').forEach(syncInput);original?.();};}
