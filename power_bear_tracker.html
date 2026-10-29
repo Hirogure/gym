@@ -121,6 +121,39 @@ button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visi
 .pb-entry-help>summary,.pb-entry-rest>summary{min-height:48px;padding:12px 0;cursor:pointer;color:#244b36;font-size:14px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
 .pb-entry-help>.muted{margin-bottom:12px}
 .pb-entry-rest>.card.compact{border:0;box-shadow:none;max-width:none;margin:0;padding:0 0 12px}
+.pb-config-advanced{margin-top:12px;border-top:1px solid #d5dce1}
+.pb-config-advanced>summary{min-height:48px;padding:12px 0;cursor:pointer;font-size:14px;font-weight:700}
+.pb-config-advanced>.fieldgrid{margin:5px 0 12px}
+/* Neutral interface: blue marks actions, amber marks caution, green remains only for completed sets. */
+:root{--paper:#f7f7f5;--ink:#24313a;--muted:#52606b;--dark:#263a4d;--accent:#dce8f0;--line:#d5dce1}
+header .bear{display:none}.brand{letter-spacing:0;color:#263a4d}
+.reentry-panel{box-shadow:0 7px 22px #263a4d0a}
+.reentry-primary{background:#edf2f6;border-color:#c6d4de}
+.reentry-primary .btn,.btn{background:#214a67;color:#fff}
+.reentry-primary .btn:hover,.btn:hover{background:#163b56}
+.btn.secondary{background:#e8eef3;color:#203a4e}.btn.outline{background:#fff;color:#234760;border-color:#becbd5}
+.reentry-eyebrow,.reentry-kicker,.reentry-options>summary,.reentry-existing>summary,.reentry-week>summary,.reentry-reference>summary{color:#294a61}
+.reentry-freq-btn{color:#294a61;border-color:#bbcad4}
+.reentry-freq-btn[aria-pressed=true],.reentry-block-btn[aria-pressed=true]{background:#e3edf4;border-color:#285571;color:#203d52}
+.reentry-block-btn{color:#263a4d;border-color:#c3d0d9}
+.reentry-block-btn small{color:#405461}
+.pb-last-weight{background:#f0f4f7;border-color:#cad6de;color:#263a4d}
+.pb-last-weight strong{color:#183c55}
+.pb-entry-help,.pb-entry-rest{border-color:#cad6de}
+.pb-entry-help>summary,.pb-entry-rest>summary,.pb-config-advanced>summary{color:#294a61}
+.pb-instructions{background:#edf2f6;border-left-color:#315f7a}
+.tab.active{background:#263a4d;color:#fff}
+.form-open{background:#edf2f6;border-color:#bdceda;color:#214a67}
+.form-open:hover{background:#e0eaf1}
+.current-exercise,.setblock.current-set{border-color:#315f7a}
+.setblock.current-set{box-shadow:inset 3px 0 #315f7a}
+.production-panel{background:#fff;border-color:#c8d5dd}
+.save-status{color:#425867}
+.setblock.done,.check[aria-pressed=true]{background:#e6f2e3;border-color:#80a875;color:#234b2e}
+.pb-entry-extras{margin:8px 0 12px;padding:0 12px;border:1px solid #c8d5dd;border-radius:12px;background:#fff}
+.pb-entry-extras>summary{display:block;min-height:48px;padding:12px 0;margin:0!important;cursor:pointer;color:#294a61;font-size:14px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.pb-entry-extras>.form-open{margin:8px 0}
+.pb-entry-extras>.config,.pb-entry-extras>.pb-tools{margin:9px 0}
 
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
@@ -1114,11 +1147,14 @@ home=function(){
 const oldCard=exerciseCard;
 exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
 const oldWorkout=workout;
-workout=function(){oldWorkout();const today=document.getElementById('today'),active=state.draft?.schemaVersion===2;today.classList?.toggle('reentry-active',active);if(!active)return;
+workout=function(){const extraOpen=[...document.querySelectorAll('#today .exercise .pb-entry-extras')].map(d=>d.open);oldWorkout();const today=document.getElementById('today'),active=state.draft?.schemaVersion===2;today.classList?.toggle('reentry-active',active);if(!active)return;
  const title=today.querySelector(':scope > .row h1');if(title)title.textContent='セットを記録';
  const help=today.querySelector('.pb-instructions');if(help)help.textContent='重量と実際の回数を入力 →「完了にする」。';
  const explanation=help?.nextElementSibling;if(explanation?.classList?.contains('muted')&&explanation.before){const d=document.createElement('details'),s=document.createElement('summary');d.className='pb-entry-help';s.textContent='入力の補足（余力・痛みなど）';explanation.before(d);d.appendChild(s);d.appendChild(explanation);}
  const rest=today.querySelector('#rest'),card=rest?.closest?.('.card.compact');if(card?.before){const d=document.createElement('details'),s=document.createElement('summary');d.className='pb-entry-rest';s.textContent='休憩タイマー：'+(rest.options?.[rest.selectedIndex]?.textContent||'設定済み')+'（変更）';card.before(d);d.appendChild(s);d.appendChild(card);}
+ today.querySelectorAll('.exercise .config').forEach(config=>{const summary=config.querySelector(':scope > summary'),grid=config.querySelector(':scope > .fieldgrid');if(!summary||!grid)return;summary.textContent='機器が変わった時の設定（任意）';const explanation=config.querySelector(':scope > p.small');if(explanation)explanation.textContent='記録だけなら設定不要。機器・座席が変わった時に確認します。';const advanced=document.createElement('details'),as=document.createElement('summary'),ag=document.createElement('div');advanced.className='pb-config-advanced';as.textContent='比較・振り返りの追加設定';ag.className='fieldgrid';for(const key of ['convention','directMuscle','increment']){const field=config.querySelector('[data-cfg$=",'+key+'"]'),label=field?.closest?.('label');if(!label)continue;const title={convention:'重量表示の種類（分かる時だけ）',directMuscle:'振り返りの部位分類（任意）',increment:'刻み幅（実機に表示がある時だけ）'}[key];if(label.firstChild?.nodeType===3)label.firstChild.textContent=title;ag.appendChild(label);}if(ag.children.length){advanced.appendChild(as);advanced.appendChild(ag);config.appendChild(advanced);}});
+ today.querySelectorAll('.exercise').forEach((exercise,i)=>{const pieces=[...exercise.children].filter(e=>e.matches?.('.form-open,.config,.pb-tools'));if(!pieces.length||!pieces[0].before)return;const d=document.createElement('details'),s=document.createElement('summary');d.className='pb-entry-extras';s.textContent='動き・機器・補助操作（必要な時）';pieces[0].before(d);d.appendChild(s);pieces.forEach(e=>d.appendChild(e));if(extraOpen[i])d.open=true;});
+ today.querySelectorAll('[data-check]').forEach(button=>{const original=button.onclick;button.onclick=()=>{const [i,j]=button.dataset.check.split(','),set=state.draft?.exercises?.[i]?.sets?.[j];if(set&&!set.done)for(const key of ['weight','reps']){const input=today.querySelector('[data-set="'+i+','+j+','+key+'"]');if(input&&input.value!==String(inputValue(set[key])))input.onchange?.();}original?.();};});
 };
 home();
 })();
