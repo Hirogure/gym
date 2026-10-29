@@ -94,6 +94,27 @@ button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visi
 @media(max-width:650px){.reentry-panel{padding:16px}.reentry-panel .fieldgrid{grid-template-columns:minmax(0,1fr)}.reentry-options,.reentry-existing,.reentry-week{padding:0 10px}.reentry-list{padding-left:19px}.reentry-list>li{padding:11px}.reentry-list .pb-recent{padding:9px}.reentry-list .pb-recent th,.reentry-list .pb-recent td{padding:7px 3px;font-size:13px}}
 @media(max-width:350px){.reentry-panel{padding:12px}.reentry-freq-btn{font-size:14px}.reentry-list{padding-left:17px}.reentry-list>li{padding:9px}.reentry-list .pb-recent th,.reentry-list .pb-recent td{font-size:12px}}
 @media(max-width:350px){.reentry-heading>p,.reentry-panel .save-status:not(.error){display:none}.reentry-primary{padding:12px;margin-top:7px}.reentry-primary p:not(.reentry-kicker){font-size:14px;margin:4px 0 8px}.tabbar .tab{min-width:0;padding:6px 1px;font-size:11px;white-space:nowrap}.tabbar .tab span{font-size:18px}}
+.reentry-blocks{margin:17px 0 12px}
+.reentry-blocks>.reentry-kicker{margin-bottom:4px}
+.reentry-block-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:11px 0}
+.reentry-block-btn{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:114px;width:100%;padding:12px;text-align:left;border:1px solid #b9cbbb;border-radius:13px;background:#fff;color:#244535;overflow-wrap:anywhere}
+.reentry-block-btn[aria-pressed=true]{border:2px solid #20553d;background:#ebf4e4}
+.reentry-block-btn strong{font-size:17px;line-height:1.4}
+.reentry-block-btn span{font-size:14px;font-weight:700;line-height:1.45}
+.reentry-block-btn small{font-size:12px;line-height:1.5;color:#3d5b4a}
+.pb-last-weight{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 9px;padding:10px 12px;margin:9px 0 13px;border-radius:10px;background:#edf5eb;border:1px solid #cbdccf;color:#294838;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.pb-last-weight strong{font-size:20px;color:#163e2d;font-variant-numeric:tabular-nums}
+.pb-last-weight strong small,.pb-last-weight>small{font-size:12px;font-weight:500;color:#435c4a}
+.reentry-active .setblock{display:flex;flex-direction:column;gap:8px}
+.reentry-active .setblock>.row{display:contents}
+.reentry-active .setblock>.row>strong{order:1;font-size:16px}
+.reentry-active .setblock>.fieldgrid.three{order:2;grid-template-columns:repeat(2,minmax(0,1fr));margin:0}
+.reentry-active .setblock>.row>.check{order:4;width:100%;min-height:52px;border-radius:12px;font-size:16px;font-weight:750}
+.reentry-active .setblock>[data-copylast]{order:3}
+.reentry-active .setblock>.set-extra{order:5}
+.reentry-active .setblock>.small{order:0}
+.reentry-active .exercise>.pb-last-weight{margin-top:5px}
+@media(max-width:650px){.reentry-block-grid{grid-template-columns:minmax(0,1fr)}.reentry-block-btn{min-height:0;padding:10px 12px}.reentry-block-btn small{font-size:12px}.pb-last-weight{font-size:13px}.pb-last-weight strong{font-size:19px}}
 
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
@@ -1035,6 +1056,20 @@ globalThis.PowerBearReentryUiInstalled=true;
 const R=PowerBearReentry,C=PowerBearRecent,L=PowerBearLegacyReference,P=PowerBearStorage;
 const escR=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const option=(values,v)=>values.map(([x,label])=>'<option value="'+escR(x)+'"'+(String(x)===String(v)?' selected':'')+'>'+escR(label)+'</option>').join('');
+const blockPurpose=['胸・背中の縦引き・肩、4種目なら腕','脚とお尻、4種目なら体幹','背中の横引き・胸・肩、4種目なら腕','脚とお尻、4種目なら前腿'];
+function latestWeightHtml(m){
+ if(!m.identityOk)return '<p class="pb-last-weight">直近重量：種目と設定を照合できません。</p>';
+ const candidates=[];
+ for(const [list,source] of [[m.same,'V6・同じ設定'],[m.other,'V6・設定が別／未確認']])for(const session of list){
+  const set=[...session.sets].reverse().find(s=>s.status==='完了'&&s.label.startsWith('実施 ')&&/^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(s.weight));
+  if(set)candidates.push({date:session.date,time:session.time,weight:set.weight,unit:session.unit,source,rank:source.startsWith('V6・同じ')?3:2});
+ }
+ for(const row of m.legacy?.rows||[])if(/^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(row.weight))candidates.push({date:row.date,time:row.time,weight:row.weight,unit:'単位未確認',source:'旧アプリ・機器設定未確認',rank:1});
+ candidates.sort((a,b)=>b.time-a.time||b.rank-a.rank);
+ const latest=candidates[0];return latest?'<p class="pb-last-weight"><span>直近の重量</span><strong>'+escR(latest.weight)+' <small>'+escR(latest.unit)+'</small></strong><small>'+escR(latest.date)+' ／ '+escR(latest.source)+'</small></p>':'<p class="pb-last-weight">直近重量：確認できる保存値はありません。</p>';
+}
+function compactFor(e,snapshots){try{return latestWeightHtml(C.collect({exercise:e,history:state.history,snapshots,legacyApi:L,comparable:PowerBearAdvice.comparable}));}catch(_){return '<p class="pb-last-weight">直近重量を読み取れません。保存内容は保持しています。</p>';}}
+function replaceRecent(html,replacement){const start=html.indexOf('<details class="pb-recent"');if(start<0)return html;const tags=/<\/?details\b[^>]*>/g;tags.lastIndex=start;let depth=0,m;while((m=tags.exec(html))){depth+=m[0].startsWith('</')?-1:1;if(depth===0)return html.slice(0,start)+replacement+html.slice(tags.lastIndex);}return html;}
 const oldHome=home;
 home=function(){
  oldHome();const today=document.getElementById('today'),panel=document.createElement('section');panel.className='card reentry-panel';panel.setAttribute('aria-label','再開期メニューの候補');
@@ -1047,15 +1082,15 @@ home=function(){
   const optionsOpen=!!document.getElementById('reentry-options')?.open;
   const snapshots=P.archiveView(storage),stageText=prefs.stage==='return'?'慣らし：余力3〜4回':'定着：余力2〜3回（手動選択・自動昇格なし）';
   panel.innerHTML='<div class="reentry-heading"><span class="reentry-eyebrow">今日のメニュー</span><h1>再開期のトレーニング</h1><p>週4回を基準に、週3〜5回を選べます。</p></div><p class="save-status" role="status"></p>'
-   +'<div class="reentry-primary"><p class="reentry-kicker">'+(state.draft?'入力中のトレーニング':'次回の候補')+'</p><h2>'+(state.draft?escR(state.draft.label||'保存中の下書き'):escR(planned.label))+'</h2><p>'+(state.draft?'入力途中の内容をそのまま開きます。下の選択では上書きしません。':planned.items.length+'種目・'+planned.sets+'セット ／ 筋トレ目安 約'+Math.ceil(planned.estimatedMinutes)+'分')+'</p><button type="button" class="btn full" id="reentry-start"'+(!read.ok?' disabled':'')+'>'+(state.draft?'下書きの続きへ →':'この内容で始める →')+'</button><p id="reentry-result" role="status"></p></div>'
+   +'<div class="reentry-primary"><p class="reentry-kicker">'+(state.draft?'保存中の下書き':'次回の候補')+'</p><h2>'+(state.draft?'続きから始める':escR(planned.label))+'</h2><p>'+(state.draft?escR(state.draft.label||'入力途中の内容を保持中')+'。内容を変えずに開きます。':planned.items.length+'種目・'+planned.sets+'セット ／ 筋トレ目安 約'+Math.ceil(planned.estimatedMinutes)+'分')+'</p><button type="button" class="btn full" id="reentry-start"'+(!read.ok?' disabled':'')+'>'+(state.draft?'下書きを開く →':'この内容で始める →')+'</button><p id="reentry-result" role="status"></p></div>'
    +(!read.ok?'<p role="alert">'+escR(read.error)+'</p>':'')
    +'<div class="reentry-frequency"><p class="reentry-kicker">今週の予定回数</p><div class="reentry-frequency-buttons" role="group" aria-label="今週の予定回数">'+[3,4,5].map(n=>'<button type="button" class="reentry-freq-btn" id="reentry-freq-'+n+'" aria-pressed="'+(prefs.frequency===n)+'">週'+n+'回</button>').join('')+'</div><p class="reentry-hint">'+(state.draft?'下書きには反映しません。次の新規開始の候補です。':'週3なら残りは翌週へ。週5回目の補助日は任意です。')+'</p></div>'
    +'<details class="reentry-options" id="reentry-options"'+(optionsOpen?' open':'')+'><summary>種目数・時間・段階を変更</summary><div class="fieldgrid"><label>今週の予定回数<select id="reentry-frequency">'+option([[3,'週3回'],[4,'週4回（基準）'],[5,'週5回（補助日は任意）']],prefs.frequency)+'</select></label><label>1回の種目数<select id="reentry-slots">'+option([[3,'3種目から'],[4,'4種目まで']],prefs.slots)+'</select></label><label>60分の配分<select id="reentry-stretch">'+option([[10,'ラン15・ストレッチ10・筋トレ35分'],[5,'ラン15・ストレッチ5・筋トレ40分']],prefs.stretchMinutes)+'</select></label><label>本人が選ぶ段階<select id="reentry-stage">'+option([['return','慣らし（各2セット）'],['steady','定着（時間内で優先1種目だけ追加）']],prefs.stage)+'</select></label></div></details>'
-   +'<label>今回の区分<select id="reentry-block">'+option([...R.blockNames.map((n,i)=>[i,n]),...(prefs.frequency===5?[['light','軽い補助・任意（第5回の候補）']]:[])],block)+'</select></label>'
+   +'<div class="reentry-blocks" role="group" aria-label="今回の区分"><p class="reentry-kicker">今回の区分を選ぶ</p><p class="reentry-hint">A・Bは順番の名前です。各日の主な種目は次のとおりです。</p><div class="reentry-block-grid">'+R.blockNames.map((name,i)=>{const names=R.plan({...prefs,slots:4},i).items.map(x=>x.name);return '<button type="button" class="reentry-block-btn" id="reentry-block-'+i+'" aria-pressed="'+(block===i)+'"><strong>'+escR(name)+'</strong><span>'+escR(blockPurpose[i])+'</span><small>'+escR(names.slice(0,3).join('・'))+'<br>4種目目：'+escR(names[3])+'</small></button>';}).join('')+(prefs.frequency===5?'<button type="button" class="reentry-block-btn" id="reentry-block-light" aria-pressed="'+(block==='light')+'"><strong>軽い補助（任意）</strong><span>回復に余裕がある第5回の候補</span><small>ローロー・アームカール・アブドミナルクランチ</small></button>':'')+'</div></div>'
    +'<h2 class="reentry-plan-title">'+(state.draft?'次回の候補：':'')+escR(planned.label)+' · '+planned.items.length+'種目／'+planned.sets+'セット</h2><p>'+stageText+'。休息は原則2分、必要なら延長。</p><p><strong>筋トレ枠'+planned.strengthMinutes+'分／机上目安 約'+Math.ceil(planned.estimatedMinutes)+'分</strong>（準備・移動・休息・待ち余白5分込み。実測・保証ではありません）</p>'
    +(planned.extraSkipped?'<p>この時間枠では追加セットを入れず、各2セットを維持します。</p>':'')
    +(planned.kind==='light'?'<p>第5回を重い筋トレ日にする必要はありません。回復が不十分ならこの補助枠は使わず、実施していない記録は作りません。</p>':'')
-   +'<ol class="reentry-list">'+planned.items.map(e=>{const record=C.collect({exercise:{name:e.name,exerciseId:'original:'+e.name,config:R.configFor(state,e.name)},history:state.history,snapshots,legacyApi:L,comparable:PowerBearAdvice.comparable});return '<li><strong>'+escR(e.name)+'</strong><p>'+e.sets+'セット × '+e.repMin+'〜'+e.repMax+'回／休息2分</p><details class="reentry-reference"><summary>この種目の直近記録・メモ</summary>'+C.render(record)+'</details></li>';}).join('')+'</ol>'
+   +'<ol class="reentry-list">'+planned.items.map(e=>'<li><strong>'+escR(e.name)+'</strong><p>'+e.sets+'セット × '+e.repMin+'〜'+e.repMax+'回／休息2分</p>'+compactFor({name:e.name,exerciseId:'original:'+e.name,config:R.configFor(state,e.name)},snapshots)+'</li>').join('')+'</ol>'
    +'<p>不足時間は最後の補助種目を見送るなどで調整し、休憩を削って詰め込みません。kg・実施回数・実施余力は自動入力しません。</p>'
    +'<details class="reentry-week"><summary>今週の配分と繰り越し</summary><ol>'+weekly.visits.map(p=>'<li>'+escR(p.label)+'：'+p.sets+'セット（約'+Math.ceil(p.estimatedMinutes)+'分）</li>').join('')+'</ol><p>計'+weekly.sets+'セット。通常区分の次は「'+escR(R.blockNames[weekly.nextBlock])+'」。週3で残った区分は次週に回し、埋め合わせで詰め込みません。補助日は通常区分の順番を進めません。</p></details>'
    +'<p class="reentry-warning">数か月ぶりの再開向けの候補です。現在の痛み・制限は未確認。痛みや強い疲労がある場合は中止・見送りを優先してください。</p>'
@@ -1063,16 +1098,17 @@ home=function(){
   const fields=[['reentry-frequency','frequency'],['reentry-slots','slots'],['reentry-stretch','stretchMinutes'],['reentry-stage','stage']];
   fields.forEach(([id,key])=>{document.getElementById(id).onchange=e=>{prefs={...prefs,[key]:key==='stage'?e.target.value:+e.target.value};if(prefs.frequency!==5&&block==='light')block=R.nextBlock(state.history);render();};});
   for(const n of [3,4,5])document.getElementById('reentry-freq-'+n).onclick=()=>{if(prefs.frequency===n)return;prefs={...prefs,frequency:n};if(n!==5&&block==='light')block=R.nextBlock(state.history);render();document.getElementById('reentry-freq-'+n)?.focus?.();};
-  document.getElementById('reentry-block').onchange=e=>{block=e.target.value==='light'?'light':+e.target.value;render();};
+  for(let i=0;i<4;i++)document.getElementById('reentry-block-'+i).onclick=()=>{if(block===i)return;block=i;render();document.getElementById('reentry-block-'+i)?.focus?.();};
+  if(prefs.frequency===5)document.getElementById('reentry-block-light').onclick=()=>{if(block==='light')return;block='light';render();document.getElementById('reentry-block-light')?.focus?.();};
   document.getElementById('reentry-start').onclick=()=>{if(state.draft){workout();return;}const prepared=R.prepare(state,prefs,block,{catalog:ORIGINAL_PROGS,now:Date.now(),id:uid()});if(!prepared.ok){document.getElementById('reentry-result').textContent=prepared.error;return;}if(save(prepared.next)){currentChecks={};undo=null;workout();}else document.getElementById('reentry-result').textContent='保存できなかったため、元の記録と設定を保持しています。';};
   status();
  }
  render();
 };
 const oldCard=exerciseCard;
-exerciseCard=function(e,i){const html=oldCard(e,i);if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
+exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
 const oldWorkout=workout;
-workout=function(){oldWorkout();if(state.draft?.reentryMeta?.version!==1)return;const today=document.getElementById('today'),p=document.createElement('p');p.className='reentry-warning';p.textContent='再開期の予定です。目安の回数・余力は実績ではありません。当日の重量と実施回数を入力し、余力・痛みは確認した内容だけを残してください。';today.querySelector('.progress')?.after(p);};
+workout=function(){oldWorkout();const today=document.getElementById('today');today.classList?.toggle('reentry-active',state.draft?.reentryMeta?.version===1);if(state.draft?.reentryMeta?.version!==1)return;const p=document.createElement('p');p.className='reentry-warning';p.textContent='重量と実際の回数を入力 →「完了にする」。余力・痛みは確認した内容だけを記録してください。';today.querySelector('.progress')?.after(p);};
 home();
 })();
 
