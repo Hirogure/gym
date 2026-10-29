@@ -101,7 +101,7 @@ button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visi
 .reentry-block-btn[aria-pressed=true]{border:2px solid #20553d;background:#ebf4e4}
 .reentry-block-btn strong{font-size:17px;line-height:1.4}
 .reentry-block-btn span{font-size:14px;font-weight:700;line-height:1.45}
-.reentry-block-btn small{font-size:12px;line-height:1.5;color:#3d5b4a}
+.reentry-block-btn small{font-size:13px;line-height:1.55;color:#304c3a}
 .pb-last-weight{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 9px;padding:10px 12px;margin:9px 0 13px;border-radius:10px;background:#edf5eb;border:1px solid #cbdccf;color:#294838;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
 .pb-last-weight strong{font-size:20px;color:#163e2d;font-variant-numeric:tabular-nums}
 .pb-last-weight strong small,.pb-last-weight>small{font-size:12px;font-weight:500;color:#435c4a}
@@ -114,7 +114,7 @@ button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visi
 .reentry-active .setblock>.set-extra{order:5}
 .reentry-active .setblock>.small{order:0}
 .reentry-active .exercise>.pb-last-weight{margin-top:5px}
-@media(max-width:650px){.reentry-block-grid{grid-template-columns:minmax(0,1fr)}.reentry-block-btn{min-height:0;padding:10px 12px}.reentry-block-btn small{font-size:12px}.pb-last-weight{font-size:13px}.pb-last-weight strong{font-size:19px}}
+@media(max-width:650px){.reentry-block-grid{grid-template-columns:minmax(0,1fr)}.reentry-block-btn{min-height:0;padding:10px 12px}.reentry-block-btn small{font-size:14px}.pb-last-weight{font-size:14px}.pb-last-weight strong{font-size:19px}.pb-last-weight>small{font-size:13px}}
 
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
@@ -1108,7 +1108,7 @@ home=function(){
 const oldCard=exerciseCard;
 exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
 const oldWorkout=workout;
-workout=function(){oldWorkout();const today=document.getElementById('today');today.classList?.toggle('reentry-active',state.draft?.reentryMeta?.version===1);if(state.draft?.reentryMeta?.version!==1)return;const p=document.createElement('p');p.className='reentry-warning';p.textContent='重量と実際の回数を入力 →「完了にする」。余力・痛みは確認した内容だけを記録してください。';today.querySelector('.progress')?.after(p);};
+workout=function(){oldWorkout();const today=document.getElementById('today');today.classList?.toggle('reentry-active',state.draft?.schemaVersion===2);if(state.draft?.reentryMeta?.version!==1)return;const p=document.createElement('p');p.className='reentry-warning';p.textContent='重量と実際の回数を入力 →「完了にする」。余力・痛みは確認した内容だけを記録してください。';today.querySelector('.progress')?.after(p);};
 home();
 })();
 
