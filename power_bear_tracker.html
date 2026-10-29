@@ -175,6 +175,7 @@ header .bear{display:none}.brand{letter-spacing:0;color:#263a4d}
 .pb-exercise-memo{display:block;margin:10px 0;padding:10px;border:1px solid #cad6de;border-radius:11px;background:#f7f9fa;font-size:14px;font-weight:700}
 .pb-exercise-memo textarea{display:block;width:100%;min-height:64px;max-height:180px;resize:vertical;margin-top:6px;padding:9px 10px;border:1px solid #bdcbd3;border-radius:9px;background:#fff;color:var(--ink);font:inherit;font-weight:400;line-height:1.5}
 @media(max-width:650px){.reentry-block-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reentry-block-btn{padding:9px}.reentry-block-btn small{font-size:11px}.reentry-active .exercise{padding:13px}}
+@media(max-width:350px){.reentry-block-grid{grid-template-columns:1fr}.reentry-block-btn{padding:9px 11px}.reentry-block-btn span,.reentry-block-btn small{font-size:13px;line-height:1.45}}
 
 </style></head><body><header><div class="brand"><div class="bear" aria-hidden="true">ʕ•ᴥ•ʔ</div>POWER BEAR</div><span class="badge">V6</span></header><div id="production-tools" class="production-panel" aria-label="本番保存と引継ぎ"></div><main class="wrap"><section id="today"></section><section id="history" class="hidden"></section><section id="growth" class="hidden"></section><section id="evidence" class="hidden"></section><div class="footer">Power Bear V6 · 記録はこのブラウザ内に保存<br>旧raw履歴を保持し、当日の推奨・確認済み実施とは分けて表示します。</div></main><nav class="tabbar" aria-label="メインメニュー"><button class="tab active" data-tab="today" aria-current="page"><span aria-hidden="true">◉</span>今日</button><button class="tab" data-tab="history"><span aria-hidden="true">▦</span>履歴</button><button class="tab" data-tab="growth"><span aria-hidden="true">↗</span>ふり返り</button><button class="tab" data-tab="evidence"><span aria-hidden="true">◎</span>根拠</button></nav><aside class="timer hidden" id="timer" aria-label="休憩タイマー"><div><div class="small">休憩</div><strong id="clock">2:30</strong></div><button id="extend">＋30秒</button><button class="close" id="skip">休憩を終える</button></aside><dialog id="form-guide-dialog" aria-labelledby="form-guide-title"><div class="guide-top"><button type="button" id="form-guide-close" class="guide-close">閉じて戻る ×</button></div><div id="form-guide-content"></div></dialog><div id="toast" class="toast hidden" role="status"></div>
 
@@ -1176,7 +1177,7 @@ home=function(){
 const oldCard=exerciseCard;
 exerciseCard=function(e,i){let html=oldCard(e,i);html=replaceRecent(html,compactFor(e,P.archiveView(storage)));
  const memo='<label class="pb-exercise-memo">この種目のメモ（自動保存）<textarea data-exercise-memo="'+i+'" maxlength="600" placeholder="フォームやマシンの位置など、あとで見返したいこと">'+escR(e.memo||'')+'</textarea></label>';
- html=html.replace('<div class="controls">',memo+'<div class="controls">').replaceAll('RIR（任意）','余力（あと何回できそう？・任意）');
+ html=html.replace('<details class="pb-tools">',memo+'<details class="pb-tools">').replaceAll('RIR（任意）','余力（あと何回できそう？・任意）');
  html=html.replace(/<details class="set-extra"><summary>[^<]*<\/summary>/g,'<details class="set-extra"><summary>体調・フォームの詳細（任意）</summary>');
  if(e.reentryMeta?.version!==1)return html;return html.replace('<p class="muted">原本 ','<p class="muted">再開期案 ').replace(archive(e.definition),R.definitionHtml(e)).replace(/(data-set="\d+,\d+,reps" value=)"null"/g,'$1"" placeholder="実施回数"');};
 const oldWorkout=workout;
