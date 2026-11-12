@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Power Bear V7</title>
+<style>
+:root{
+  --navy:#1d3a8a; --navy-d:#152c6b; --bg:#f4f6fa; --card:#fff; --ink:#1a2233;
+  --sub:#5b6678; --line:#dde3ee; --ok:#1e9e62; --warn:#c77400;
+  --radius:14px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html{font-size:16px;}
+body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.5;}
+main{max-width:640px; margin:0 auto; padding:14px 14px 110px;}
+body.timer-on main{padding-bottom:180px;}
+h1{font-size:1.05rem; margin:2px 0 10px; letter-spacing:.06em; color:var(--navy);}
+h2{font-size:1rem; margin:0 0 8px;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px; margin-bottom:12px;}
+.muted{color:var(--sub); font-size:.85rem;}
+.small{font-size:.8rem;}
+.btn{display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+  min-height:54px; padding:12px 16px; border:none; border-radius:12px; cursor:pointer;
+  background:var(--navy); color:#fff; font-size:1.05rem; font-weight:700;}
+.btn:active{background:var(--navy-d);}
+.btn.sub{background:#e8edf7; color:var(--navy);}
+.btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line); font-weight:600;}
+.btn.danger{background:#fff; color:#b3261e; border:1px solid #e5b6b3; font-weight:600;}
+.btn.sm{min-height:46px; font-size:.95rem;}
+.btn:disabled{opacity:.45;}
+.row{display:flex; gap:8px;}
+.row>*{flex:1;}
+.chips{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{flex:1 1 40%; min-height:50px; padding:10px 8px; border-radius:12px; border:1.5px solid var(--line);
+  background:#fff; font-size:1rem; font-weight:700; cursor:pointer; text-align:center;}
+.chip.on{background:var(--navy); color:#fff; border-color:var(--navy);}
+.chip .sub2{display:block; font-size:.72rem; font-weight:500; opacity:.75; margin-top:2px;}
+.seg{display:flex; border:1.5px solid var(--line); border-radius:12px; overflow:hidden;}
+.seg button{flex:1; min-height:50px; border:none; background:#fff; font-size:1rem; font-weight:700; cursor:pointer; padding:8px 4px;}
+.seg button.on{background:var(--navy); color:#fff;}
+.seg button .sub2{display:block; font-size:.7rem; font-weight:500; opacity:.8;}
+/* workout */
+.ex{border:1px solid var(--line); border-radius:var(--radius); background:#fff; margin-bottom:12px; overflow:hidden;}
+.ex-head{padding:12px 14px; cursor:pointer;}
+.ex-head .nm{font-size:1.08rem; font-weight:800;}
+.tag{display:inline-block; font-size:.7rem; font-weight:700; color:var(--navy); background:#e8edf7;
+  border-radius:999px; padding:2px 8px; margin-left:6px; vertical-align:2px;}
+.ex-body{padding:0 14px 14px;}
+.lastbar{background:#eef1f7; border-radius:10px; padding:8px 10px; font-size:.85rem; margin-bottom:10px;}
+.lastbar b{color:var(--navy);}
+.setrow{display:flex; align-items:center; gap:8px; padding:10px 0; border-top:1px solid var(--line);}
+.setrow .no{width:1.4em; font-weight:800; color:var(--sub); text-align:center;}
+.inp{display:flex; align-items:center; gap:4px;}
+.inp button{width:40px; height:48px; border-radius:10px; border:1px solid var(--line); background:#f2f5fa;
+  font-size:1.15rem; font-weight:800; cursor:pointer; color:var(--navy);}
+.inp input{width:64px; height:48px; border:1.5px solid var(--line); border-radius:10px; text-align:center;
+  font-size:1.1rem; font-weight:700; padding:0 2px;}
+.inp .unit{font-size:.78rem; color:var(--sub); width:1.6em;}
+.setrow.done{opacity:.75;}
+.setrow .donebtn{flex:0 0 86px; min-height:52px; border:none; border-radius:12px; background:var(--navy);
+  color:#fff; font-size:1rem; font-weight:800; cursor:pointer;}
+.setrow .undobtn{flex:0 0 86px; min-height:52px; border-radius:12px; background:#e6f4ec; color:var(--ok);
+  border:1px solid #bfe3cf; font-size:.95rem; font-weight:800; cursor:pointer;}
+textarea.memo{width:100%; min-height:44px; border:1.5px solid var(--line); border-radius:10px; padding:9px 10px;
+  font-size:1rem; font-family:inherit; resize:vertical; margin-top:6px;}
+.subacts{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+.subacts button{flex:1 1 28%; min-height:44px; border-radius:10px; border:1px solid var(--line);
+  background:#fff; font-size:.88rem; font-weight:600; cursor:pointer; color:var(--ink);}
+select.subsel{width:100%; min-height:48px; border:1.5px solid var(--line); border-radius:10px; font-size:1rem; padding:0 10px; background:#fff;}
+details{margin-top:10px;}
+details summary{cursor:pointer; font-size:.9rem; font-weight:700; color:var(--navy); padding:6px 0;}
+.formbox{font-size:.9rem; background:#f7f9fc; border-radius:10px; padding:10px 12px;}
+.formbox li{margin:2px 0;}
+/* nav + timer */
+nav{position:fixed; left:0; right:0; bottom:0; z-index:40; background:#fff; border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);}
+nav .inner{max-width:640px; margin:0 auto; display:flex;}
+nav button{flex:1; min-height:58px; border:none; background:none; font-size:.95rem; font-weight:700;
+  color:var(--sub); cursor:pointer;}
+nav button.on{color:var(--navy);}
+#timerbar{position:fixed; left:0; right:0; bottom:calc(58px + env(safe-area-inset-bottom)); z-index:41;
+  display:none; background:var(--navy); color:#fff;}
+body.timer-on #timerbar{display:block;}
+#timerbar .inner{max-width:640px; margin:0 auto; display:flex; align-items:center; gap:10px; padding:10px 14px;}
+#timerbar .t{font-size:1.5rem; font-weight:800; font-variant-numeric:tabular-nums; min-width:4.2em;}
+#timerbar button{min-height:48px; border-radius:10px; border:none; font-weight:800; cursor:pointer; padding:0 16px; font-size:.95rem;}
+#timerbar .add{background:#33519e; color:#fff;}
+#timerbar .end{background:#fff; color:var(--navy); margin-left:auto;}
+#toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(76px + env(safe-area-inset-bottom));
+  z-index:60; background:#222c44; color:#fff; padding:12px 18px; border-radius:999px; font-size:.92rem;
+  font-weight:600; opacity:0; pointer-events:none; transition:opacity .25s; max-width:92vw; text-align:center;}
+#toast.show{opacity:1;}
+.hist-item{cursor:pointer;}
+.hist-item .hd{display:flex; justify-content:space-between; align-items:baseline;}
+.badge{font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 9px; background:#e8edf7; color:var(--navy);}
+.badge.legacy{background:#f3e8d8; color:#8a5a12;}
+table.week{width:100%; border-collapse:collapse; font-size:.92rem;}
+table.week td, table.week th{padding:7px 4px; border-bottom:1px solid var(--line); text-align:left;}
+.kv{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); font-size:.95rem;}
+.kv:last-child{border-bottom:none;}
+input[type="file"]{font-size:.9rem;}
+.progress{height:10px; background:#e8edf7; border-radius:999px; overflow:hidden; margin:8px 0 4px;}
+.progress i{display:block; height:100%; background:var(--navy);}
+.sheet{position:fixed; inset:0; z-index:70; background:rgba(15,20,35,.5); display:none; align-items:flex-end; justify-content:center;}
+.sheet.open{display:flex;}
+.sheet .box{background:#fff; width:100%; max-width:640px; border-radius:18px 18px 0 0; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); max-height:88vh; overflow:auto;}
+.num2{display:flex; gap:10px;}
+.num2 label{flex:1; font-size:.85rem; color:var(--sub);}
+.num2 input{width:100%; height:50px; border:1.5px solid var(--line); border-radius:10px; font-size:1.05rem; text-align:center; margin-top:4px;}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="timerbar"><div class="inner">
+  <span class="t" id="timerText">2:00</span>
+  <button class="add" id="timerAdd">+30秒</button>
+  <button class="end" id="timerEnd">休憩を終える</button>
+</div></div>
+<nav><div class="inner">
+  <button data-tab="today" class="on">今日</button>
+  <button data-tab="history">履歴</button>
+  <button data-tab="review">ふり返り</button>
+  <button data-tab="settings">設定</button>
+</div></nav>
+<div id="toast"></div>
+<div class="sheet" id="sheet"><div class="box" id="sheetBox"></div></div>
+<script>
+"use strict";
+/* ===== メニュー定義（段階1=再開期の現行メニューが土台） ===== */
+const MENUS = {
+  upperA:{label:"上半身A", menus:{
+    1:[["チェストプレス","マシン",2,"8–12"],["ラットプルダウン","マシン",2,"8–12"],["ショルダープレス","マシン",2,"8–12"],["アームカール","マシン",2,"10–15"]],
+    2:[["スミスマシーンベンチプレス","スミス",3,"8–12"],["ラットプルダウン","マシン",3,"8–12"],["DBショルダープレス","ダンベル",2,"8–12"],["ケーブルカール","ケーブル",2,"10–15"]],
+    3:[["スミスマシーンベンチプレス","スミス",3,"8–12"],["ケーブルロウ","ケーブル",3,"8–12"],["DBショルダープレス","ダンベル",3,"8–12"],["ハンマーカール","ダンベル",2,"10–15"]]}},
+  lowerA:{label:"下半身A", menus:{
+    1:[["レッグプレス","マシン",2,"10–15"],["レッグエクステンション","マシン",2,"10–15"],["レッグカール","マシン",2,"10–15"],["アブドミナルクランチ","マシン",2,"10–15"]],
+    2:[["スミスマシーンスクワット","スミス",3,"8–12"],["レッグエクステンション","マシン",2,"10–15"],["レッグカール","マシン",2,"10–15"],["アブドミナルクランチ","マシン",2,"10–15"]],
+    3:[["スミスマシーンスクワット","スミス",3,"8–12"],["DBRDL","ダンベル",3,"8–12"],["レッグエクステンション","マシン",2,"10–15"],["ケーブルクランチ","ケーブル",2,"10–15"]]}},
+  upperB:{label:"上半身B", menus:{
+    1:[["シーテッドロウ","マシン",2,"8–12"],["ペクトラル","マシン",2,"8–12"],["ケーブルフェイスプル","ケーブル",2,"10–15"],["ケーブルトライセプスプッシュダウン","ケーブル",2,"10–15"]],
+    2:[["シーテッドロウ","マシン",3,"8–12"],["スミスマシーンインクラインプレス","スミス",3,"8–12"],["ケーブルフェイスプル","ケーブル",2,"10–15"],["ケーブルトライセプスプッシュダウン","ケーブル",2,"10–15"]],
+    3:[["スミスマシーンインクラインプレス","スミス",3,"8–12"],["ラットプルダウン","マシン",3,"8–12"],["DBサイドレイズ","ダンベル",2,"10–15"],["DBオーバーヘッドトライセップスエクステンション","ダンベル",2,"10–15"]]}},
+  lowerB:{label:"下半身B", menus:{
+    1:[["グルート","マシン",2,"10–15"],["アブダクター","マシン",2,"10–15"],["カーフレイズ","マシン",2,"12–15"],["ケーブルクランチ","ケーブル",2,"10–15"]],
+    2:[["レッグプレス","マシン",3,"10–15"],["スミスマシーンRDL","スミス",2,"8–12"],["グルート","マシン",2,"10–15"],["カーフレイズ","マシン",2,"12–15"]],
+    3:[["スミスマシーンヒップスラスト","スミス",3,"8–12"],["レッグカール","マシン",3,"10–15"],["レッグプレス","マシン",2,"10–15"],["カーフレイズ","マシン",2,"12–15"]]}}
+};
+const ORDER = ["upperA","lowerA","upperB","lowerB"];
+const STAGES = {1:"段階1 慣らし（マシン中心）",2:"段階2 移行（スミス・ダンベル併用）",3:"段階3 フリーウェイト中心"};
+const CATALOG = ["チェストプレス","ラットプルダウン","ショルダープレス","アームカール","シーテッドロウ","ペクトラル","ケーブルフェイスプル","ケーブルトライセプスプッシュダウン","ケーブルカール","ケーブルロウ","ケーブルフライ","ケーブルハンマーカール","ケーブルオーバーヘッドトライセップスエクステンション","ケーブルキックバック","ケーブルラットプルダウン","スミスマシーンベンチプレス","スミスマシーンインクラインプレス","スミスマシーンオーバーヘッドプレス","スミスマシーンスクワット","スミスマシーンRDL","スミスマシーンローバーロウ","スミスマシーンヒップスラスト","DBショルダープレス","DBサイドレイズ","DBリアレイズ","DBシュラッグ","DBRDL","DBオーバーヘッドトライセップスエクステンション","ハンマーカール","レッグプレス","レッグエクステンション","レッグカール","ケーブルレッグカール","グルート","アブダクター","アダクター","カーフレイズ","アブドミナルクランチ","ケーブルクランチ","ローロー"];
+function equipOf(name){ if(name.startsWith("スミス"))return"スミス"; if(name.startsWith("DB")||name==="ハンマーカール")return"ダンベル"; if(name.startsWith("ケーブル"))return"ケーブル"; return"マシン"; }
+</script>
+<script>
+"use strict";
+const FORM = {"チェストプレス": {"s": "背もたれに座り、胸の横のハンドルを持つ", "e": "胸の前へ押し、肘は突っ張らない", "c": ["手首をまっすぐ", "肩をすくめない", "避けたい動き：背中を反らせて押す"]}, "ラットプルダウン": {"s": "座って太ももを固定し、頭上のバーを握る", "e": "肘を下へ引き、バーを胸の上部へ", "c": ["胸を軽く起こす", "ゆっくり戻す", "避けたい動き：首の後ろに引く"]}, "レッグプレス": {"s": "背中と骨盤を支え、足裏をプレートへ", "e": "膝と股関節を伸ばして押す", "c": ["足裏全体で押す", "膝はつま先方向", "避けたい動き：深く下ろしすぎて骨盤が浮く"]}, "DBシュラッグ": {"s": "DB（ダンベル）を体の横に持つ", "e": "腕を伸ばしたまま肩を上げる", "c": ["首は自然な位置", "肩を回さない", "避けたい動き：肘を曲げて持ち上げる"]}, "ケーブルトライセップスプッシュダウン": {"s": "高い滑車のロープを持ち、肘を体側へ", "e": "上腕を保ち、手を腰の横へ下ろす", "c": ["肘を動かさない", "戻りも制御", "避けたい動き：体重で押し込む"]}, "カーフレイズ": {"s": "背中を支え、前足部を安全に支持面へ", "e": "膝の角度を保ち、足首を伸ばす", "c": ["足を滑らせない", "反動を使わない", "避けたい動き：膝を曲げ伸ばしする"]}, "スミスマシーンベンチプレス": {"s": "平らなベンチでバーを胸の上に構える", "e": "胸へ下ろしてから上へ押す", "c": ["足を床へ", "手首を前腕にそろえる", "避けたい動き：バーを胸で弾ませる"]}, "ケーブルラットプルダウン": {"s": "安定した座位で頭上のバーを持つ", "e": "肘を下げ、バーを胸の上部へ", "c": ["胴体を大きく振らない", "首の前へ引く", "避けたい動き：腕だけで勢いよく引く"]}, "スミスマシーンスクワット": {"s": "バーを首でなく背中上部に載せて立つ", "e": "股関節と膝を曲げて下がり、足で立つ", "c": ["膝はつま先方向", "足裏を安定", "避けたい動き：腰が丸まる深さまで下ろす"]}, "ショルダープレス": {"s": "背もたれに座り、肩の横のハンドルを持つ", "e": "上へ押し、ゆっくり肩の高さへ戻す", "c": ["肋骨を突き出さない", "手首をまっすぐ", "避けたい動き：腰を大きく反らす"]}, "アームカール": {"s": "上腕をパッドへ置き、ハンドルを持つ", "e": "上腕を保ち、肘を曲げる", "c": ["肩を浮かせない", "手首を反らさない", "避けたい動き：胴体を揺らす"]}, "グルート": {"s": "支持台で体を支え、片足を押す面へ", "e": "骨盤を保ち、片脚を後ろへ押す", "c": ["腰を反らさない", "左右それぞれ制御", "避けたい動き：脚を高く上げすぎる"]}, "DBリアレイズ": {"s": "股関節から前傾し、DBを肩の下へ", "e": "肘を軽く曲げたまま左右へ開く", "c": ["首を反らさない", "胴体は静かに", "避けたい動き：上体を起こして振り上げる"]}, "アブドミナルクランチ": {"s": "機械に座り、パッド位置を合わせる", "e": "みぞおちを骨盤へ近づける", "c": ["首で引かない", "小さく制御", "避けたい動き：腕だけでハンドルを引く"]}, "DBショルダープレス": {"s": "背もたれに座り、DBを肩の横へ", "e": "左右をそろえて上へ押す", "c": ["足を床へ", "腰を反らさない", "避けたい動き：頭上でDBをぶつける"]}, "ケーブルカール": {"s": "低い滑車のバーを手のひら上向きで持つ", "e": "肘を保ち、バーを胸の方向へ", "c": ["手首は自然に", "反動なし", "避けたい動き：肩を前へ振る"]}, "スミスマシーンヒップスラスト": {"s": "上背部を固定ベンチへ、パッド付きバーを骨盤前へ", "e": "足で押し、肩・骨盤・膝がほぼ一直線へ", "c": ["腰で反らない", "顎は自然に", "避けたい動き：高く上げようと腰を反る"]}, "ケーブルフェイスプル": {"s": "高い滑車に向き、ロープを前へ構える", "e": "肘を外へ開き、手を顔の左右へ", "c": ["頭を前に出さない", "体幹を保つ", "避けたい動き：腰を反って引く"]}, "ケーブルクランチ": {"s": "高いロープを持ち、膝立ちで手を頭の横へ", "e": "手の位置を保ち、胸を骨盤へ丸める", "c": ["腕で引かない", "戻りもゆっくり", "避けたい動き：お尻を引くだけのお辞儀"]}, "スミスマシーンオーバーヘッドプレス": {"s": "背もたれ付きベンチでバーを顔の前に構える", "e": "顔を避けて頭上へ押す", "c": ["肋骨を開きすぎない", "無理な深さに下ろさない", "避けたい動き：首の後ろへ下ろす"]}, "ケーブルハンマーカール": {"s": "低い滑車のロープを両手で持つ", "e": "手のひらを向かい合わせたまま上げる", "c": ["肘を体側へ", "手首はまっすぐ", "避けたい動き：体を後ろへ倒す"]}, "ローロー": {"s": "胸をパッドへ支え、前のハンドルを持つ", "e": "肘を後ろへ引き、手を脇腹付近へ", "c": ["肩をすくめない", "胸の支えを保つ", "避けたい動き：腰を反って引く"]}, "レッグカール": {"s": "座位または伏臥位で、足首側をパッドへ", "e": "膝を曲げ、かかとをお尻方向へ", "c": ["膝の軸を合わせる", "骨盤を安定", "避けたい動き：腰を反らせて曲げる"]}, "ケーブルロウ": {"s": "座って足を支持し、腕を前へ", "e": "肘を体側に沿わせ、手を脇腹へ", "c": ["胸を自然に起こす", "上体を振らない", "避けたい動き：戻す際に背中を丸める"]}, "DBRDL": {"s": "DBをもも前へ、膝を軽く曲げて立つ", "e": "お尻を後ろへ引き、DBを脚沿いに下げる", "c": ["腰の形を保つ", "もも裏の張りまで", "避けたい動き：スクワットのように深くしゃがむ"]}, "スミスマシーンRDL": {"s": "バーをもも前に持ち、膝は軽く曲げる", "e": "お尻を後ろへ、バーを脚の近くで下げる", "c": ["背中を丸めない", "膝を深く曲げない", "避けたい動き：腰だけを曲げる"]}, "DBサイドレイズ": {"s": "立ってDBを体の横に持つ", "e": "肘を軽く曲げ、腕を横へ上げる", "c": ["肩の高さ付近までを目安", "振り上げない", "避けたい動き：肩をすくめて反動を使う"]}, "ペクトラル（バタフライ）": {"s": "背もたれに座り、左右のパッド／グリップへ", "e": "腕を胸の前へ寄せる", "c": ["肩を前へ丸めない", "開きすぎない", "避けたい動き：胸を伸ばそうと無理に後ろへ開く"]}, "DBオーバーヘッドトライセップスエクステンション": {"s": "DBを両手で支え、肘を曲げ頭の後ろへ", "e": "上腕を保ち、頭上へ肘を伸ばす", "c": ["DBを頭に当てない", "腰を反らさない", "避けたい動き：肘が大きく左右へ開く"]}, "ケーブルフライ": {"s": "左右の滑車から持ち、腕を横へ構える", "e": "肘の曲がりを保ち、胸の前へ寄せる", "c": ["胸を開きすぎない", "ゆっくり戻す", "避けたい動き：肘を曲げ伸ばししてプレスにする"]}, "ケーブルオーバーヘッドトライセップスエクステンション": {"s": "滑車に背を向け、ロープを頭の後ろへ", "e": "上腕を保ち、肘を伸ばす", "c": ["体幹を安定", "肩ではなく肘を動かす", "避けたい動き：腰を反らして押す"]}, "レッグエクステンション": {"s": "座ってすね下部をパッドへ", "e": "膝を伸ばして足先を上げる", "c": ["膝の軸を合わせる", "急に蹴り上げない", "避けたい動き：お尻を浮かせる"]}, "アダクター": {"s": "座り、膝の内側をパッドへ", "e": "開いた脚を内側へ閉じる", "c": ["骨盤を座面へ", "小さく制御", "避けたい動き：勢いでパッドをぶつける"]}, "アブダクター": {"s": "座り、膝の外側をパッドへ", "e": "脚を外側へ開く", "c": ["上体を振らない", "戻りもゆっくり", "避けたい動き：反動で大きく開く"]}, "ケーブルレッグカール": {"s": "低い滑車の足首カフを着け、支えを持つ", "e": "ももを保ち、膝を曲げる", "c": ["支持脚を安定", "腰を反らさない", "避けたい動き：脚全体を後ろへ振る"]}, "スミスマシーンインクラインプレス": {"s": "傾斜ベンチに寝てバーを胸の上へ", "e": "胸の上部方向へ下ろし、押し戻す", "c": ["足を床へ", "肩をすくめない", "避けたい動き：腰を大きく反らせる"]}, "ケーブルキックバック": {"s": "低い滑車のカフを着け、支えを持つ", "e": "膝角度を大きく変えず、脚を後ろへ", "c": ["骨盤を正面へ", "小さな可動域", "避けたい動き：腰を反って脚を高く上げる"]}, "スミスマシーンローバーロウ": {"s": "股関節から前傾し、腕を下へ伸ばす", "e": "上体の角度を保ち、バーを胴体へ引く", "c": ["肘を後ろへ", "首を自然な位置", "避けたい動き：毎回立ち上がってしまう"]}, "ペクトラル": {"s": "座って腕を左右へ構える", "e": "胸の前へ腕を閉じる", "c": ["ゆっくり戻す", "肩を開きすぎない", "避けたい動き：肩を前へ巻き込む"]}, "ハンマーカール": {"s": "DBを体の横に持ち、手のひらを内側へ", "e": "握りの向きを保ち、肘を曲げる", "c": ["肘を体側へ", "体を振らない", "避けたい動き：手首を曲げる"]}, "ネックエクステンション": {"s": "座って頭を自然な位置に保つ", "e": "小さく上を向く方向を矢印で示す", "c": ["痛み・しびれ・めまいで中止", "開始前に医師・理学療法士へ相談", "避けたい動き：大きく反らす／強く押す"]}, "ネックフレクション": {"s": "座って頭を自然な位置に保つ", "e": "小さく下を向く方向を矢印で示す", "c": ["痛み・しびれ・めまいで中止", "開始前に医師・理学療法士へ相談", "避けたい動き：大きく反らす／強く押す"]}};
+</script>
+<script>
+"use strict";
+/* ===== 状態 ===== */
+const KEY = "power_bear_v7";
+let S = loadState();
+let tab = "today";
+let inWorkout = false;
+let openEx = 0;           // 展開中の種目のindex
+let openHist = null;      // 履歴詳細を開いているid
+let lastAction = null;    // {ex,set} 直前の完了（戻す用）
+let timerInt = null;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const p = JSON.parse(raw); if(p && p.settings && Array.isArray(p.history)) return p; }
+  }catch(e){}
+  return { settings:{freq:4, stage:1, rest:120, lastExportAt:null}, history:[], draft:null };
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("保存できませんでした。空き容量を確認してください"); } }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function pad(n){ return String(n).padStart(2,"0"); }
+function todayStr(d){ d = d||new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function fmtDay(iso){ if(!iso) return "----"; const d = new Date(iso.length<=10 ? iso+"T00:00:00" : iso); if(isNaN(d)) return iso; return (d.getMonth()+1)+"/"+d.getDate()+"（"+"日月火水木金土"[d.getDay()]+"）"; }
+function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 2600); }
+function openSheet(html){ document.getElementById("sheetBox").innerHTML = html; document.getElementById("sheet").classList.add("open"); }
+function closeSheet(){ document.getElementById("sheet").classList.remove("open"); }
+document.getElementById("sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") closeSheet(); });
+
+/* ===== 前回記録 ===== */
+function lastRecord(name){
+  for(const h of S.history){
+    if(!h.exercises) continue;
+    for(const e of h.exercises){
+      if(e.name === name && e.sets && e.sets.length){
+        return { date:h.date, sets:e.sets, memo:e.memo||"" };
+      }
+    }
+  }
+  return null;
+}
+function setsText(sets){ return sets.map(s=>((s.kg||s.kg===0)? s.kg+"kg×" : "×") + (s.reps||"")).join(" · "); }
+
+/* ===== ワークアウト開始 ===== */
+function nextMenuId(){
+  for(const h of S.history){ if(h.menuId && ORDER.includes(h.menuId)){ return ORDER[(ORDER.indexOf(h.menuId)+1)%ORDER.length]; } }
+  return "upperA";
+}
+function menuSummary(menuId, stage){
+  const list = MENUS[menuId].menus[stage];
+  const sets = list.reduce((n,e)=>n+e[2],0);
+  return { list, sets, minutes: Math.round(sets*2.6) };
+}
+function startWorkout(menuId){
+  const stage = S.settings.stage;
+  const { list } = menuSummary(menuId, stage);
+  const exercises = list.map(([name, equip, nSets, reps])=>{
+    const last = lastRecord(name);
+    const sets = [];
+    for(let i=0;i<nSets;i++){
+      const ls = last && last.sets[Math.min(i, last.sets.length-1)];
+      sets.push({ kg: ls? (ls.kg??"") : "", reps: ls? (ls.reps??"") : "", done:false });
+    }
+    return { name, equip, reps, sets, memo:"", status:"active", substitutedFrom:null,
+             lastDate: last? last.date : null, lastSets: last? last.sets : null, lastMemo: last? last.memo : "" };
+  });
+  S.draft = { id: uid(), menuId, stage, startedAt: Date.now(), timerEnd: 0, exercises };
+  lastAction = null; openEx = 0; inWorkout = true;
+  save(); render();
+  window.scrollTo(0,0);
+}
+function draftProgress(){
+  const d = S.draft; if(!d) return {done:0,total:0};
+  let done=0,total=0;
+  for(const e of d.exercises){ if(e.status==="skipped") continue; for(const s of e.sets){ total++; if(s.done) done++; } }
+  return {done,total};
+}
+
+/* ===== 描画ルーター ===== */
+function render(){
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===tab));
+  const app = document.getElementById("app");
+  if(inWorkout && S.draft){ app.innerHTML = viewWorkout(); }
+  else if(tab==="today"){ app.innerHTML = viewToday(); }
+  else if(tab==="history"){ app.innerHTML = viewHistory(); }
+  else if(tab==="review"){ app.innerHTML = viewReview(); }
+  else if(tab==="settings"){ app.innerHTML = viewSettings(); }
+  updateTimerBar();
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click", ()=>{ tab = b.dataset.tab; inWorkout = false; render(); window.scrollTo(0,0); }));
+
+/* ===== 今日 ===== */
+function viewToday(){
+  const st = S.settings;
+  let h = "<h1>POWER BEAR V7</h1>";
+  h += '<p class="muted" style="margin-top:-6px">'+fmtDay(todayStr())+" · 週"+st.freq+"回 · "+esc(STAGES[st.stage])+"</p>";
+  if(!S.history.length && !S.draft && v6LocalExists()){
+    h += '<div class="card"><h2>V6の記録が見つかりました</h2><p class="muted">この端末に残っている今のアプリ（V6）の記録を取り込めます。V6側の記録は変更されません。</p>'
+      + '<button class="btn" onclick="importLocalV6()">V6の記録を取り込む</button></div>';
+  }
+  if(S.draft){
+    const p = draftProgress();
+    h += '<div class="card"><h2>記録中のトレーニングがあります</h2>'
+      + "<p><b>"+esc(MENUS[S.draft.menuId].label)+"</b> · 完了 "+p.done+" / "+p.total+" セット</p>"
+      + '<div class="progress"><i style="width:'+(p.total? Math.round(p.done/p.total*100):0)+'%"></i></div>'
+      + '<button class="btn" onclick="resumeWorkout()">続きから始める →</button>'
+      + '<button class="btn ghost sm" style="margin-top:8px" onclick="confirmDiscard()">下書きを破棄する</button></div>';
+  } else {
+    const nid = nextMenuId();
+    const sum = menuSummary(nid, st.stage);
+    h += '<div class="card"><h2>次は '+esc(MENUS[nid].label)+"</h2>"
+      + '<p class="muted">'+sum.list.map(e=>esc(e[0])).join("、")+"</p>"
+      + "<p>"+sum.list.length+"種目 · "+sum.sets+"セット · 筋トレ目安 約"+sum.minutes+"分</p>"
+      + '<button class="btn" onclick="startWorkout(\''+nid+'\')">この内容で始める →</button></div>';
+    h += '<div class="card"><h2>別のメニューで始める</h2><div class="chips">';
+    for(const id of ORDER){
+      const s2 = menuSummary(id, st.stage);
+      h += '<button class="chip" onclick="startWorkout(\''+id+'\')">'+esc(MENUS[id].label)+'<span class="sub2">'+s2.list.length+'種目 · '+s2.sets+'セット</span></button>';
+    }
+    h += "</div></div>";
+  }
+  const wk = weekSessions();
+  h += '<div class="card"><h2>今週</h2><p>実施 '+wk.length+" 回（目標 週"+st.freq+'回）</p>'
+    + '<button class="btn ghost sm" onclick="goTab(\'review\')">ふり返りを見る</button></div>';
+  if(S.history.length>=3 && (!st.lastExportAt || Date.now()-new Date(st.lastExportAt).getTime() > 30*864e5)){
+    h += '<div class="card"><h2>バックアップのお願い</h2><p class="muted">記録はこの端末の中だけに保存されています。機種変更や故障で消えないよう、ときどきバックアップを保存してください。</p>'
+      + '<button class="btn sub sm" onclick="goTab(\'settings\')">設定でバックアップする</button></div>';
+  }
+  return h;
+}
+function goTab(t){ tab = t; inWorkout = false; render(); window.scrollTo(0,0); }
+function resumeWorkout(){ inWorkout = true; render(); window.scrollTo(0,0); }
+function confirmDiscard(){
+  openSheet("<h2>下書きを破棄しますか</h2><p class='muted'>入力中の記録は消えます。元に戻せません。</p>"
+    + '<button class="btn danger" onclick="doDiscard()">破棄する</button>'
+    + '<button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">やめる</button>');
+}
+function doDiscard(){ S.draft = null; inWorkout = false; lastAction = null; stopTimer(); save(); closeSheet(); render(); toast("下書きを破棄しました"); }
+
+/* ===== 記録画面 ===== */
+function viewWorkout(){
+  const d = S.draft, p = draftProgress();
+  const mins = Math.max(0, Math.round((Date.now()-d.startedAt)/60000));
+  let h = '<button class="btn ghost sm" style="margin-bottom:10px" onclick="backToToday()">← 今日へ（下書きは保持されます）</button>';
+  h += "<h1>"+esc(MENUS[d.menuId].label)+" · "+esc(STAGES[d.stage])+"</h1>";
+  h += '<div class="card" style="padding:10px 14px"><div class="kv"><span>進捗</span><b>完了 '+p.done+" / "+p.total+' セット</b></div>'
+    + '<div class="progress"><i style="width:'+(p.total? Math.round(p.done/p.total*100):0)+'%"></i></div>'
+    + '<div class="kv"><span>経過</span><span>'+mins+' 分</span></div>'
+    + (lastAction? '<button class="btn ghost sm" onclick="undoLast()">直前の完了を戻す</button>' : "")
+    + "</div>";
+  d.exercises.forEach((e, i)=>{ h += exCard(e, i); });
+  const allDone = p.total>0 && p.done===p.total;
+  h += '<button class="btn" '+(p.done===0?"disabled":"")+' onclick="openFinish()">'+(allDone? "完了して記録する" : "できた分で終了する")+"</button>";
+  if(p.done===0) h += '<p class="muted small">1セットでも完了すると、終了して履歴に残せます。</p>';
+  h += '<button class="btn ghost sm" style="margin-top:14px" onclick="confirmDiscard()">このトレーニングを破棄する</button>';
+  return h;
+}
+function backToToday(){ inWorkout = false; tab = "today"; render(); window.scrollTo(0,0); }
+
+function exCard(e, i){
+  const skipped = e.status==="skipped";
+  const doneSets = e.sets.filter(s=>s.done).length;
+  let h = '<div class="ex" id="ex'+i+'">';
+  h += '<div class="ex-head" onclick="toggleEx('+i+')"><span class="nm">'+(i+1)+". "+esc(e.name)+'</span><span class="tag">'+esc(e.equip)+"</span>"
+    + '<div class="muted small">'+e.sets.length+"セット × "+esc(e.reps)+"回"
+    + (skipped? ' · <b style="color:var(--warn)">見送り</b>' : " · 完了 "+doneSets+"/"+e.sets.length)
+    + (e.substitutedFrom? " · 代替（元："+esc(e.substitutedFrom)+"）" : "")+"</div></div>";
+  if(openEx !== i || skipped){
+    if(skipped){
+      h += '<div class="ex-body"><button class="btn ghost sm" onclick="unskipEx('+i+')">見送りを取り消す</button></div>';
+    }
+    return h + "</div>";
+  }
+  h += '<div class="ex-body">';
+  if(e.lastSets){
+    h += '<div class="lastbar">前回 '+fmtDay(e.lastDate)+"： <b>"+esc(setsText(e.lastSets))+"</b>"
+      + (e.lastMemo? "<br>メモ： "+esc(e.lastMemo) : "")
+      + '<br><button class="btn sub sm" style="margin-top:6px" onclick="fillFromLast('+i+')">前回の値を使う</button></div>';
+  } else {
+    h += '<div class="lastbar">前回の記録はまだありません。</div>';
+  }
+  e.sets.forEach((s, j)=>{
+    if(s.done){
+      h += '<div class="setrow done"><span class="no">'+(j+1)+'</span><span style="flex:1;font-weight:700">'+(s.kg===""?"自重":s.kg+" kg")+" × "+s.reps+' 回 ✓</span>'
+        + '<button class="undobtn" onclick="undoSet('+i+","+j+')">戻す</button></div>';
+    } else {
+      const oc = `onclick="stepVal(${i},${j},'kg',-1)"`;
+      const oc2 = `onclick="stepVal(${i},${j},'kg',1)"`;
+      const oc3 = `onclick="stepVal(${i},${j},'reps',-1)"`;
+      const oc4 = `onclick="stepVal(${i},${j},'reps',1)"`;
+      h += `<div class="setrow"><span class="no">${j+1}</span>`
+        + `<span class="inp"><button ${oc}>−</button>`
+        + `<input type="number" inputmode="decimal" step="0.5" min="0" placeholder="重量" value="${esc(s.kg)}" onchange="setVal(${i},${j},'kg',this.value)">`
+        + `<button ${oc2}>＋</button><span class="unit">kg</span></span>`
+        + `<span class="inp"><button ${oc3}>−</button>`
+        + `<input type="number" inputmode="numeric" step="1" min="0" placeholder="回数" value="${esc(s.reps)}" onchange="setVal(${i},${j},'reps',this.value)">`
+        + `<button ${oc4}>＋</button><span class="unit">回</span></span>`
+        + `<button class="donebtn" onclick="completeSet(${i},${j})">完了</button></div>`;
+    }
+  });
+  h += '<label class="small muted">この種目のメモ（自動保存）</label>'
+    + '<textarea class="memo" placeholder="フォームやマシンの位置など、あとで見返したいこと" oninput="setMemo('+i+',this.value)">'+esc(e.memo)+"</textarea>";
+  const f = (typeof FORM!=="undefined") ? FORM[e.name] : null;
+  if(f){
+    h += "<details><summary>動きを見る（フォームの要点）</summary><div class='formbox'>"
+      + "<p><b>開始：</b>"+esc(f.s)+"</p><p><b>終了：</b>"+esc(f.e)+"</p><ul>"
+      + f.c.map(c=>"<li>"+esc(c)+"</li>").join("") + "</ul>"
+      + '<p class="muted small">痛みやしびれがあれば中止してください。機種により形が異なります。実機の表示とスタッフの説明を優先してください。</p></div></details>';
+  }
+  h += '<div class="subacts">'
+    + '<button onclick="moveLater('+i+')">あとで行う ↓</button>'
+    + '<button onclick="skipEx('+i+')">今日は見送る</button>'
+    + '<button onclick="toggleSub('+i+')">代替する</button></div>';
+  h += '<div id="sub'+i+'" style="display:none;margin-top:8px"><label class="small muted">代替種目を選んでください（今のメニューと重複する種目は除いています）</label>'
+    + '<select class="subsel" id="subsel'+i+'">' + CATALOG.filter(n=>!S.draft.exercises.some(x=>x.name===n)).map(n=>'<option value="'+esc(n)+'">'+esc(n)+"</option>").join("") + "</select>"
+    + '<button class="btn sub sm" style="margin-top:8px" onclick="applySub('+i+')">この種目に置き換える</button></div>';
+  h += "</div></div>";
+  return h;
+}
+function toggleEx(i){ openEx = (openEx===i? -1 : i); render(); }
+function toggleSub(i){ const el = document.getElementById("sub"+i); if(el) el.style.display = el.style.display==="none"? "block":"none"; }
+
+function setVal(i,j,field,val){ const s = S.draft.exercises[i].sets[j]; s[field] = val===""? "" : Math.max(0, parseFloat(val)||0); save(); }
+function stepVal(i,j,field,delta){
+  const s = S.draft.exercises[i].sets[j];
+  let v = parseFloat(s[field]); if(isNaN(v)) v = 0;
+  v = Math.max(0, Math.round((v+delta)*10)/10);
+  s[field] = v; save(); render();
+}
+function setMemo(i,val){ S.draft.exercises[i].memo = val; save(); }
+function fillFromLast(i){
+  const e = S.draft.exercises[i]; if(!e.lastSets) return;
+  e.sets.forEach((s,j)=>{ if(!s.done){ const ls = e.lastSets[Math.min(j, e.lastSets.length-1)]; s.kg = ls.kg??""; s.reps = ls.reps??""; } });
+  save(); render(); toast("前回の値を入れました");
+}
+function completeSet(i,j){
+  const e = S.draft.exercises[i], s = e.sets[j];
+  if(s.kg==="" && s.reps===""){ toast("重量か回数を入れてください"); return; }
+  s.done = true; lastAction = {ex:i, set:j};
+  save();
+  const p = draftProgress();
+  if(p.done < p.total){
+    startRest();
+    const exDone = e.sets.every(x=>x.done);
+    if(exDone){ const nxt = S.draft.exercises.findIndex((x,idx)=>idx>i && x.status!=="skipped" && x.sets.some(y=>!y.done)); if(nxt>=0) openEx = nxt; }
+  } else { stopTimer(); toast("全セット完了。お疲れさまでした"); }
+  render();
+  const el = document.getElementById("ex"+openEx); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+function undoSet(i,j){ S.draft.exercises[i].sets[j].done = false; if(lastAction && lastAction.ex===i && lastAction.set===j) lastAction = null; save(); render(); }
+function undoLast(){ if(!lastAction) return; S.draft.exercises[lastAction.ex].sets[lastAction.set].done = false; lastAction = null; save(); render(); }
+function moveLater(i){
+  const arr = S.draft.exercises; const [e] = arr.splice(i,1); arr.push(e);
+  openEx = arr.length-1; save(); render(); toast("最後に回しました");
+}
+function skipEx(i){ S.draft.exercises[i].status = "skipped"; const nxt = S.draft.exercises.findIndex((x,idx)=>idx>i && x.status!=="skipped"); openEx = nxt; save(); render(); }
+function unskipEx(i){ S.draft.exercises[i].status = "active"; openEx = i; save(); render(); }
+function applySub(i){
+  const sel = document.getElementById("subsel"+i); if(!sel) return;
+  const name = sel.value, e = S.draft.exercises[i];
+  e.substitutedFrom = e.substitutedFrom || e.name;
+  e.name = name; e.equip = equipOf(name);
+  const last = lastRecord(name);
+  e.lastDate = last? last.date : null; e.lastSets = last? last.sets : null; e.lastMemo = last? last.memo : "";
+  save(); render(); toast(name+" に置き換えました");
+}
+
+/* ===== 休憩タイマー ===== */
+function startRest(){
+  if(!S.draft) return;
+  S.draft.timerEnd = Date.now() + S.settings.rest*1000;
+  save(); updateTimerBar();
+}
+function stopTimer(){ if(S.draft){ S.draft.timerEnd = 0; save(); } document.body.classList.remove("timer-on"); }
+function updateTimerBar(){
+  const end = S.draft && S.draft.timerEnd;
+  if(end && end > Date.now()){ document.body.classList.add("timer-on"); tickTimer(); }
+  else document.body.classList.remove("timer-on");
+}
+function tickTimer(){
+  const end = S.draft && S.draft.timerEnd;
+  const el = document.getElementById("timerText");
+  if(!end){ document.body.classList.remove("timer-on"); return; }
+  const rest = Math.max(0, Math.round((end - Date.now())/1000));
+  if(el) el.textContent = Math.floor(rest/60)+":"+pad(rest%60);
+  if(rest<=0){
+    stopTimer();
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    toast("休憩おわり。次のセットへ");
+    render();
+  }
+}
+setInterval(tickTimer, 500);
+document.getElementById("timerAdd").addEventListener("click", ()=>{ if(S.draft && S.draft.timerEnd){ S.draft.timerEnd += 30000; save(); tickTimer(); } });
+document.getElementById("timerEnd").addEventListener("click", ()=>{ stopTimer(); render(); });
+
+/* ===== 終了フロー ===== */
+function openFinish(){
+  const d = S.draft, p = draftProgress();
+  const mins = Math.max(1, Math.round((Date.now()-d.startedAt)/60000));
+  openSheet("<h2>"+esc(MENUS[d.menuId].label)+" を記録します</h2>"
+    + '<div class="kv"><span>完了したセット</span><b>'+p.done+" / "+p.total+"</b></div>"
+    + '<div class="kv"><span>所要時間</span><span>約'+mins+"分</span></div>"
+    + '<p class="muted small">任意：今日の有酸素・ストレッチ（分）</p>'
+    + '<div class="num2"><label>ランニング（分）<input type="number" inputmode="numeric" id="finRun" placeholder="15"></label>'
+    + '<label>ストレッチ（分）<input type="number" inputmode="numeric" id="finStretch" placeholder="10"></label></div>'
+    + '<button class="btn" style="margin-top:14px" onclick="doFinish()">記録して終了する</button>'
+    + '<button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">戻る</button>');
+}
+function doFinish(){
+  const d = S.draft, p = draftProgress();
+  const run = parseInt(document.getElementById("finRun").value,10);
+  const stretch = parseInt(document.getElementById("finStretch").value,10);
+  const exercises = [];
+  const skippedNames = [];
+  for(const e of d.exercises){
+    if(e.status==="skipped"){ skippedNames.push(e.name); continue; }
+    const doneSets = e.sets.filter(s=>s.done).map(s=>({kg:s.kg, reps:s.reps}));
+    if(doneSets.length || e.memo) exercises.push({ name:e.name, equip:e.equip, sets:doneSets, memo:e.memo||"", substitutedFrom:e.substitutedFrom||null });
+  }
+  const allDone = p.total>0 && p.done===p.total;
+  S.history.unshift({
+    id: uid(), date: todayStr(), menuId: d.menuId, menuLabel: MENUS[d.menuId].label, stage: d.stage,
+    startedAt: d.startedAt, finishedAt: Date.now(),
+    durationMin: Math.max(1, Math.round((Date.now()-d.startedAt)/60000)),
+    status: allDone? "完了":"終了", exercises, skippedNames,
+    cardio: { run: isNaN(run)? null: run, stretch: isNaN(stretch)? null: stretch }
+  });
+  S.draft = null; inWorkout = false; lastAction = null; stopTimer();
+  save(); closeSheet(); tab = "today"; render(); window.scrollTo(0,0);
+  toast("記録しました。お疲れさまでした");
+}
+
+/* ===== 履歴 ===== */
+function viewHistory(){
+  let h = "<h1>履歴</h1>";
+  if(!S.history.length){
+    h += '<div class="card"><p>まだ履歴がありません。</p><p class="muted">トレーニングを終了すると、ここに記録が残ります。</p></div>';
+    return h;
+  }
+  h += '<p class="muted small">タップすると詳細が見られます。</p>';
+  for(const s of S.history){
+    const sets = (s.exercises||[]).reduce((n,e)=>n+(e.sets? e.sets.length:0),0);
+    h += '<div class="card hist-item" onclick="toggleHist(\''+s.id+'\')"><div class="hd"><b>'+fmtDay(s.date)+" · "+esc(s.menuLabel||"記録")+"</b>"
+      + (s.legacy? '<span class="badge legacy">旧アプリの記録</span>' : '<span class="badge">'+esc(s.status||"")+"</span>")+"</div>"
+      + '<p class="muted" style="margin:4px 0 0">'+sets+"セット"+(s.durationMin? " · 約"+s.durationMin+"分":"")+"</p>";
+    if(openHist === s.id){
+      h += '<div style="margin-top:8px">';
+      for(const e of (s.exercises||[])){
+        h += '<div class="kv"><span>'+esc(e.name)+(e.substitutedFrom? "（代替）":"")+"</span><span>"+esc(setsText(e.sets||[]))+"</span></div>"
+          + (e.memo? '<p class="muted small" style="margin:2px 0 6px">メモ： '+esc(e.memo)+"</p>" : "");
+      }
+      if(s.skippedNames && s.skippedNames.length) h += '<p class="muted small">見送り： '+s.skippedNames.map(esc).join("、")+"</p>";
+      if(s.cardio && (s.cardio.run!=null || s.cardio.stretch!=null))
+        h += '<p class="muted small">'+(s.cardio.run!=null? "ランニング "+s.cardio.run+"分":"")+(s.cardio.stretch!=null? " · ストレッチ "+s.cardio.stretch+"分":"")+"</p>";
+      h += "</div>";
+    }
+    h += "</div>";
+  }
+  return h;
+}
+function toggleHist(id){ openHist = (openHist===id? null: id); render(); }
+
+/* ===== ふり返り ===== */
+function weekStart(d){ const x = new Date(d); const day = (x.getDay()+6)%7; x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+function weekSessions(){
+  const ws = weekStart(new Date());
+  return S.history.filter(s=>{ const d = new Date((s.date||"")+"T00:00:00"); return !isNaN(d) && d >= ws; });
+}
+function viewReview(){
+  const st = S.settings;
+  const wk = weekSessions();
+  const totalSets = wk.reduce((n,s)=>n+(s.exercises||[]).reduce((m,e)=>m+(e.sets? e.sets.length:0),0),0);
+  let h = "<h1>ふり返り</h1>";
+  h += '<div class="card"><h2>今週</h2>'
+    + '<div class="kv"><span>実施した日</span><b>'+wk.length+" 日（目標 週"+st.freq+"回）</b></div>"
+    + '<div class="kv"><span>合計セット数</span><b>'+totalSets+"</b></div>"
+    + (wk.length? '<p class="muted" style="margin:6px 0 0">'+wk.map(s=>fmtDay(s.date)+" "+esc(s.menuLabel||"")).join(" · ")+"</p>" : '<p class="muted" style="margin:6px 0 0">今週の記録はまだありません。</p>')
+    + "</div>";
+  h += '<div class="card"><h2>メニュー別の最終実施日</h2>';
+  for(const id of ORDER){
+    const s = S.history.find(x=>x.menuId===id);
+    h += '<div class="kv"><span>'+esc(MENUS[id].label)+"</span><span>"+(s? fmtDay(s.date) : "まだなし")+"</span></div>";
+  }
+  h += "</div>";
+  const latest = {};
+  for(const s of S.history){
+    for(const e of (s.exercises||[])){
+      if(!latest[e.name] && e.sets && e.sets.length) latest[e.name] = { date:s.date, sets:e.sets };
+    }
+  }
+  const names = Object.keys(latest).slice(0,14);
+  h += '<div class="card"><h2>種目別の直近記録</h2>';
+  if(!names.length) h += '<p class="muted">記録がたまると、ここに種目ごとの直近の値が出ます。</p>';
+  for(const n of names){
+    h += '<div class="kv"><span>'+esc(n)+'</span><span class="small">'+fmtDay(latest[n].date)+" · "+esc(setsText(latest[n].sets))+"</span></div>";
+  }
+  h += "</div>";
+  h += '<div class="card"><h2>進め方の目安</h2><p class="muted">同じ部位を連日続けて行う前提にはしていません。目安の余力は「あと3〜4回できそう」くらいです。痛みやしびれがあれば、その種目は中止してください。段階を上げる・重量を増やす判断に迷うときは、無理に進めず様子を見るのが安全です。</p></div>';
+  return h;
+}
+
+/* ===== 設定 ===== */
+function viewSettings(){
+  const st = S.settings;
+  let h = "<h1>設定</h1>";
+  h += '<div class="card"><h2>週に何回行くか</h2><div class="seg">'
+    + [3,4,5].map(n=>'<button class="'+(st.freq===n?"on":"")+'" onclick="setOpt(\'freq\','+n+')">週'+n+"回</button>").join("") + "</div></div>";
+  h += '<div class="card"><h2>段階（使う器具の進み具合）</h2><div class="seg">'
+    + [1,2,3].map(n=>'<button class="'+(st.stage===n?"on":"")+'" onclick="setOpt(\'stage\','+n+')">段階'+n+'<span class="sub2">'+["マシン中心","スミス・DB併用","フリーウェイト中心"][n-1]+"</span></button>").join("") + "</div>"
+    + '<p class="muted small">段階は次のトレーニングから反映されます。記録中の下書きには影響しません。</p></div>';
+  h += '<div class="card"><h2>休憩時間</h2><div class="seg">'
+    + [60,90,120,180].map(n=>'<button class="'+(st.rest===n?"on":"")+'" onclick="setOpt(\'rest\','+n+')">'+n+"秒</button>").join("") + "</div></div>";
+  h += '<div class="card"><h2>バックアップ</h2>'
+    + '<p class="muted">記録はこの端末のブラウザの中だけに保存されています。機種変更や故障で消えないよう、ファイルに保存しておいてください。新しい端末では、そのファイルから復元できます。</p>'
+    + '<p class="small">前回のバックアップ： '+(st.lastExportAt? fmtDay(todayStr(new Date(st.lastExportAt))) : "まだ保存していません")+"</p>"
+    + '<button class="btn" onclick="exportJSON()">バックアップを保存する</button>'
+    + '<label class="btn ghost" style="margin-top:8px">バックアップから復元する<input type="file" accept="application/json,.json" style="display:none" onchange="importJSON(this)"></label>'
+    + '<p class="muted small">今のアプリ（V6）のバックアップファイルも読み込めます。その場合は、過去の記録が「旧アプリの記録」として追加されます。今の記録は消えません。</p>'
+    + (v6LocalExists()? '<button class="btn sub" style="margin-top:6px" onclick="importLocalV6()">この端末のV6の記録を取り込む</button><p class="muted small">V6と同じ場所（同じサイト）で開いている場合、この端末に残っているV6の記録をそのまま取り込めます。</p>' : "")
+    + "</div>";
+  h += '<div class="card"><h2>データの削除</h2><p class="muted">この端末に保存された記録・設定をすべて消します。元に戻せません。先にバックアップを保存してください。</p>'
+    + '<button class="btn danger" onclick="confirmWipe()">すべてのデータを消す</button></div>';
+  return h;
+}
+function setOpt(k,v){ S.settings[k] = v; save(); render(); }
+function confirmWipe(){
+  openSheet("<h2>本当にすべて消しますか</h2><p class='muted'>履歴・下書き・設定がすべて消えます。バックアップファイルがあれば復元できます。</p>"
+    + '<button class="btn danger" onclick="doWipe()">消す</button>'
+    + '<button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">やめる</button>');
+}
+function doWipe(){ localStorage.removeItem(KEY); S = loadState(); inWorkout = false; lastAction = null; stopTimer(); save(); closeSheet(); tab="today"; render(); toast("データを消去しました"); }
+
+/* ===== バックアップ ===== */
+function exportJSON(){
+  const data = { app:"PowerBear", kind:"v7-backup", version:1, exportedAt:new Date().toISOString(),
+    data:{ settings:S.settings, history:S.history } };
+  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "power_bear_v7_backup_" + todayStr().replace(/-/g,"") + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  S.settings.lastExportAt = new Date().toISOString(); save(); render();
+  toast("バックアップを保存しました");
+}
+function toNum(v){ const n = parseFloat(v); return isNaN(n)? "" : n; }
+function extractV6History(parsed){
+  if(!parsed || typeof parsed!=="object") return null;
+  if(Array.isArray(parsed.history)) return parsed.history;
+  if(parsed.state && Array.isArray(parsed.state.history)) return parsed.state.history;
+  if(parsed.data && Array.isArray(parsed.data.history)) return parsed.data.history;
+  if(parsed.app && Array.isArray(parsed.app.history)) return parsed.app.history;
+  return null;
+}
+function v6LocalExists(){
+  try{ return !!(localStorage.getItem("power_bear_production_v1") || localStorage.getItem("powerBearReentryV1")); }catch(e){ return false; }
+}
+function importLocalV6(){
+  let parsed = null;
+  try{
+    const raw = localStorage.getItem("power_bear_production_v1") || localStorage.getItem("powerBearReentryV1");
+    if(raw) parsed = JSON.parse(raw);
+  }catch(e){}
+  const hist = extractV6History(parsed);
+  if(!hist){ toast("この端末にV6の記録が見つかりませんでした"); return; }
+  const mapped = mapV6History(hist);
+  if(!mapped.length){ toast("取り込める記録がありませんでした"); return; }
+  const seen = new Set(S.history.map(x=>x.date+"|"+x.menuLabel+"|"+(x.exercises||[]).length));
+  const add = mapped.filter(x=>!seen.has(x.date+"|"+x.menuLabel+"|"+x.exercises.length));
+  if(!add.length){ toast("V6の記録は取り込み済みです"); return; }
+  S.history = add.concat(S.history).sort((a,b)=> String(b.date).localeCompare(String(a.date)));
+  save(); render();
+  toast("V6の記録を "+add.length+" 件取り込みました");
+}
+function mapV6History(hist){
+  const blockMap = ["上半身A","下半身A","上半身B","下半身B"];
+  const out = [];
+  for(const rec of hist){
+    if(!rec || !Array.isArray(rec.exercises)) continue;
+    const exercises = [];
+    for(const e of rec.exercises){
+      if(!e || e.deleted) continue;
+      const sets = (Array.isArray(e.sets)? e.sets:[]).filter(s=>s && typeof s==="object" && s.completed!==false)
+        .map(s=>({ kg: toNum(s.load!=null? s.load : (s.kg!=null? s.kg : s.weight)), reps: toNum(s.reps) }))
+        .filter(s=>s.kg!=="" || s.reps!=="");
+      const name = e.name || e.title || e.label || "種目";
+      if(sets.length) exercises.push({ name, equip: equipOf(name), sets, memo: e.memo || e.note || "", substitutedFrom:null });
+    }
+    if(!exercises.length) continue;
+    let label = "旧記録";
+    const b = rec.reentryMeta && rec.reentryMeta.block;
+    if(Number.isInteger(b) && blockMap[b]) label = blockMap[b];
+    else if(rec.label) label = String(rec.label);
+    out.push({ id: uid()+out.length, date: String(rec.date||"").slice(0,10) || "----", menuId:null, menuLabel: label,
+      stage:0, startedAt: Date.parse(rec.date)||0, finishedAt: Date.parse(rec.date)||0, durationMin:null,
+      status:"旧記録", legacy:true, exercises, skippedNames:[], cardio:{run:null, stretch:null} });
+  }
+  return out;
+}
+function importJSON(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const obj = JSON.parse(reader.result);
+      if(obj && obj.app==="PowerBear" && obj.kind==="v7-backup" && obj.data){
+        if(!confirm("このバックアップで復元しますか。今の記録は置き換わります。")) return;
+        S.settings = obj.data.settings || S.settings;
+        S.history = Array.isArray(obj.data.history)? obj.data.history : [];
+        S.draft = null; inWorkout = false;
+        save(); render(); toast("復元しました");
+        return;
+      }
+      if(obj && obj.localStorage && typeof obj.localStorage==="object"){
+        const raw = obj.localStorage["power_bear_production_v1"] || obj.localStorage["powerBearReentryV1"];
+        if(!raw) throw new Error("no-key");
+        const parsed = typeof raw==="string"? JSON.parse(raw) : raw;
+        const v6hist = extractV6History(parsed);
+        if(!v6hist) throw new Error("empty");
+        const mapped = mapV6History(v6hist);
+        if(!mapped.length) throw new Error("empty");
+        const seen = new Set(S.history.map(x=>x.date+"|"+x.menuLabel+"|"+(x.exercises||[]).length));
+        const add = mapped.filter(x=>!seen.has(x.date+"|"+x.menuLabel+"|"+x.exercises.length));
+        S.history = add.concat(S.history).sort((a,b)=> String(b.date).localeCompare(String(a.date)));
+        save(); render();
+        toast(add.length? "旧アプリの記録を "+add.length+" 件追加しました" : "追加できる新しい旧記録はありませんでした");
+        return;
+      }
+      throw new Error("format");
+    }catch(e){
+      toast("読み込めませんでした。Power Bear のバックアップファイルを選んでください");
+    }
+    input.value = "";
+  };
+  reader.readAsText(file);
+}
+
+/* ===== 初期化 ===== */
+render();
+if(S.draft && S.draft.timerEnd && S.draft.timerEnd > Date.now()) updateTimerBar();
+</script>
+</body>
+</html>
