@@ -107,11 +107,15 @@ body.timer-on #timerbar{display:block;}
 .cal-grid.dow{margin-bottom:2px;}
 .cal-dow{text-align:center; font-size:11px; color:var(--gray); padding:2px 0;}
 .cal-cell{position:relative; border:none; background:transparent; height:40px; border-radius:10px; font-size:14px; color:var(--ink); cursor:pointer; font-family:inherit;}
-.cal-cell.on{background:#e5f6ec; font-weight:800;}
-.cal-cell.on i{position:absolute; left:50%; bottom:5px; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:var(--navy);}
+.cal-cell.on{background:#eef6f1; font-weight:800;}
+.cal-dots{position:absolute; left:50%; bottom:4px; transform:translateX(-50%); display:flex; gap:2.5px;}
+.cal-dots i{width:5px; height:5px; border-radius:50%;}
+.cal-legend{display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:8px;}
+.cal-legend span{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--gray);}
+.cal-legend i{width:8px; height:8px; border-radius:50%; display:inline-block;}
 .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--navy);}
 .cal-cell.sel{background:var(--navy); color:#fff;}
-.cal-cell.sel i{background:#fff;}
+.cal-cell.sel .cal-dots i{box-shadow:0 0 0 1px rgba(255,255,255,.65);}
 span.cal-cell{cursor:default;}
 .hist-item .hd{display:flex; justify-content:space-between; align-items:baseline;}
 .badge{font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 9px; background:#e7f6ee; color:var(--navy);}
@@ -877,6 +881,8 @@ function doFinish(){
 }
 
 /* ===== 履歴 ===== */
+const PART_GROUP = { "chest":["胸","#ef4444"], "back":["背中","#3b82f6"], "shoulder":["肩","#f59e0b"], "biceps":["腕","#a855f7"], "triceps":["腕","#a855f7"], "abs":["腹","#06b6d4"], "quads":["脚","#22c55e"], "glutes":["脚","#22c55e"], "hams":["脚","#22c55e"], "calves":["脚","#22c55e"] };
+const GROUP_LEGEND = [["胸","#ef4444"],["背中","#3b82f6"],["肩","#f59e0b"],["腕","#a855f7"],["腹","#06b6d4"],["脚","#22c55e"]];
 function histCalHTML(){
   const now = new Date();
   const base = histMonth? new Date(histMonth + "-02T00:00:00") : new Date(now.getFullYear(), now.getMonth(), 2);
@@ -884,20 +890,31 @@ function histCalHTML(){
   const startDow = new Date(y, m, 1).getDay();
   const days = new Date(y, m + 1, 0).getDate();
   const trained = {};
-  for(const s of S.history){ trained[s.date] = true; }
+  const dayGroups = {};
+  for(const s of S.history){
+    trained[s.date] = true;
+    const arr = dayGroups[s.date] || (dayGroups[s.date] = []);
+    for(const e of (s.exercises || [])){
+      const g = PART_GROUP[PART_OF[e.name]];
+      if(g && !arr.some(x => x[0] === g[0])) arr.push(g);
+    }
+  }
   const todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
   let cells = "";
   for(let i = 0; i < startDow; i++) cells += '<span class="cal-cell"></span>';
   for(let d = 1; d <= days; d++){
     const ds = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
     const cls = "cal-cell" + (trained[ds]? " on" : "") + (ds === todayStr? " today" : "") + (histDay === ds? " sel" : "");
-    cells += '<button class="' + cls + '" onclick="pickHistDay(\'' + ds + '\')">' + d + (trained[ds]? "<i></i>" : "") + "</button>";
+    const dots = (dayGroups[ds] || []).slice(0, 4).map(g => '<i style="background:' + g[1] + '"></i>').join("");
+    cells += '<button class="' + cls + '" onclick="pickHistDay(\'' + ds + '\')">' + d + (dots? '<span class="cal-dots">' + dots + "</span>" : "") + "</button>";
   }
   const dows = ["日","月","火","水","木","金","土"].map(d => '<span class="cal-dow">' + d + "</span>").join("");
+  const legend = GROUP_LEGEND.map(g => '<span><i style="background:' + g[1] + '"></i>' + g[0] + "</span>").join("");
   return '<div class="cal-wrap"><div class="cal-head"><button class="cal-nav" onclick="moveHistMonth(-1)">‹</button><b>' + y + "年" + (m + 1) + '月</b><button class="cal-nav" onclick="moveHistMonth(1)">›</button></div>'
     + '<div class="cal-grid dow">' + dows + '</div><div class="cal-grid">' + cells + "</div>"
+    + '<div class="cal-legend">' + legend + "</div>"
     + (histDay? '<p class="small" style="margin:8px 0 0">' + fmtDay(histDay) + ' の記録を表示中 <button class="btn ghost sm" onclick="pickHistDay(null)">すべて表示</button></p>'
-              : '<p class="muted small" style="margin:8px 0 0">緑の日がトレーニングした日です。タップするとその日の記録だけを表示します。</p>')
+              : '<p class="muted small" style="margin:8px 0 0">日の下の色は、その日に鍛えた部位です。タップするとその日の記録だけを表示します。</p>')
     + "</div>";
 }
 function moveHistMonth(delta){
