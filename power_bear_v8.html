@@ -538,6 +538,12 @@ function viewToday(){
       + '<button class="btn" onclick="resumeWorkout()">続きから始める →</button>'
       + '<button class="btn ghost sm" style="margin-top:8px" onclick="confirmDiscard()">下書きを破棄する</button></div>';
   } else {
+    if(!origProg) origProg = ORIG[String(st.freq)] ? String(st.freq) : "4";
+    const prog0 = ORIG[origProg];
+    h += '<div class="sec"><h2>プログラムを選ぶ</h2>'
+      + '<p class="lbl">週に何回やる？</p><div class="seg" style="margin-bottom:8px">' + Object.keys(ORIG).map(function(k){ return '<button class="'+(origProg===k?"on":"")+'" onclick="setOrigProg(\''+k+'\')">'+esc(ORIG[k].name)+"</button>"; }).join("") + "</div>"
+      + '<p class="lbl">フェーズ</p><div class="seg">' + ["1","2","3"].map(function(p){ return '<button class="'+(origPhase===p?"on":"")+'" onclick="setOrigPhase(\''+p+'\')">フェーズ'+p+"</button>"; }).join("") + "</div>"
+      + '<p class="muted small" style="margin:6px 0 0">'+esc(prog0.name)+'：'+esc(prog0.sub)+' ― 選んだ内容のメニューは、クマ（部位別コンディション）の下に表示されます。</p></div>';
     h += '<button class="banner" onclick="startWorkout(\''+nid+'\')"><span>トレーニングを始める</span><span>→</span></button>';
     h += '<div class="rowline"><span class="muted">マイメニュー</span><button class="linkbtn" onclick="openMenuSheet()">新しく記録 ＋</button></div>';
     const sum = menuSummary(nid, st.stage);
@@ -553,23 +559,19 @@ function viewToday(){
   h += '<div class="weekline"><span>今週 <b class="bignum">'+wk.length+" / "+st.freq+'日</b></span><span class="muted">'+wk.length+'回のトレーニング</span><button class="linkbtn" onclick="goTab(\'settings\')">目標設定</button></div>';
   h += viewRecoverySection();
   if(!S.draft){
-    h += '<div class="sec"><h2>ほかのメニュー</h2><div class="chips">';
-    for(const id of ORDER){
-      const s2 = menuSummary(id, st.stage);
-      h += '<button class="chip" onclick="startWorkout(\''+id+'\')">'+esc(MENUS[id].label)+'<span class="sub2">'+s2.list.length+'種目 · '+s2.sets+'セット</span></button>';
-    }
-    h += "</div></div>";
-    if(!origProg) origProg = ORIG[String(st.freq)] ? String(st.freq) : "4";
     const prog = ORIG[origProg];
-    h += '<div class="sec"><h2>従来メニュー（原本）</h2><p class="muted small">V6までのプログラムです。再開期メニューとは別の内容で、ここからも記録を始められます。</p>'
-      + '<div class="seg" style="margin-bottom:8px">' + Object.keys(ORIG).map(function(k){ return '<button class="'+(origProg===k?"on":"")+'" onclick="setOrigProg(\''+k+'\')">'+esc(ORIG[k].name)+"</button>"; }).join("") + "</div>"
-      + '<div class="seg" style="margin-bottom:8px">' + ["1","2","3"].map(function(p){ return '<button class="'+(origPhase===p?"on":"")+'" onclick="setOrigPhase(\''+p+'\')">フェーズ'+p+"</button>"; }).join("") + "</div>"
-      + '<p class="muted small">'+esc(prog.sub)+'</p><div class="chips">';
+    h += '<div class="sec"><h2>'+esc(prog.name)+'・フェーズ'+origPhase+' のメニュー</h2><p class="muted small">従来プログラム（V6原本）です。上の「プログラムを選ぶ」で選んだ内容を表示しています。ここからも記録を始められます。</p><div class="chips">';
     prog.days.forEach(function(day, di){
       const items = day.ph[origPhase] || day.ph["1"];
       const sets = items.reduce(function(n,it){ return n+it[1]; },0);
       h += '<button class="chip" onclick="startOriginal(\''+origProg+'\','+di+',\''+origPhase+'\')">'+esc(day.lbl)+'<span class="sub2">'+items.length+'種目 · '+sets+'セット</span></button>';
     });
+    h += "</div></div>";
+    h += '<div class="sec"><h2>再開期メニュー</h2><p class="muted small">いまの段階（'+esc(STAGES[st.stage])+'）に合わせた軽めのメニューです。上の従来プログラムとは別の内容で、各種目少なめの構成になっています。</p><div class="chips">';
+    for(const id of ORDER){
+      const s2 = menuSummary(id, st.stage);
+      h += '<button class="chip" onclick="startWorkout(\''+id+'\')">'+esc(MENUS[id].label)+'<span class="sub2">'+s2.list.length+'種目 · '+s2.sets+'セット</span></button>';
+    }
     h += "</div></div>";
   }
   if(S.history.length){
@@ -588,7 +590,7 @@ function viewToday(){
   return h;
 }
 function goTab(t){ tab = t; inWorkout = false; render(); window.scrollTo(0,0); }
-function setOrigProg(k){ origProg = k; render(); }
+function setOrigProg(k){ origProg = k; if(S.settings.freq !== Number(k)){ S.settings.freq = Number(k); save(); } render(); }
 function setOrigPhase(p){ origPhase = p; render(); }
 function resumeWorkout(){ inWorkout = true; render(); window.scrollTo(0,0); }
 function confirmDiscard(){
@@ -1063,7 +1065,7 @@ function viewSettings(){
   const st = S.settings;
   let h = "<h1>設定</h1>";
   h += '<div class="card"><h2>週に何回行くか</h2><div class="seg">'
-    + [3,4,5].map(n=>'<button class="'+(st.freq===n?"on":"")+'" onclick="setOpt(\'freq\','+n+')">週'+n+"回</button>").join("") + "</div></div>";
+    + [3,4,5,6].map(n=>'<button class="'+(st.freq===n?"on":"")+'" onclick="setOpt(\'freq\','+n+')">週'+n+"回</button>").join("") + "</div></div>";
   h += '<div class="card"><h2>段階（使う器具の進み具合）</h2><div class="seg">'
     + [1,2,3].map(n=>'<button class="'+(st.stage===n?"on":"")+'" onclick="setOpt(\'stage\','+n+')">段階'+n+'<span class="sub2">'+["マシン中心","スミス・DB併用","フリーウェイト中心"][n-1]+"</span></button>").join("") + "</div>"
     + '<p class="muted small">段階は次のトレーニングから反映されます。記録中の下書きには影響しません。</p></div>';
@@ -1082,7 +1084,7 @@ function viewSettings(){
     + '<button class="btn danger" onclick="confirmWipe()">すべてのデータを消す</button></div>';
   return h;
 }
-function setOpt(k,v){ S.settings[k] = v; save(); render(); }
+function setOpt(k,v){ S.settings[k] = v; if(k==="freq" && ORIG[String(v)]) origProg = String(v); save(); render(); }
 function confirmWipe(){
   openSheet("<h2>本当にすべて消しますか</h2><p class='muted'>履歴・下書き・設定がすべて消えます。バックアップファイルがあれば復元できます。</p>"
     + '<button class="btn danger" onclick="doWipe()">消す</button>'
